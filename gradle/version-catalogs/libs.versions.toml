@@ -1,0 +1,17 @@
+[versions]
+projektor = "6.+"
+kotlin-poet = "2.3.0"
+java-poet = "0.14.0"
+
+[plugins]
+projektor = { id = "io.github.diskria.projektor", version.ref = "projektor" }
+
+[libraries]
+kotlin-poet = { group = "com.squareup", name = "kotlinpoet", version.ref = "kotlin-poet" }
+java-poet = { group = "com.palantir.javapoet", name = "javapoet", version.ref = "java-poet" }
+
+[bundles]
+poets = [
+    "kotlin-poet",
+    "java-poet",
+]
