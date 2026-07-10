@@ -2,12 +2,33 @@ package io.github.diskria.poetesse.java
 
 import com.palantir.javapoet.JavaFile
 import com.palantir.javapoet.TypeSpec
+import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseFile
-import io.github.diskria.poetesse.PoetesseSettings
+import java.nio.file.Path
 import javax.annotation.processing.Filer
+import kotlin.io.path.createDirectories
+import kotlin.io.path.isDirectory
+import kotlin.io.path.notExists
+import kotlin.io.path.outputStream
 
-abstract class JPFile : PoetesseFile() {
+abstract class JPFile : PoetesseFile {
+
     override val extensionName: String = "java"
+    override val relativePath: String
+        get() = buildString {
+            packageName?.let { append(it.replace('.', '/') + "/") }
+            append("$fileName.$extensionName")
+        }
+
+    override fun writeTo(directory: Path): Path {
+        require(directory.notExists() || directory.isDirectory()) {
+            "path '$directory' exists but is not a directory."
+        }
+        val outputPath = directory.resolve(relativePath)
+        outputPath.parent.createDirectories()
+        outputPath.outputStream().bufferedWriter().use(::writeTo)
+        return outputPath
+    }
 }
 
 class SingleClassJPFile(
@@ -29,7 +50,7 @@ class MultiClassJPFile private constructor(
     override val packageName: String?,
     override val fileName: String,
     private val typeSpecs: List<TypeSpec>,
-    private val settings: PoetesseSettings,
+    private val settings: Poetesse.Settings,
 ) : JPFile() {
 
     private val staticImports: MutableSet<String> = mutableSetOf()
@@ -153,7 +174,7 @@ class MultiClassJPFile private constructor(
             packageName: String?,
             fileName: String,
             typeSpecs: List<TypeSpec>,
-            settings: PoetesseSettings,
+            settings: Poetesse.Settings,
         ): MultiClassJPFile {
             val file = MultiClassJPFile(packageName, fileName, typeSpecs, settings)
             val typeCollector = file.TypeCollector()

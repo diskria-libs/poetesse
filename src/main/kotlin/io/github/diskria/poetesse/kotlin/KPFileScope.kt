@@ -2,23 +2,26 @@ package io.github.diskria.poetesse.kotlin
 
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.TypeSpecHolder
+import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseKotlin
-import io.github.diskria.poetesse.PoetesseSettings
 import io.github.diskria.poetesse.XClassName
-import io.github.diskria.poetesse.kotlin.KotlinScope.File
+import io.github.diskria.poetesse.kotlin.KPRootScope.File
 
 @PoetesseKotlin
 class KPFileScope private constructor(
+    private val packageName: String?,
     val fileName: String,
     private val specBuilder: FileSpec.Builder,
 ) : KPTypeContainerScope {
 
-    override val typeSpecHolderBuilder: TypeSpecHolder.Builder<*> get() = specBuilder
+    internal val typeContainerInternalScope = object : KPTypeContainerScope.Companion.Internal {
+        override val specHolderBuilder: TypeSpecHolder.Builder<*> get() = specBuilder
 
-    fun type(kind: KPTypeKind, name: String, block: KPTypeScope.() -> Unit = {}): XClassName =
-        addType(kind, name, className = XClassName.of(specBuilder.packageName.takeIf { it.isNotEmpty() }, name), block)
+        override fun innerClassName(name: String): XClassName =
+            XClassName.of(packageName, name)
+    }
 
-    internal fun build(settings: PoetesseSettings): KPFile {
+    internal fun build(settings: Poetesse.Settings): KPFile {
         val file = specBuilder.apply {
             indent(settings.indent)
             settings.comment?.let { addFileComment(it) }
@@ -28,6 +31,6 @@ class KPFileScope private constructor(
 
     internal companion object {
         fun of(packageName: String?, fileName: String): KPFileScope =
-            KPFileScope(fileName, File.builder(packageName.orEmpty(), fileName))
+            KPFileScope(packageName, fileName, File.builder(packageName.orEmpty(), fileName))
     }
 }

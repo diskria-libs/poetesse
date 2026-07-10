@@ -1,10 +1,10 @@
 package io.github.diskria.poetesse.java
 
+import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseJava
-import io.github.diskria.poetesse.PoetesseSettings
 
 @PoetesseJava
-class JavaScope(internal val settings: PoetesseSettings) {
+class JPRootScope(internal val settings: Poetesse.Settings) {
     typealias FileBuilder = com.palantir.javapoet.JavaFile.Builder
     typealias File = com.palantir.javapoet.JavaFile
 

@@ -7,6 +7,6 @@ enum class KPTypeKind {
     OBJECT,
     INTERFACE,
     FUN_INTERFACE,
-    ENUM,
+    ENUM_CLASS,
     ANNOTATION,
 }

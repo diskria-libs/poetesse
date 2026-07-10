@@ -10,11 +10,13 @@ class JPTypeScope private constructor(
     private val specBuilder: TypeSpec.Builder
 ): JPTypeContainerScope {
 
-    fun type(kind: JPTypeKind, name: String, block: JPTypeScope.() -> Unit = {}): XClassName =
-        addType(kind, name, className = className.inner(name), block)
+    internal val typeContainerInternalScope = object : JPTypeContainerScope.Companion.Internal {
+        override fun innerClassName(name: String): XClassName =
+            className.inner(name)
 
-    override fun addType(typeSpec: TypeSpec) {
-        specBuilder.addType(typeSpec)
+        override fun addType(typeSpec: TypeSpec) {
+            specBuilder.addType(typeSpec)
+        }
     }
 
     internal fun build(): TypeSpec =

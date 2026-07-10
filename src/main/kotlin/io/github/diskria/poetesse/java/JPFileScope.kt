@@ -2,8 +2,8 @@ package io.github.diskria.poetesse.java
 
 import com.palantir.javapoet.JavaFile
 import com.palantir.javapoet.TypeSpec
+import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseJava
-import io.github.diskria.poetesse.PoetesseSettings
 import io.github.diskria.poetesse.XClassName
 
 @PoetesseJava
@@ -14,14 +14,16 @@ class JPFileScope private constructor(
 
     private val typeSpecs: MutableList<TypeSpec> = mutableListOf()
 
-    fun type(kind: JPTypeKind, name: String, block: JPTypeScope.() -> Unit = {}): XClassName =
-        addType(kind, name, className = XClassName.of(packageName.orEmpty(), name), block)
+    internal val typeContainerInternalScope = object : JPTypeContainerScope.Companion.Internal {
+        override fun innerClassName(name: String): XClassName =
+            XClassName.of(packageName, name)
 
-    override fun addType(typeSpec: TypeSpec) {
-        typeSpecs += typeSpec
+        override fun addType(typeSpec: TypeSpec) {
+            typeSpecs += typeSpec
+        }
     }
 
-    internal fun build(settings: PoetesseSettings): JPFile {
+    internal fun build(settings: Poetesse.Settings): JPFile {
         val primaryTypeSpec = requireNotNull(typeSpecs.find { it.name() == fileName }) {
             "File '$fileName' cannot be built because primary type was not configured."
         }

@@ -1,10 +1,10 @@
 package io.github.diskria.poetesse.kotlin
 
+import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseKotlin
-import io.github.diskria.poetesse.PoetesseSettings
 
 @PoetesseKotlin
-class KotlinScope(internal val settings: PoetesseSettings) {
+class KPRootScope(internal val settings: Poetesse.Settings) {
     typealias FileBuilder = com.squareup.kotlinpoet.FileSpec.Builder
     typealias File = com.squareup.kotlinpoet.FileSpec
 
@@ -39,6 +39,6 @@ class KotlinScope(internal val settings: PoetesseSettings) {
 
     typealias Modifier = com.squareup.kotlinpoet.KModifier
 
-    fun file(packageName: String?, fileName: String, block: KPFileScope.() -> Unit = {}): KPFile =
+    fun file(packageName: String?, fileName: String, block: KPFileScope.() -> Unit): KPFile =
         KPFileScope.of(packageName, fileName).apply(block).build(settings)
 }
