@@ -18,11 +18,7 @@ class XClassName private constructor(
     val nestedName: String = simpleNames.joinToString(".")
     val qualifiedName: String = listOfNotNull(packageName, nestedName).joinToString(".")
 
-    val outer: XClassName?
-        get() = if (simpleNames.size == 1) null
-        else XClassName(packageName, simpleNames.dropLast(1))
-
-    fun inner(name: String): XClassName =
+    fun nested(name: String): XClassName =
         XClassName(packageName, simpleNames + name)
 
     companion object {

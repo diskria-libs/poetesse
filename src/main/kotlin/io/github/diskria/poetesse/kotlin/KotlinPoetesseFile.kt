@@ -5,12 +5,12 @@ import io.github.diskria.poetesse.PoetesseFile
 import java.nio.file.Path
 import javax.annotation.processing.Filer
 
-class KPFile internal constructor(private val spec: FileSpec) : PoetesseFile {
+class KotlinPoetesseFile internal constructor(private val spec: FileSpec) : PoetesseFile {
 
-    override val packageName: String? get() = spec.packageName.takeIf { it.isNotEmpty() }
-    override val fileName: String get() = spec.name
+    override val packageName: String? = spec.packageName.takeIf { it.isNotEmpty() }
+    override val fileName: String = spec.name
     override val extensionName: String = "kt"
-    override val relativePath: String get() = spec.relativePath
+    override val relativePath: String = spec.relativePath
 
     override fun writeTo(out: Appendable) {
         spec.writeTo(out)

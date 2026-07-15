@@ -4,7 +4,6 @@ import java.nio.file.Path
 import javax.annotation.processing.Filer
 
 interface PoetesseFile {
-
     val packageName: String?
     val fileName: String
     val extensionName: String

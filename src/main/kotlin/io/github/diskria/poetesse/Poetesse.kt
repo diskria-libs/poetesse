@@ -1,14 +1,14 @@
 package io.github.diskria.poetesse
 
-import io.github.diskria.poetesse.java.JPRootScope
-import io.github.diskria.poetesse.kotlin.KPRootScope
+import io.github.diskria.poetesse.java.JavaRootScope
+import io.github.diskria.poetesse.kotlin.KotlinRootScope
 
 @PoetesseKotlin
 @PoetesseJava
 class Poetesse private constructor(val settings: Settings) {
 
-    val kotlin: KPRootScope get() = KPRootScope(settings)
-    val java: JPRootScope get() = JPRootScope(settings)
+    val kotlin: KotlinRootScope get() = KotlinRootScope(settings)
+    val java: JavaRootScope get() = JavaRootScope(settings)
 
     inline operator fun <T> invoke(block: Poetesse.() -> T): T =
         block()
@@ -22,7 +22,7 @@ class Poetesse private constructor(val settings: Settings) {
         var indent: String = Default.settings.indent
         var commentHeader: String? = Default.settings.comment
 
-        fun build(): Poetesse =
+        internal fun build(): Poetesse =
             Poetesse(Settings(indent, commentHeader))
     }
 
