@@ -9,7 +9,8 @@ class JavaRootScope(
     internal val settings: Poetesse.Settings
 ) : JavaCodeFactory,
     JavaCodeBlockFactory,
-    JavaAnnotationFactory {
+    JavaAnnotationFactory,
+    JavaTypeFactory {
 
     fun file(packageName: String?, name: String, block: JavaFileScope.() -> Unit): JavaDeferredFile =
         JavaFileScope.of(packageName, name).apply(block).build(settings)

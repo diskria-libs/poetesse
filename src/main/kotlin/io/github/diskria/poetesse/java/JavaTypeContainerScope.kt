@@ -4,11 +4,11 @@ import io.github.diskria.poetesse.XClassName
 
 class JavaTypeContainerScope private constructor() {
 
-    sealed interface External {
+    sealed interface External : JavaTypeFactory {
 
         fun type(kind: JPTypeKind, name: String, block: JavaTypeScope.() -> Unit = {}): XClassName = with(internal) {
             val className = nestedClassName(name)
-            append(JavaTypeScope.of(kind, name, className).apply(block).build())
+            append((this@External as JavaTypeFactory).type(kind, name, block).build(className))
             return className
         }
 
@@ -26,6 +26,12 @@ class JavaTypeContainerScope private constructor() {
 
         fun annotation_(name: String, block: JavaTypeScope.() -> Unit = {}): XClassName =
             type(JPTypeKind.ANNOTATION, name, block)
+
+        operator fun JavaDeferredType.unaryPlus(): XClassName {
+            val className = internal.nestedClassName(name)
+            internal.append(build(className))
+            return className
+        }
     }
 
     internal interface Internal {
