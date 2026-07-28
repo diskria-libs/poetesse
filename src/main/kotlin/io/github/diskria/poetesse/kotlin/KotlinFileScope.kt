@@ -21,12 +21,12 @@ class KotlinFileScope private constructor(
         specHolderBuilder = specBuilder
     )
 
-    internal fun build(settings: Poetesse.Settings): KotlinPoetesseFile {
+    internal fun build(settings: Poetesse.Settings): KotlinDeferredFile {
         val file = specBuilder.apply {
             indent(settings.indent)
             settings.comment?.let { addFileComment(it) }
         }.build()
-        return KotlinPoetesseFile(file)
+        return KotlinDeferredFile(file)
     }
 
     internal companion object {

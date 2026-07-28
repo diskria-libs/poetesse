@@ -8,15 +8,37 @@ internal typealias JavaStatementBuilder = JavaStatementScope.() -> String
 
 @PoetesseJava
 @JvmInline
-value class JavaStatementScope private constructor(private val arguments: MutableList<Any> = mutableListOf()) {
+value class JavaStatementScope private constructor(
+    private val arguments: MutableList<Any> = mutableListOf()
+) : JavaCodeFactory {
 
     fun S(argument: String): String {
         arguments += argument
         return $$"$S"
     }
 
-    fun L(argument: Any): String {
+    fun L(argument: Boolean): String {
         arguments += argument
+        return $$"$L"
+    }
+
+    fun L(argument: Int): String {
+        arguments += argument
+        return $$"$L"
+    }
+
+    fun L(argument: String): String {
+        arguments += argument
+        return $$"$L"
+    }
+
+    fun L(argument: JavaDeferredAnnotation<*>): String {
+        arguments += argument.spec
+        return $$"$L"
+    }
+
+    fun L(argument: JavaDeferredCode): String {
+        arguments += argument.statement
         return $$"$L"
     }
 
@@ -34,9 +56,9 @@ value class JavaStatementScope private constructor(private val arguments: Mutabl
     }
 
     internal companion object {
-        fun create(statement: JavaStatementBuilder): JPCodeBlock =
+        fun of(build: JavaStatementBuilder): JavaDeferredCode =
             JavaStatementScope().let {
-                JPCodeBlock.of(it.statement(), *it.arguments.toTypedArray())
+                JavaDeferredCode(JPCodeBlock.of(it.build(), *it.arguments.toTypedArray()))
             }
     }
 }

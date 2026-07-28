@@ -18,18 +18,18 @@ class JavaFileScope private constructor(
         nestedClassName = { name -> XClassName.of(packageName, name) },
     )
 
-    internal fun build(settings: Poetesse.Settings): JavaPoetesseFile {
+    internal fun build(settings: Poetesse.Settings): JavaDeferredFile {
         val primaryType = requireNotNull(types.find { it.name() == fileName }) {
             "File '$fileName' cannot be built because primary type was not configured."
         }
         if (types.size > 1) {
-            return MultiClassJavaPoetesseFile.mergeFrom(packageName, fileName, types, settings)
+            return MultiClassJavaDeferredFile.mergeFrom(packageName, fileName, types, settings)
         }
         val javaFile = JavaFile.builder(packageName.orEmpty(), primaryType).apply {
             indent(settings.indent)
             settings.comment?.let { addFileComment(it) }
         }.build()
-        return SingleClassJavaPoetesseFile(packageName, fileName, javaFile)
+        return SingleClassJavaDeferredFile(packageName, fileName, javaFile)
     }
 
     internal companion object {

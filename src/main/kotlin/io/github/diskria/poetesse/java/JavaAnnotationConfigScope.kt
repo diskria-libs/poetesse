@@ -1,22 +1,25 @@
 package io.github.diskria.poetesse.java
 
-import com.palantir.javapoet.AnnotationSpec
 import io.github.diskria.poetesse.XClassName
 import kotlin.reflect.KClass
 
 class JavaAnnotationConfigScope private constructor() {
 
-    sealed interface External
+    sealed interface External : JavaAnnotationFactory {
+        operator fun JavaDeferredAnnotation<*>.unaryPlus() {
+            internal.append(this)
+        }
+    }
 
     @PublishedApi internal interface Internal {
 
-        fun append(annotation: JPAnnotation)
+        fun append(annotation: JavaDeferredAnnotation<*>)
 
         companion object {
             internal fun of(
-                append: (annotation: AnnotationSpec) -> Unit,
+                append: (annotation: JavaDeferredAnnotation<*>) -> Unit,
             ): Internal = object : Internal {
-                override fun append(annotation: AnnotationSpec) = append(annotation)
+                override fun append(annotation: JavaDeferredAnnotation<*>) = append(annotation)
             }
         }
     }
@@ -26,20 +29,20 @@ fun <A : Annotation> JavaAnnotationConfigScope.External.annotation(
     kClass: KClass<out A>,
     block: JavaAnnotationScope<A>.() -> Unit = {}
 ) {
-    internal.append(JavaAnnotationScope.of(kClass).apply(block).build())
+    internal.append((this as JavaAnnotationFactory).annotation(kClass, block))
 }
 
 inline fun <reified A : Annotation> JavaAnnotationConfigScope.External.annotation(
     noinline block: JavaAnnotationScope<A>.() -> Unit = {}
 ) {
-    internal.append(JavaAnnotationScope.of<A>().apply(block).build())
+    internal.append((this as JavaAnnotationFactory).annotation<A>(block))
 }
 
 fun JavaAnnotationConfigScope.External.annotation(
     className: XClassName,
     block: JavaAnnotationScope<Annotation>.() -> Unit = {}
 ) {
-    internal.append(JavaAnnotationScope.of(className).apply(block).build())
+    internal.append((this as JavaAnnotationFactory).annotation(className, block))
 }
 
 @PublishedApi
