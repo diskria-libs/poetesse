@@ -17,7 +17,7 @@ class JavaMethodContainerScope private constructor() {
 
         operator fun JavaDeferredMethod.unaryPlus(): XFunctionName {
             internal.append(spec)
-            return XFunctionName.of(spec.name())
+            return XFunctionName.of(name)
         }
     }
 

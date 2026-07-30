@@ -1,5 +1,8 @@
 package io.github.diskria.poetesse
 
+import com.squareup.kotlinpoet.asClassName
+import kotlin.reflect.KClass
+
 class XClassName private constructor(
     val packageName: String?,
     private val simpleNames: List<String>,
@@ -24,5 +27,15 @@ class XClassName private constructor(
     companion object {
         fun of(packageName: String?, vararg simpleNames: String): XClassName =
             XClassName(packageName, simpleNames.toList())
+
+        fun of(kClass: KClass<*>): XClassName {
+            val className = kClass.asClassName()
+            return of(
+                className.packageName.takeIf { it.isNotEmpty() },
+                *className.simpleNames.toTypedArray()
+            )
+        }
+
+        inline fun <reified T> of(): XClassName = of(T::class)
     }
 }

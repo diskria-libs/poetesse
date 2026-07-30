@@ -1,7 +1,7 @@
 package io.github.diskria.poetesse.java
 
-class JavaDeferredCodeBlock internal constructor(buildBlock: JavaMultiLineCodeBlockScope.() -> Unit) {
-    internal val statements: List<JPCodeBlock> by lazy {
-        JavaMultiLineCodeBlockScope().apply(buildBlock).buildStatements()
+class JavaDeferredCodeBlock internal constructor(build: JavaCodeBlockScope.() -> Unit) {
+    internal val codeBlocks: List<JPCodeBlock> by lazy {
+        JavaCodeBlockScope().apply(build).build()
     }
 }

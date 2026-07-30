@@ -2,7 +2,6 @@ package io.github.diskria.poetesse.kotlin
 
 import com.squareup.kotlinpoet.FileSpec
 import io.github.diskria.poetesse.PoetesseFile
-import java.io.OutputStream
 import java.nio.file.Path
 import javax.annotation.processing.Filer
 

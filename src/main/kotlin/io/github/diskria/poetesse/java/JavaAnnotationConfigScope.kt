@@ -26,27 +26,28 @@ class JavaAnnotationConfigScope private constructor() {
 }
 
 fun <A : Annotation> JavaAnnotationConfigScope.External.annotation(
+    className: XClassName,
+    block: JavaAnnotationScope<A>.() -> Unit = {}
+) {
+    internal.append((this as JavaAnnotationFactory).annotation(className, block))
+}
+
+fun <A : Annotation> JavaAnnotationConfigScope.External.annotation(
     kClass: KClass<out A>,
     block: JavaAnnotationScope<A>.() -> Unit = {}
 ) {
-    internal.append((this as JavaAnnotationFactory).annotation(kClass, block))
+    annotation(XClassName.of(kClass), block)
 }
 
 inline fun <reified A : Annotation> JavaAnnotationConfigScope.External.annotation(
     noinline block: JavaAnnotationScope<A>.() -> Unit = {}
 ) {
-    internal.append((this as JavaAnnotationFactory).annotation<A>(block))
-}
-
-fun JavaAnnotationConfigScope.External.annotation(
-    className: XClassName,
-    block: JavaAnnotationScope<Annotation>.() -> Unit = {}
-) {
-    internal.append((this as JavaAnnotationFactory).annotation(className, block))
+    annotation(A::class, block)
 }
 
 @PublishedApi
 internal val JavaAnnotationConfigScope.External.internal: JavaAnnotationConfigScope.Internal
     get() = when (this) {
         is JavaTypeScope -> annotationConfigInternalScope
+        is JavaMethodScope -> annotationConfigInternalScope
     }

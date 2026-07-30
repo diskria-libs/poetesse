@@ -14,11 +14,11 @@ class JavaAnnotationScope<A : Annotation> @PublishedApi internal constructor(
     private typealias ArrayArgumentProperty<A, E> = ArgumentProperty<A, Array<out E>>
 
     fun argument(name: String, deferredCode: JavaDeferredCode) {
-        specBuilder.addMember(name, deferredCode.statement)
+        specBuilder.addMember(name, deferredCode.codeBlock)
     }
 
-    fun argument(name: String, buildStatement: JavaStatementBuilder) {
-        argument(name, JavaStatementScope.of(buildStatement))
+    fun argument(name: String, buildValueCode: JavaCodeBuilder) {
+        argument(name, JavaCodeScope.of(buildValueCode))
     }
 
     fun argument(property: ArgumentProperty<A, String>, value: String) {
@@ -28,7 +28,7 @@ class JavaAnnotationScope<A : Annotation> @PublishedApi internal constructor(
     @JvmName("stringArrayArgument")
     fun argument(property: ArrayArgumentProperty<A, String>, values: Iterable<String>) {
         argument(property.name) {
-            values.joinToArray { S(it) }
+            values.joinToArgumentArray { S(it) }
         }
     }
 
@@ -44,7 +44,7 @@ class JavaAnnotationScope<A : Annotation> @PublishedApi internal constructor(
     @JvmName("booleanArrayArgument")
     fun argument(property: ArgumentProperty<A, BooleanArray>, values: Iterable<Boolean>) {
         argument(property.name) {
-            values.joinToArray { L(it) }
+            values.joinToArgumentArray { L(it) }
         }
     }
 
@@ -60,7 +60,7 @@ class JavaAnnotationScope<A : Annotation> @PublishedApi internal constructor(
     @JvmName("intArrayArgument")
     fun argument(property: ArgumentProperty<A, IntArray>, values: Iterable<Int>) {
         argument(property.name) {
-            values.joinToArray { L(it) }
+            values.joinToArgumentArray { L(it) }
         }
     }
 
@@ -70,13 +70,13 @@ class JavaAnnotationScope<A : Annotation> @PublishedApi internal constructor(
     }
 
     fun argument(property: ArgumentProperty<A, KClass<*>>, value: KClass<*>) {
-        argument(property.name) { classRef(value) }
+        argument(property.name) { classReference(value)  }
     }
 
     @JvmName("classArrayArgument")
     fun argument(property: ArrayArgumentProperty<A, KClass<*>>, values: Iterable<KClass<*>>) {
         argument(property.name) {
-            values.joinToArray { classRef(it) }
+            values.joinToArgumentArray { classReference(it) }
         }
     }
 
@@ -86,13 +86,13 @@ class JavaAnnotationScope<A : Annotation> @PublishedApi internal constructor(
     }
 
     fun argument(property: ArgumentProperty<A, KClass<*>>, value: XClassName) {
-        argument(property.name) { classRef(value) }
+        argument(property.name) { classReference(value) }
     }
 
     @JvmName("classNameArgument")
     fun argument(property: ArrayArgumentProperty<A, KClass<*>>, values: Iterable<XClassName>) {
         argument(property.name) {
-            values.joinToArray { classRef(it) }
+            values.joinToArgumentArray { classReference(it) }
         }
     }
 
@@ -103,13 +103,13 @@ class JavaAnnotationScope<A : Annotation> @PublishedApi internal constructor(
 
     @JvmName("enumArgument")
     inline fun <reified E : Enum<E>> argument(property: ArgumentProperty<A, E>, value: E) {
-        argument(property.name) { enumEntryRef<E>(value) }
+        argument(property.name) { enumEntryReference(value) }
     }
 
     @JvmName("enumArrayArgument")
     inline fun <reified E : Enum<E>> argument(property: ArrayArgumentProperty<A, E>, values: Iterable<E>) {
         argument(property.name) {
-            values.joinToArray { enumEntryRef<E>(it) }
+            values.joinToArgumentArray { enumEntryReference(it) }
         }
     }
 
@@ -130,7 +130,7 @@ class JavaAnnotationScope<A : Annotation> @PublishedApi internal constructor(
         property: ArgumentProperty<A, Embedded>,
         noinline block: JavaAnnotationScope<Embedded>.() -> Unit = {}
     ) {
-        argument(property, of<Embedded>().apply(block).build())
+        argument(property, JavaDeferredAnnotation { of<Embedded>().apply(block).build() })
     }
 
     @JvmName("annotationArrayArgument")
@@ -139,7 +139,7 @@ class JavaAnnotationScope<A : Annotation> @PublishedApi internal constructor(
         values: Iterable<JavaDeferredAnnotation<Embedded>>
     ) {
         argument(property.name) {
-            values.joinToArray { L(it) }
+            values.joinToArgumentArray { L(it) }
         }
     }
 
@@ -152,32 +152,22 @@ class JavaAnnotationScope<A : Annotation> @PublishedApi internal constructor(
     }
 
     @PublishedApi
-    internal fun build(): JavaDeferredAnnotation<A> =
-        JavaDeferredAnnotation { specBuilder.build() }
+    internal fun build(): JPAnnotation =
+        specBuilder.build()
 
     @PublishedApi
     internal companion object {
+        fun <A : Annotation> of(className: XClassName): JavaAnnotationScope<A> =
+            JavaAnnotationScope(JPAnnotation.builder(className.java))
+
         fun <A : Annotation> of(kClass: KClass<out A>): JavaAnnotationScope<A> =
-            JavaAnnotationScope(JPAnnotation.builder(kClass.java))
+            of(XClassName.of(kClass))
 
         inline fun <reified A : Annotation> of(): JavaAnnotationScope<A> =
             of(A::class)
-
-        fun of(className: XClassName): JavaAnnotationScope<Annotation> =
-            JavaAnnotationScope(JPAnnotation.builder(className.java))
     }
 }
 
 @PublishedApi
-internal inline fun <reified E> Iterable<E>.joinToArray(crossinline transform: (E) -> String): String =
+internal inline fun <reified E> Iterable<E>.joinToArgumentArray(crossinline transform: (E) -> String): String =
     joinToString(prefix = "{", postfix = "}") { transform(it) }
-
-internal fun JavaStatementScope.classRef(value: XClassName): String =
-    "${T(value)}.class"
-
-internal fun JavaStatementScope.classRef(value: KClass<*>): String =
-    "${T(value)}.class"
-
-@PublishedApi
-internal inline fun <reified E : Enum<E>> JavaStatementScope.enumEntryRef(value: E): String =
-    "${T<E>()}.${L(value.name)}"

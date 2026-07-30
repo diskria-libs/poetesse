@@ -4,11 +4,11 @@ import io.github.diskria.poetesse.PoetesseJava
 import io.github.diskria.poetesse.XClassName
 import kotlin.reflect.KClass
 
-typealias JavaStatementBuilder = JavaStatementScope.() -> String
+typealias JavaCodeBuilder = JavaCodeScope.() -> String
 
 @PoetesseJava
 @JvmInline
-value class JavaStatementScope private constructor(
+value class JavaCodeScope private constructor(
     private val arguments: MutableList<Any> = mutableListOf()
 ) : JavaCodeFactory {
 
@@ -38,8 +38,13 @@ value class JavaStatementScope private constructor(
     }
 
     fun L(argument: JavaDeferredCode): String {
-        arguments += argument.statement
+        arguments += argument.codeBlock
         return $$"$L"
+    }
+
+    fun T(argument: XClassName): String {
+        arguments += argument.java
+        return $$"$T"
     }
 
     fun T(argument: KClass<*>): String {
@@ -50,15 +55,22 @@ value class JavaStatementScope private constructor(
     inline fun <reified T> T(): String =
         T(T::class)
 
-    fun T(argument: XClassName): String {
-        arguments += argument.java
-        return $$"$T"
-    }
-
     internal companion object {
-        fun of(build: JavaStatementBuilder): JavaDeferredCode =
-            JavaStatementScope().let {
-                JavaDeferredCode { JPCodeBlock.of(it.build(), *it.arguments.toTypedArray()) }
+        fun of(buildCode: JavaCodeBuilder): JavaDeferredCode =
+            JavaCodeScope().let {
+                JavaDeferredCode { JPCodeBlock.of(it.buildCode(), *it.arguments.toTypedArray()) }
             }
     }
 }
+
+fun JavaCodeScope.classReference(value: XClassName): String =
+    "${T(value)}.class"
+
+fun JavaCodeScope.classReference(value: KClass<*>): String =
+    "${T(value)}.class"
+
+inline fun <reified T> JavaCodeScope.classReference(): String =
+    "${T<T>()}.class"
+
+inline fun <reified E : Enum<E>> JavaCodeScope.enumEntryReference(value: E): String =
+    "${T<E>()}.${L(value.name)}"
