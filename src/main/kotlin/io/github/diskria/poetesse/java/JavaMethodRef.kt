@@ -1,6 +1,6 @@
 package io.github.diskria.poetesse.java
 
-class JavaDeferredMethod internal constructor(
+class JavaMethodRef internal constructor(
     val name: String,
     buildSpec: () -> JPMethod
 ) {

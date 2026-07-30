@@ -2,7 +2,7 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.XClassName
 
-class JavaDeferredType internal constructor(
+class JavaTypeRef internal constructor(
     val name: String,
     internal val build: (XClassName) -> JPType
 )

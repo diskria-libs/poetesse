@@ -13,9 +13,9 @@ class JavaRootScope(
     JavaTypeFactory,
     JavaMethodFactory {
 
-    fun file(packageName: String?, name: String, block: JavaFileScope.() -> Unit): JavaPoetesseFile =
+    fun file(packageName: String?, name: String, block: JavaFileScope.() -> Unit): JavaFileRef =
         JavaFileScope.of(packageName, name).apply(block).build(settings)
 
-    fun file(className: XClassName, block: JavaFileScope.() -> Unit): JavaPoetesseFile =
+    fun file(className: XClassName, block: JavaFileScope.() -> Unit): JavaFileRef =
         file(className.packageName, className.simpleName, block)
 }

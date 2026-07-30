@@ -1,11 +1,10 @@
 package io.github.diskria.poetesse.kotlin
 
-import com.squareup.kotlinpoet.FunSpec
 import io.github.diskria.poetesse.PoetesseKotlin
 
 @PoetesseKotlin
 class KotlinFunctionScope private constructor(
-    private val specBuilder: FunSpec.Builder
+    private val specBuilder: KPFunctionBuilder
 ) : KotlinModifierContainer {
 
     internal val modifierContainer = KotlinModifierContainerInternal.of(
@@ -36,11 +35,11 @@ class KotlinFunctionScope private constructor(
         modifiers(KPModifier.OPERATOR)
     }
 
-    internal fun build(): FunSpec =
+    internal fun build(): KPFunction =
         specBuilder.build()
 
     internal companion object {
         fun of(name: String): KotlinFunctionScope =
-            KotlinFunctionScope(FunSpec.builder(name))
+            KotlinFunctionScope(KPFunction.builder(name))
     }
 }

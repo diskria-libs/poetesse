@@ -1,13 +1,12 @@
 package io.github.diskria.poetesse.kotlin
 
-import com.squareup.kotlinpoet.TypeSpec
 import io.github.diskria.poetesse.PoetesseKotlin
 import io.github.diskria.poetesse.XClassName
 
 @PoetesseKotlin
 class KotlinTypeScope private constructor(
     val className: XClassName,
-    private val specBuilder: TypeSpec.Builder
+    private val specBuilder: KPTypeBuilder
 ) : KotlinModifierContainer,
     KotlinTypeContainer,
     KotlinFunctionContainer {
@@ -16,11 +15,11 @@ class KotlinTypeScope private constructor(
         append = { specBuilder.addModifiers(*it) }
     )
     internal val typeContainer = KotlinTypeContainerInternal.of(
-        specHolderBuilder = specBuilder,
+        holderBuilder = specBuilder,
         nestedClassName = { name -> className.nested(name) },
     )
     internal val functionContainer = KotlinFunctionContainerInternal.of(
-        specHolderBuilder = specBuilder
+        holderBuilder = specBuilder
     )
 
     fun sealed() {
@@ -31,17 +30,17 @@ class KotlinTypeScope private constructor(
         modifiers(KPModifier.INNER)
     }
 
-    internal fun build(): TypeSpec =
+    internal fun build(): KPType =
         specBuilder.build()
 
     internal companion object {
-        fun of(kind: TypeSpec.Kind, name: String, className: XClassName): KotlinTypeScope =
+        fun of(kind: KPTypeKind, name: String, className: XClassName): KotlinTypeScope =
             KotlinTypeScope(
                 className,
                 when (kind) {
-                    TypeSpec.Kind.CLASS -> TypeSpec.classBuilder(name)
-                    TypeSpec.Kind.OBJECT -> TypeSpec.objectBuilder(name)
-                    TypeSpec.Kind.INTERFACE -> TypeSpec.interfaceBuilder(name)
+                    KPTypeKind.CLASS -> KPType.classBuilder(name)
+                    KPTypeKind.OBJECT -> KPType.objectBuilder(name)
+                    KPTypeKind.INTERFACE -> KPType.interfaceBuilder(name)
                 }
             )
     }

@@ -1,6 +1,5 @@
 package io.github.diskria.poetesse.java
 
-import com.palantir.javapoet.AnnotationSpec
 import io.github.diskria.poetesse.PoetesseJava
 import io.github.diskria.poetesse.XClassName
 import kotlin.reflect.KClass
@@ -8,12 +7,12 @@ import kotlin.reflect.KProperty1
 
 @PoetesseJava
 class JavaAnnotationScope<A : Annotation> internal constructor(
-    private val specBuilder: AnnotationSpec.Builder
+    private val specBuilder: JPAnnotationBuilder
 ) {
     private typealias ArgumentProperty<A, V> = KProperty1<out A, V>
     private typealias ArrayArgumentProperty<A, E> = ArgumentProperty<A, Array<out E>>
 
-    fun argument(name: String, deferredCode: JavaDeferredCode) {
+    fun argument(name: String, deferredCode: JavaCodeRef) {
         specBuilder.addMember(name, deferredCode.codeBlock)
     }
 
@@ -131,7 +130,7 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
     @JvmName("annotationArgument")
     inline fun <reified Embedded : Annotation> argument(
         property: ArgumentProperty<A, Embedded>,
-        annotation: JavaDeferredTypedAnnotation<Embedded>,
+        annotation: JavaTypedAnnotationRef<Embedded>,
     ) {
         argument(property) { L(annotation) }
     }
@@ -141,13 +140,13 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
         property: ArgumentProperty<A, Embedded>,
         noinline block: JavaAnnotationScope<Embedded>.() -> Unit = {}
     ) {
-        argument(property, JavaDeferredTypedAnnotation { of<Embedded>().apply(block).build() })
+        argument(property, JavaTypedAnnotationRef { of<Embedded>().apply(block).build() })
     }
 
     @JvmName("annotationArrayArgument")
     inline fun <reified Embedded : Annotation> argument(
         property: ArrayArgumentProperty<A, Embedded>,
-        values: Iterable<JavaDeferredTypedAnnotation<Embedded>>
+        values: Iterable<JavaTypedAnnotationRef<Embedded>>
     ) {
         argument(property.name) {
             arrayOf_(values) { L(it) }
@@ -157,7 +156,7 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
     @JvmName("annotationArrayArgument")
     inline fun <reified Embedded : Annotation> argument(
         property: ArrayArgumentProperty<A, Embedded>,
-        vararg values: JavaDeferredTypedAnnotation<Embedded>
+        vararg values: JavaTypedAnnotationRef<Embedded>
     ) {
         argument(property, values.asIterable())
     }

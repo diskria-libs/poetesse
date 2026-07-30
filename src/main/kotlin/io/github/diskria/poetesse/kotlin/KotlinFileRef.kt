@@ -1,11 +1,10 @@
 package io.github.diskria.poetesse.kotlin
 
-import com.squareup.kotlinpoet.FileSpec
 import io.github.diskria.poetesse.PoetesseFile
 import java.nio.file.Path
 import javax.annotation.processing.Filer
 
-class KotlinPoetesseFile internal constructor(private val spec: FileSpec) : PoetesseFile {
+class KotlinFileRef internal constructor(private val spec: KPFile) : PoetesseFile {
 
     override val packageName: String? = spec.packageName.takeIf { it.isNotEmpty() }
     override val fileName: String = spec.name

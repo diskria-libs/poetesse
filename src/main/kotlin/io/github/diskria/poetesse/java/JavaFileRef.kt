@@ -9,7 +9,7 @@ import kotlin.io.path.isDirectory
 import kotlin.io.path.notExists
 import kotlin.io.path.outputStream
 
-abstract class JavaPoetesseFile : PoetesseFile {
+abstract class JavaFileRef : PoetesseFile {
 
     override val extensionName: String = "java"
     override val relativePath: String
@@ -29,11 +29,11 @@ abstract class JavaPoetesseFile : PoetesseFile {
     }
 }
 
-class SingleClassJavaPoetesseFile internal constructor(
+class SingleClassJavaFileRef internal constructor(
     override val packageName: String?,
     override val fileName: String,
     private val file: JPFile,
-) : JavaPoetesseFile() {
+) : JavaFileRef() {
 
     override fun writeTo(out: Appendable) {
         file.writeTo(out)
@@ -44,12 +44,12 @@ class SingleClassJavaPoetesseFile internal constructor(
     }
 }
 
-class MultiClassJavaPoetesseFile private constructor(
+class MultiClassJavaFileRef private constructor(
     override val packageName: String?,
     override val fileName: String,
     private val types: List<JPType>,
     private val settings: Poetesse.Settings,
-) : JavaPoetesseFile() {
+) : JavaFileRef() {
 
     private val staticImports: MutableSet<String> = mutableSetOf()
     private val imports: MutableSet<String> = mutableSetOf()
@@ -106,8 +106,8 @@ class MultiClassJavaPoetesseFile private constructor(
             fileName: String,
             types: List<JPType>,
             settings: Poetesse.Settings,
-        ): MultiClassJavaPoetesseFile {
-            val file = MultiClassJavaPoetesseFile(packageName, fileName, types, settings)
+        ): MultiClassJavaFileRef {
+            val file = MultiClassJavaFileRef(packageName, fileName, types, settings)
             types.forEach { typeSpec ->
                 val source = JPFile.builder(packageName.orEmpty(), typeSpec)
                     .indent(settings.indent)

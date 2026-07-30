@@ -32,12 +32,12 @@ value class JavaCodeScope private constructor(
         return $$"$L"
     }
 
-    fun L(argument: JavaDeferredAnnotation): String {
+    fun L(argument: JavaAnnotationRef): String {
         arguments += argument.spec
         return $$"$L"
     }
 
-    fun L(argument: JavaDeferredCode): String {
+    fun L(argument: JavaCodeRef): String {
         arguments += argument.codeBlock
         return $$"$L"
     }
@@ -56,9 +56,9 @@ value class JavaCodeScope private constructor(
         T(T::class)
 
     internal companion object {
-        fun of(buildCode: JavaCodeBuilder): JavaDeferredCode =
+        fun of(buildCode: JavaCodeBuilder): JavaCodeRef =
             JavaCodeScope().let {
-                JavaDeferredCode { JPCodeBlock.of(it.buildCode(), *it.arguments.toTypedArray()) }
+                JavaCodeRef { JPCodeBlock.of(it.buildCode(), *it.arguments.toTypedArray()) }
             }
     }
 }

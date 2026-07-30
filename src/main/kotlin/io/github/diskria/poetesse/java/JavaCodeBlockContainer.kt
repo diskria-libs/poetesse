@@ -4,11 +4,11 @@ import io.github.diskria.poetesse.EagerDelegate
 
 sealed interface JavaCodeBlockContainer : JavaCodeBlockFactory, JavaCodeFactory {
 
-    operator fun JavaDeferredCode.unaryPlus() {
+    operator fun JavaCodeRef.unaryPlus() {
         +codeBlock
     }
 
-    operator fun JavaDeferredCodeBlock.unaryPlus() {
+    operator fun JavaCodeBlockRef.unaryPlus() {
         codeBlocks.forEach { +it }
     }
 

@@ -4,7 +4,7 @@ import io.github.diskria.poetesse.XClassName
 
 sealed interface JavaTypeContainer : JavaTypeFactory {
 
-    operator fun JavaDeferredType.unaryPlus(): XClassName {
+    operator fun JavaTypeRef.unaryPlus(): XClassName {
         val className = internal.nestedClassName(name)
         internal.append(build(className))
         return className

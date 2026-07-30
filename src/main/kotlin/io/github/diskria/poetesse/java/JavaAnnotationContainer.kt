@@ -5,7 +5,7 @@ import kotlin.reflect.KClass
 
 sealed interface JavaAnnotationContainer : JavaAnnotationFactory {
 
-    operator fun JavaDeferredAnnotation.unaryPlus() {
+    operator fun JavaAnnotationRef.unaryPlus() {
         internal.append(spec)
     }
 }

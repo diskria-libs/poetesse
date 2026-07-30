@@ -1,25 +1,24 @@
 package io.github.diskria.poetesse.kotlin
 
-import com.squareup.kotlinpoet.MemberSpecHolder
 import io.github.diskria.poetesse.XFunctionName
 
 sealed interface KotlinFunctionContainer {
 
     fun fun_(name: String, block: KotlinFunctionScope.() -> Unit = {}): XFunctionName {
-        internal.specHolderBuilder.addFunction(KotlinFunctionScope.of(name).apply(block).build())
+        internal.holderBuilder.addFunction(KotlinFunctionScope.of(name).apply(block).build())
         return XFunctionName.of(name)
     }
 }
 
 internal interface KotlinFunctionContainerInternal {
 
-    val specHolderBuilder: MemberSpecHolder.Builder<*>
+    val holderBuilder: KPMemberHolderBuilder
 
     companion object {
         fun of(
-            specHolderBuilder: MemberSpecHolder.Builder<*>,
+            holderBuilder: KPMemberHolderBuilder,
         ): KotlinFunctionContainerInternal = object : KotlinFunctionContainerInternal {
-            override val specHolderBuilder: MemberSpecHolder.Builder<*> = specHolderBuilder
+            override val holderBuilder: KPMemberHolderBuilder = holderBuilder
         }
     }
 }

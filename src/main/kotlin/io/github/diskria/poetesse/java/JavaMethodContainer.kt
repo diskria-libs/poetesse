@@ -5,7 +5,7 @@ import io.github.diskria.poetesse.XFunctionName
 
 sealed interface JavaMethodContainer : JavaMethodFactory {
 
-    operator fun JavaDeferredMethod.unaryPlus(): XFunctionName {
+    operator fun JavaMethodRef.unaryPlus(): XFunctionName {
         internal.append(spec)
         return XFunctionName.of(name)
     }
