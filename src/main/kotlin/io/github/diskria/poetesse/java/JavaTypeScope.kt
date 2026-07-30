@@ -12,7 +12,6 @@ class JavaTypeScope private constructor(
     JavaMethodContainerScope.External,
     JavaTypeContainerScope.External {
 
-    @PublishedApi
     internal val annotationConfigInternalScope = JavaAnnotationConfigScope.Internal.of(
         append = { specBuilder.addAnnotation(it.spec) },
     )

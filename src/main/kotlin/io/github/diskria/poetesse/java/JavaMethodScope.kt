@@ -11,7 +11,6 @@ class JavaMethodScope private constructor(
     internal val modifierConfigInternalScope = JavaModifierConfigScope.Internal.of(
         append = { specBuilder.addModifiers(*it) }
     )
-    @PublishedApi
     internal val annotationConfigInternalScope = JavaAnnotationConfigScope.Internal.of(
         append = { specBuilder.addAnnotation(it.spec) },
     )

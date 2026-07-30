@@ -26,7 +26,7 @@ class JavaMethodContainerScope private constructor() {
         fun append(method: JPMethod)
 
         companion object {
-            internal fun of(
+            fun of(
                 append: (method: JPMethod) -> Unit,
             ): Internal = object : Internal {
                 override fun append(method: JPMethod) = append(method)
@@ -35,8 +35,7 @@ class JavaMethodContainerScope private constructor() {
     }
 }
 
-@PublishedApi
-internal val JavaMethodContainerScope.External.internal: JavaMethodContainerScope.Internal
+private val JavaMethodContainerScope.External.internal: JavaMethodContainerScope.Internal
     get() = when (this) {
         is JavaTypeScope -> methodContainerInternalScope
     }

@@ -17,15 +17,16 @@ class KotlinFunctionContainerScope private constructor() {
         val specHolderBuilder: MemberSpecHolder.Builder<*>
 
         companion object {
-            fun of(specHolderBuilder: MemberSpecHolder.Builder<*>) = object : Internal {
+            fun of(
+                specHolderBuilder: MemberSpecHolder.Builder<*>,
+            ): Internal = object : Internal {
                 override val specHolderBuilder: MemberSpecHolder.Builder<*> = specHolderBuilder
             }
         }
     }
 }
 
-@PublishedApi
-internal val KotlinFunctionContainerScope.External.internal: KotlinFunctionContainerScope.Internal
+private val KotlinFunctionContainerScope.External.internal: KotlinFunctionContainerScope.Internal
     get() = when (this) {
         is KotlinFileScope -> functionContainerInternalScope
         is KotlinTypeScope -> functionContainerInternalScope

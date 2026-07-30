@@ -6,20 +6,20 @@ import kotlin.reflect.KClass
 class JavaAnnotationConfigScope private constructor() {
 
     sealed interface External : JavaAnnotationFactory {
-        operator fun JavaDeferredAnnotation<*>.unaryPlus() {
+        operator fun JavaDeferredAnnotation.unaryPlus() {
             internal.append(this)
         }
     }
 
-    @PublishedApi internal interface Internal {
+    internal interface Internal {
 
-        fun append(annotation: JavaDeferredAnnotation<*>)
+        fun append(annotation: JavaDeferredAnnotation)
 
         companion object {
-            internal fun of(
-                append: (annotation: JavaDeferredAnnotation<*>) -> Unit,
+            fun of(
+                append: (annotation: JavaDeferredAnnotation) -> Unit,
             ): Internal = object : Internal {
-                override fun append(annotation: JavaDeferredAnnotation<*>) = append(annotation)
+                override fun append(annotation: JavaDeferredAnnotation) = append(annotation)
             }
         }
     }
@@ -45,8 +45,7 @@ inline fun <reified A : Annotation> JavaAnnotationConfigScope.External.annotatio
     annotation(A::class, block)
 }
 
-@PublishedApi
-internal val JavaAnnotationConfigScope.External.internal: JavaAnnotationConfigScope.Internal
+private val JavaAnnotationConfigScope.External.internal: JavaAnnotationConfigScope.Internal
     get() = when (this) {
         is JavaTypeScope -> annotationConfigInternalScope
         is JavaMethodScope -> annotationConfigInternalScope

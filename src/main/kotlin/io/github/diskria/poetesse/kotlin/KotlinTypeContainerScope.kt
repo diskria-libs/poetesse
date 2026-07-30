@@ -54,14 +54,14 @@ class KotlinTypeContainerScope private constructor() {
             }
     }
 
-    @PublishedApi internal interface Internal {
+    internal interface Internal {
 
         val specHolderBuilder: TypeSpecHolder.Builder<*>
 
         fun nestedClassName(name: String): XClassName
 
         companion object {
-            internal fun of(
+            fun of(
                 specHolderBuilder: TypeSpecHolder.Builder<*>,
                 nestedClassName: (name: String) -> XClassName,
             ): Internal = object : Internal {
@@ -72,8 +72,7 @@ class KotlinTypeContainerScope private constructor() {
     }
 }
 
-@PublishedApi
-internal val KotlinTypeContainerScope.External.internal: KotlinTypeContainerScope.Internal
+private val KotlinTypeContainerScope.External.internal: KotlinTypeContainerScope.Internal
     get() = when (this) {
         is KotlinFileScope -> typeContainerInternalScope
         is KotlinTypeScope -> typeContainerInternalScope

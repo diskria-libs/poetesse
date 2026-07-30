@@ -8,17 +8,17 @@ interface JavaAnnotationFactory
 fun <A : Annotation> JavaAnnotationFactory.annotation(
     className: XClassName,
     block: JavaAnnotationScope<A>.() -> Unit = {}
-): JavaDeferredAnnotation<A> = JavaDeferredAnnotation {
-    JavaAnnotationScope.of<A>(className).apply(block).specBuilder.build()
+): JavaDeferredTypedAnnotation<A> = JavaDeferredTypedAnnotation {
+    JavaAnnotationScope.of<A>(className).apply(block).build()
 }
 
 fun <A : Annotation> JavaAnnotationFactory.annotation(
     kClass: KClass<out A>,
     block: JavaAnnotationScope<A>.() -> Unit = {}
-): JavaDeferredAnnotation<A> =
+): JavaDeferredTypedAnnotation<A> =
     annotation(XClassName.of(kClass), block)
 
 inline fun <reified A : Annotation> JavaAnnotationFactory.annotation(
     noinline block: JavaAnnotationScope<A>.() -> Unit = {}
-): JavaDeferredAnnotation<A> =
+): JavaDeferredTypedAnnotation<A> =
     annotation(A::class, block)

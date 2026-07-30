@@ -32,7 +32,7 @@ value class JavaCodeScope private constructor(
         return $$"$L"
     }
 
-    fun L(argument: JavaDeferredAnnotation<*>): String {
+    fun L(argument: JavaDeferredAnnotation): String {
         arguments += argument.spec
         return $$"$L"
     }
@@ -74,3 +74,6 @@ inline fun <reified T> JavaCodeScope.classReference(): String =
 
 inline fun <reified E : Enum<E>> JavaCodeScope.enumEntryReference(value: E): String =
     "${T<E>()}.${L(value.name)}"
+
+inline fun <reified E> JavaCodeScope.arrayOf_(values: Iterable<E>, crossinline transform: (E) -> String): String =
+    values.joinToString(prefix = "{", postfix = "}") { transform(it) }

@@ -21,7 +21,7 @@ class JavaCodeBlockContainerScope private constructor() {
         fun append(codeBlock: JPCodeBlock)
 
         companion object {
-            internal fun of(
+            fun of(
                 append: (codeBlock: JPCodeBlock) -> Unit,
             ): Internal = object : Internal {
                 override fun append(codeBlock: JPCodeBlock) = append(codeBlock)
@@ -30,8 +30,7 @@ class JavaCodeBlockContainerScope private constructor() {
     }
 }
 
-@PublishedApi
-internal val JavaCodeBlockContainerScope.External.internal: JavaCodeBlockContainerScope.Internal
+private val JavaCodeBlockContainerScope.External.internal: JavaCodeBlockContainerScope.Internal
     get() = when (this) {
         is JavaMethodScope.Body -> codeBlockContainerInternalScope
         is JavaCodeBlockScope -> codeBlockContainerInternalScope

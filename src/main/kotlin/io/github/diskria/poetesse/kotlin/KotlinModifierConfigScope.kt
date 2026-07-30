@@ -60,12 +60,12 @@ class KotlinModifierConfigScope private constructor() {
         }
     }
 
-    @PublishedApi internal interface Internal {
+    internal interface Internal {
 
         fun append(vararg modifiers: KPModifier)
 
         companion object {
-            internal fun of(
+            fun of(
                 append: (modifiers: Array<out KPModifier>) -> Unit,
             ): Internal = object : Internal {
                 override fun append(vararg modifiers: KPModifier) = append(modifiers)
@@ -74,8 +74,7 @@ class KotlinModifierConfigScope private constructor() {
     }
 }
 
-@PublishedApi
-internal val KotlinModifierConfigScope.External.internal: KotlinModifierConfigScope.Internal
+private val KotlinModifierConfigScope.External.internal: KotlinModifierConfigScope.Internal
     get() = when (this) {
         is KotlinTypeScope -> modifierConfigInternalScope
         is KotlinFunctionScope -> modifierConfigInternalScope

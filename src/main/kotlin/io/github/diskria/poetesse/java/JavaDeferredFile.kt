@@ -100,7 +100,7 @@ class MultiClassJavaDeferredFile private constructor(
         }
     }
 
-    companion object {
+    internal companion object {
         fun mergeFrom(
             packageName: String?,
             fileName: String,

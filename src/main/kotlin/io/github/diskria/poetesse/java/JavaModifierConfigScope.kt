@@ -40,12 +40,12 @@ class JavaModifierConfigScope private constructor() {
         }
     }
 
-    @PublishedApi internal interface Internal {
+    internal interface Internal {
 
         fun append(vararg modifiers: JPModifier)
 
         companion object {
-            internal fun of(
+            fun of(
                 append: (modifiers: Array<out JPModifier>) -> Unit,
             ): Internal = object : Internal {
                 override fun append(vararg modifiers: JPModifier) = append(modifiers)
@@ -54,7 +54,7 @@ class JavaModifierConfigScope private constructor() {
     }
 }
 
-internal val JavaModifierConfigScope.External.internal: JavaModifierConfigScope.Internal
+private val JavaModifierConfigScope.External.internal: JavaModifierConfigScope.Internal
     get() = when (this) {
         is JavaTypeScope -> modifierConfigInternalScope
         is JavaMethodScope -> modifierConfigInternalScope

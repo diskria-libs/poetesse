@@ -40,7 +40,7 @@ class JavaTypeContainerScope private constructor() {
         fun nestedClassName(name: String): XClassName
 
         companion object {
-            internal fun of(
+            fun of(
                 append: (type: JPType) -> Unit,
                 nestedClassName: (name: String) -> XClassName,
             ): Internal = object : Internal {
@@ -51,8 +51,7 @@ class JavaTypeContainerScope private constructor() {
     }
 }
 
-@PublishedApi
-internal val JavaTypeContainerScope.External.internal: JavaTypeContainerScope.Internal
+private val JavaTypeContainerScope.External.internal: JavaTypeContainerScope.Internal
     get() = when (this) {
         is JavaFileScope -> typeContainerInternalScope
         is JavaTypeScope -> typeContainerInternalScope
