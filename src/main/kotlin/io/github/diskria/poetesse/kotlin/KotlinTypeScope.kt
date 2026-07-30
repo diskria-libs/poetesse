@@ -8,18 +8,18 @@ import io.github.diskria.poetesse.XClassName
 class KotlinTypeScope private constructor(
     val className: XClassName,
     private val specBuilder: TypeSpec.Builder
-) : KotlinModifierConfigScope.External,
-    KotlinTypeContainerScope.External,
-    KotlinFunctionContainerScope.External {
+) : KotlinModifierContainer,
+    KotlinTypeContainer,
+    KotlinFunctionContainer {
 
-    internal val modifierConfigInternalScope = KotlinModifierConfigScope.Internal.of(
+    internal val modifierContainer = KotlinModifierContainerInternal.of(
         append = { specBuilder.addModifiers(*it) }
     )
-    internal val typeContainerInternalScope = KotlinTypeContainerScope.Internal.of(
+    internal val typeContainer = KotlinTypeContainerInternal.of(
         specHolderBuilder = specBuilder,
         nestedClassName = { name -> className.nested(name) },
     )
-    internal val functionContainerInternalScope = KotlinFunctionContainerScope.Internal.of(
+    internal val functionContainer = KotlinFunctionContainerInternal.of(
         specHolderBuilder = specBuilder
     )
 

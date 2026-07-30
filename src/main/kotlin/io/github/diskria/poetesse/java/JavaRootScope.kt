@@ -13,9 +13,9 @@ class JavaRootScope(
     JavaTypeFactory,
     JavaMethodFactory {
 
-    fun file(packageName: String?, name: String, block: JavaFileScope.() -> Unit): JavaDeferredFile =
+    fun file(packageName: String?, name: String, block: JavaFileScope.() -> Unit): JavaPoetesseFile =
         JavaFileScope.of(packageName, name).apply(block).build(settings)
 
-    fun file(className: XClassName, block: JavaFileScope.() -> Unit): JavaDeferredFile =
+    fun file(className: XClassName, block: JavaFileScope.() -> Unit): JavaPoetesseFile =
         file(className.packageName, className.simpleName, block)
 }

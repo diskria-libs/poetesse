@@ -5,14 +5,14 @@ import io.github.diskria.poetesse.PoetesseJava
 @PoetesseJava
 class JavaMethodScope private constructor(
     private val specBuilder: JPMethodBuilder
-) : JavaModifierConfigScope.External,
-    JavaAnnotationConfigScope.External {
+) : JavaModifierContainer,
+    JavaAnnotationContainer {
 
-    internal val modifierConfigInternalScope = JavaModifierConfigScope.Internal.of(
+    internal val modifierContainer = JavaModifierContainerInternal.of(
         append = { specBuilder.addModifiers(*it) }
     )
-    internal val annotationConfigInternalScope = JavaAnnotationConfigScope.Internal.of(
-        append = { specBuilder.addAnnotation(it.spec) },
+    internal val annotationContainer = JavaAnnotationContainerInternal.of(
+        append = { specBuilder.addAnnotation(it) },
     )
 
     fun body(block: Body.() -> Unit) {
@@ -26,8 +26,8 @@ class JavaMethodScope private constructor(
     internal fun build(): JPMethod =
         specBuilder.build()
 
-    inner class Body : JavaCodeBlockContainerScope.External {
-        internal val codeBlockContainerInternalScope = JavaCodeBlockContainerScope.Internal.of(
+    inner class Body : JavaCodeBlockContainer {
+        internal val codeBlockContainer = JavaCodeBlockContainerInternal.of(
             append = { specBuilder.addStatement(it) }
         )
     }

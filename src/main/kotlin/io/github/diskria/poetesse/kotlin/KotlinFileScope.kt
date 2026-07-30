@@ -10,23 +10,23 @@ class KotlinFileScope private constructor(
     private val packageName: String?,
     val fileName: String,
     private val specBuilder: FileSpec.Builder,
-) : KotlinTypeContainerScope.External,
-    KotlinFunctionContainerScope.External {
+) : KotlinTypeContainer,
+    KotlinFunctionContainer {
 
-    internal val typeContainerInternalScope = KotlinTypeContainerScope.Internal.of(
+    internal val typeContainer = KotlinTypeContainerInternal.of(
         specHolderBuilder = specBuilder,
         nestedClassName = { name -> XClassName.of(packageName, name) },
     )
-    internal val functionContainerInternalScope = KotlinFunctionContainerScope.Internal.of(
+    internal val functionContainer = KotlinFunctionContainerInternal.of(
         specHolderBuilder = specBuilder
     )
 
-    internal fun build(settings: Poetesse.Settings): KotlinDeferredFile {
+    internal fun build(settings: Poetesse.Settings): KotlinPoetesseFile {
         val file = specBuilder.apply {
             indent(settings.indent)
             settings.comment?.let { addFileComment(it) }
         }.build()
-        return KotlinDeferredFile(file)
+        return KotlinPoetesseFile(file)
     }
 
     internal companion object {

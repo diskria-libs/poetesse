@@ -6,9 +6,9 @@ import io.github.diskria.poetesse.PoetesseKotlin
 @PoetesseKotlin
 class KotlinFunctionScope private constructor(
     private val specBuilder: FunSpec.Builder
-) : KotlinModifierConfigScope.External {
+) : KotlinModifierContainer {
 
-    internal val modifierConfigInternalScope = KotlinModifierConfigScope.Internal.of(
+    internal val modifierContainer = KotlinModifierContainerInternal.of(
         append = { specBuilder.addModifiers(*it) }
     )
 

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import javax.lang.model.element.Modifier
 
-class MultiClassJavaDeferredFileTest {
+class MultiClassJavaPoetesseFileTest {
 
     private val listType: ClassName = ClassName.get("java.util", "List")
     private val mapType: ClassName = ClassName.get("java.util", "Map")
@@ -77,7 +77,7 @@ class MultiClassJavaDeferredFileTest {
         fileName: String = typeSpecs.first().name(),
     ): String =
         buildString {
-            MultiClassJavaDeferredFile.mergeFrom(packageName, fileName, typeSpecs, settings).writeTo(this)
+            MultiClassJavaPoetesseFile.mergeFrom(packageName, fileName, typeSpecs, settings).writeTo(this)
         }
 
     private fun String.occurrencesOf(token: String): Int =

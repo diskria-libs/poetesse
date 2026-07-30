@@ -3,11 +3,11 @@ package io.github.diskria.poetesse.java
 import io.github.diskria.poetesse.PoetesseJava
 
 @PoetesseJava
-class JavaCodeBlockScope : JavaCodeBlockContainerScope.External {
+class JavaCodeBlockScope : JavaCodeBlockContainer {
 
     private val codeBlocks: MutableList<JPCodeBlock> = mutableListOf()
 
-    internal val codeBlockContainerInternalScope = JavaCodeBlockContainerScope.Internal.of(
+    internal val codeBlockContainer = JavaCodeBlockContainerInternal.of(
         append = { codeBlocks += it }
     )
 

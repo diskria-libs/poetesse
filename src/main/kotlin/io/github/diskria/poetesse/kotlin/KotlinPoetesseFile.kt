@@ -5,7 +5,7 @@ import io.github.diskria.poetesse.PoetesseFile
 import java.nio.file.Path
 import javax.annotation.processing.Filer
 
-class KotlinDeferredFile internal constructor(private val spec: FileSpec) : PoetesseFile {
+class KotlinPoetesseFile internal constructor(private val spec: FileSpec) : PoetesseFile {
 
     override val packageName: String? = spec.packageName.takeIf { it.isNotEmpty() }
     override val fileName: String = spec.name

@@ -9,7 +9,7 @@ import kotlin.io.path.isDirectory
 import kotlin.io.path.notExists
 import kotlin.io.path.outputStream
 
-abstract class JavaDeferredFile : PoetesseFile {
+abstract class JavaPoetesseFile : PoetesseFile {
 
     override val extensionName: String = "java"
     override val relativePath: String
@@ -29,11 +29,11 @@ abstract class JavaDeferredFile : PoetesseFile {
     }
 }
 
-class SingleClassJavaDeferredFile internal constructor(
+class SingleClassJavaPoetesseFile internal constructor(
     override val packageName: String?,
     override val fileName: String,
     private val file: JPFile,
-) : JavaDeferredFile() {
+) : JavaPoetesseFile() {
 
     override fun writeTo(out: Appendable) {
         file.writeTo(out)
@@ -44,12 +44,12 @@ class SingleClassJavaDeferredFile internal constructor(
     }
 }
 
-class MultiClassJavaDeferredFile private constructor(
+class MultiClassJavaPoetesseFile private constructor(
     override val packageName: String?,
     override val fileName: String,
     private val types: List<JPType>,
     private val settings: Poetesse.Settings,
-) : JavaDeferredFile() {
+) : JavaPoetesseFile() {
 
     private val staticImports: MutableSet<String> = mutableSetOf()
     private val imports: MutableSet<String> = mutableSetOf()
@@ -106,8 +106,8 @@ class MultiClassJavaDeferredFile private constructor(
             fileName: String,
             types: List<JPType>,
             settings: Poetesse.Settings,
-        ): MultiClassJavaDeferredFile {
-            val file = MultiClassJavaDeferredFile(packageName, fileName, types, settings)
+        ): MultiClassJavaPoetesseFile {
+            val file = MultiClassJavaPoetesseFile(packageName, fileName, types, settings)
             types.forEach { typeSpec ->
                 val source = JPFile.builder(packageName.orEmpty(), typeSpec)
                     .indent(settings.indent)

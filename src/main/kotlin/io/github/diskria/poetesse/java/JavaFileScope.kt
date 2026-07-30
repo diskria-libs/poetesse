@@ -9,27 +9,27 @@ import io.github.diskria.poetesse.XClassName
 class JavaFileScope private constructor(
     private val packageName: String?,
     val fileName: String,
-) : JavaTypeContainerScope.External {
+) : JavaTypeContainer {
 
     private val types: MutableList<JPType> = mutableListOf()
 
-    internal val typeContainerInternalScope = JavaTypeContainerScope.Internal.of(
+    internal val typeContainer = JavaTypeContainerInternal.of(
         append = { types += it },
         nestedClassName = { name -> XClassName.of(packageName, name) },
     )
 
-    internal fun build(settings: Poetesse.Settings): JavaDeferredFile {
+    internal fun build(settings: Poetesse.Settings): JavaPoetesseFile {
         val primaryType = requireNotNull(types.find { it.name() == fileName }) {
             "File '$fileName' cannot be built because primary type was not configured."
         }
         if (types.size > 1) {
-            return MultiClassJavaDeferredFile.mergeFrom(packageName, fileName, types, settings)
+            return MultiClassJavaPoetesseFile.mergeFrom(packageName, fileName, types, settings)
         }
         val javaFile = JavaFile.builder(packageName.orEmpty(), primaryType).apply {
             indent(settings.indent)
             settings.comment?.let { addFileComment(it) }
         }.build()
-        return SingleClassJavaDeferredFile(packageName, fileName, javaFile)
+        return SingleClassJavaPoetesseFile(packageName, fileName, javaFile)
     }
 
     internal companion object {
