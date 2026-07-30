@@ -21,10 +21,12 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
         argument(name, JavaCodeScope.of(buildValueCode))
     }
 
+    @JvmName("propertyArgument")
     fun argument(property: ArgumentProperty<A, *>, buildValueCode: JavaCodeBuilder) {
         argument(property.name, buildValueCode)
     }
 
+    @JvmName("stringArgument")
     fun argument(property: ArgumentProperty<A, String>, value: String) {
         argument(property) { S(value) }
     }
@@ -41,6 +43,7 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
         argument(property, values.asIterable())
     }
 
+    @JvmName("booleanArgument")
     fun argument(property: ArgumentProperty<A, Boolean>, value: Boolean) {
         argument(property) { L(value) }
     }
@@ -57,6 +60,7 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
         argument(property, values.asIterable())
     }
 
+    @JvmName("intArgument")
     fun argument(property: ArgumentProperty<A, Int>, value: Int) {
         argument(property) { L(value) }
     }
@@ -73,6 +77,7 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
         argument(property, values.asIterable())
     }
 
+    @JvmName("classArgument")
     fun argument(property: ArgumentProperty<A, KClass<*>>, value: KClass<*>) {
         argument(property) { classReference(value) }
     }
@@ -89,18 +94,19 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
         argument(property, values.asIterable())
     }
 
+    @JvmName("classNameArgument")
     fun argument(property: ArgumentProperty<A, KClass<*>>, value: XClassName) {
         argument(property) { classReference(value) }
     }
 
-    @JvmName("classNameArgument")
+    @JvmName("classNameArrayArgument")
     fun argument(property: ArrayArgumentProperty<A, KClass<*>>, values: Iterable<XClassName>) {
         argument(property) {
             arrayOf_(values) { classReference(it) }
         }
     }
 
-    @JvmName("classNameArgument")
+    @JvmName("classNameArrayArgument")
     fun argument(property: ArrayArgumentProperty<A, KClass<*>>, vararg values: XClassName) {
         argument(property, values.asIterable())
     }
@@ -122,6 +128,7 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
         argument(property, values.asIterable())
     }
 
+    @JvmName("annotationArgument")
     inline fun <reified Embedded : Annotation> argument(
         property: ArgumentProperty<A, Embedded>,
         annotation: JavaDeferredTypedAnnotation<Embedded>,

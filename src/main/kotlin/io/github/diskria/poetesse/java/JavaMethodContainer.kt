@@ -11,7 +11,7 @@ sealed interface JavaMethodContainer : JavaMethodFactory {
     }
 
     fun method(name: String, block: JavaMethodScope.() -> Unit = {}): XFunctionName =
-        +(this as JavaMethodFactory).method(name, block)
+        +factory.method(name, block)
 
     fun method(block: JavaMethodScope.() -> Unit = {}): EagerDelegate<XFunctionName> =
         EagerDelegate { name -> method(name, block) }
@@ -29,6 +29,9 @@ internal interface JavaMethodContainerInternal {
         }
     }
 }
+
+private val JavaMethodContainer.factory: JavaMethodFactory
+    get() = this as JavaMethodFactory
 
 private val JavaMethodContainer.internal: JavaMethodContainerInternal
     get() = when (this) {

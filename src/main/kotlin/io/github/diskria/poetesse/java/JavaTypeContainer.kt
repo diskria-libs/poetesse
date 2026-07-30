@@ -11,7 +11,7 @@ sealed interface JavaTypeContainer : JavaTypeFactory {
     }
 
     fun type(kind: JPTypeKind, name: String, block: JavaTypeScope.() -> Unit = {}): XClassName =
-        +(this as JavaTypeFactory).type(kind, name, block)
+        +factory.type(kind, name, block)
 
     fun class_(name: String, block: JavaTypeScope.() -> Unit = {}): XClassName =
         type(JPTypeKind.CLASS, name, block)
@@ -44,6 +44,9 @@ internal interface JavaTypeContainerInternal {
         }
     }
 }
+
+private val JavaTypeContainer.factory: JavaTypeFactory
+    get() = this as JavaTypeFactory
 
 private val JavaTypeContainer.internal: JavaTypeContainerInternal
     get() = when (this) {

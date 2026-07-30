@@ -21,6 +21,13 @@ sealed interface JavaCodeBlockContainer : JavaCodeBlockFactory, JavaCodeFactory 
     }
 }
 
+inline fun <reified T> JavaCodeBlockContainer.initAssign(
+    noinline buildValueCode: JavaCodeBuilder
+): EagerDelegate<String> = EagerDelegate { name ->
+    line { "${T<T>()} $name = ${L(code(buildValueCode))}" }
+    name
+}
+
 internal interface JavaCodeBlockContainerInternal {
 
     fun append(codeBlock: JPCodeBlock)
@@ -39,10 +46,3 @@ private val JavaCodeBlockContainer.internal: JavaCodeBlockContainerInternal
         is JavaMethodScope.Body -> codeBlockContainer
         is JavaCodeBlockScope -> codeBlockContainer
     }
-
-inline fun <reified T> JavaCodeBlockContainer.initAssign(
-    noinline buildValueCode: JavaCodeBuilder
-): EagerDelegate<String> = EagerDelegate { name ->
-    line { "${T<T>()} $name = ${L(code(buildValueCode))}" }
-    name
-}
