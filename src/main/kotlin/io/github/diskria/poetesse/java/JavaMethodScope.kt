@@ -19,8 +19,8 @@ class JavaMethodScope private constructor(
         modifiers(JPModifier.STATIC)
     }
 
-    internal fun build(): JPMethod =
-        specBuilder.build()
+    internal fun build(): JavaDeferredMethod =
+        JavaDeferredMethod(specBuilder.build())
 
     inner class Body : JavaStatementContainerScope.External {
         internal val statementContainerInternalScope = JavaStatementContainerScope.Internal.of(

@@ -29,7 +29,7 @@ abstract class JavaDeferredFile : PoetesseFile {
     }
 }
 
-class SingleClassJavaDeferredFile(
+class SingleClassJavaDeferredFile internal constructor(
     override val packageName: String?,
     override val fileName: String,
     private val file: JPFile,

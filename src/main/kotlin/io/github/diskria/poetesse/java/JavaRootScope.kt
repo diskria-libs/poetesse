@@ -10,7 +10,8 @@ class JavaRootScope(
 ) : JavaCodeFactory,
     JavaCodeBlockFactory,
     JavaAnnotationFactory,
-    JavaTypeFactory {
+    JavaTypeFactory,
+    JavaMethodFactory {
 
     fun file(packageName: String?, name: String, block: JavaFileScope.() -> Unit): JavaDeferredFile =
         JavaFileScope.of(packageName, name).apply(block).build(settings)

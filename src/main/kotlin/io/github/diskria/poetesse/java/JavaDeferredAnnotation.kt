@@ -1,5 +1,6 @@
 package io.github.diskria.poetesse.java
 
-import com.palantir.javapoet.AnnotationSpec
-
-class JavaDeferredAnnotation<A : Annotation>(@PublishedApi internal val spec: AnnotationSpec)
+class JavaDeferredAnnotation<A : Annotation> internal constructor(buildSpec: () -> JPAnnotation) {
+    @PublishedApi
+    internal val spec: JPAnnotation by lazy(buildSpec)
+}

@@ -1,6 +1,6 @@
 package io.github.diskria.poetesse.java
 
-interface JavaCodeBlockFactory
-
-fun JavaCodeBlockFactory.codeBlock(block: JavaMultiLineCodeBlockScope.() -> Unit): JavaDeferredCodeBlock =
-    JavaMultiLineCodeBlockScope().apply(block).build()
+interface JavaCodeBlockFactory {
+    fun codeBlock(block: JavaMultiLineCodeBlockScope.() -> Unit): JavaDeferredCodeBlock =
+        JavaDeferredCodeBlock(block)
+}

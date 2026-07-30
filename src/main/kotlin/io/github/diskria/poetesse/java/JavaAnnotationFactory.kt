@@ -19,5 +19,5 @@ inline fun <reified A : Annotation> JavaAnnotationFactory.annotation(
 fun JavaAnnotationFactory.annotation(
     className: XClassName,
     block: JavaAnnotationScope<Annotation>.() -> Unit = {}
-): JavaDeferredAnnotation<*> =
+): JavaDeferredAnnotation<Annotation> =
     JavaAnnotationScope.of(className).apply(block).build()

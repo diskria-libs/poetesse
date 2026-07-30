@@ -4,7 +4,7 @@ import io.github.diskria.poetesse.PoetesseJava
 import io.github.diskria.poetesse.XClassName
 import kotlin.reflect.KClass
 
-internal typealias JavaStatementBuilder = JavaStatementScope.() -> String
+typealias JavaStatementBuilder = JavaStatementScope.() -> String
 
 @PoetesseJava
 @JvmInline
@@ -58,7 +58,7 @@ value class JavaStatementScope private constructor(
     internal companion object {
         fun of(build: JavaStatementBuilder): JavaDeferredCode =
             JavaStatementScope().let {
-                JavaDeferredCode(JPCodeBlock.of(it.build(), *it.arguments.toTypedArray()))
+                JavaDeferredCode { JPCodeBlock.of(it.build(), *it.arguments.toTypedArray()) }
             }
     }
 }

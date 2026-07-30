@@ -13,8 +13,12 @@ class JavaAnnotationScope<A : Annotation> @PublishedApi internal constructor(
     private typealias ArgumentProperty<A, V> = KProperty1<out A, V>
     private typealias ArrayArgumentProperty<A, E> = ArgumentProperty<A, Array<out E>>
 
+    fun argument(name: String, deferredCode: JavaDeferredCode) {
+        specBuilder.addMember(name, deferredCode.statement)
+    }
+
     fun argument(name: String, buildStatement: JavaStatementBuilder) {
-        specBuilder.addMember(name, JavaStatementScope.of(buildStatement).statement)
+        argument(name, JavaStatementScope.of(buildStatement))
     }
 
     fun argument(property: ArgumentProperty<A, String>, value: String) {
@@ -149,7 +153,7 @@ class JavaAnnotationScope<A : Annotation> @PublishedApi internal constructor(
 
     @PublishedApi
     internal fun build(): JavaDeferredAnnotation<A> =
-        JavaDeferredAnnotation(specBuilder.build())
+        JavaDeferredAnnotation { specBuilder.build() }
 
     @PublishedApi
     internal companion object {

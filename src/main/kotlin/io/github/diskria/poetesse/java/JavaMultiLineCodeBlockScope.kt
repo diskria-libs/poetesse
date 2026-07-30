@@ -11,6 +11,6 @@ class JavaMultiLineCodeBlockScope : JavaStatementContainerScope.External {
         append = { statements += it }
     )
 
-    fun build(): JavaDeferredCodeBlock =
-        JavaDeferredCodeBlock(statements)
+    internal fun buildStatements(): List<JPCodeBlock> =
+        statements
 }
