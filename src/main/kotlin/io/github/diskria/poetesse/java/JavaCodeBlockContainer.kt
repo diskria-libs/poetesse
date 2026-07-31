@@ -2,18 +2,17 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.EagerDelegate
 
-sealed interface JavaCodeBlockContainer : JavaCodeBlockFactory, JavaCodeFactory {
+sealed interface JavaCodeBlockContainer : JavaCodeBlockFactory {
 
-    operator fun JavaCodeRef.unaryPlus() {
-        +codeBlock
-    }
+    val expression: JavaCodeBlockExpressionScope
+        get() = JavaCodeBlockExpressionScope(this)
 
     operator fun JavaCodeBlockRef.unaryPlus() {
         codeBlocks.forEach { +it }
     }
 
-    fun line(buildCode: JavaCodeBuilder) {
-        +code(buildCode)
+    fun line(build: JavaCodeBuilder) {
+        +code(build).codeBlock
     }
 
     private operator fun JPCodeBlock.unaryPlus() {
@@ -21,11 +20,13 @@ sealed interface JavaCodeBlockContainer : JavaCodeBlockFactory, JavaCodeFactory 
     }
 }
 
-inline fun <reified T> JavaCodeBlockContainer.initAssign(
-    noinline buildValueCode: JavaCodeBuilder
-): EagerDelegate<String> = EagerDelegate { name ->
-    line { "${T<T>()} $name = ${L(code(buildValueCode))}" }
-    name
+@JvmInline
+value class JavaCodeBlockExpressionScope internal constructor(val container: JavaCodeBlockContainer) {
+
+    inline fun <reified T : Any> init(noinline value: JavaCodeBuilder): EagerDelegate<String> = EagerDelegate { name ->
+        container.line { "${T<T>()} $name = ${L(value)}" }
+        name
+    }
 }
 
 internal interface JavaCodeBlockContainerInternal {
@@ -43,6 +44,6 @@ internal interface JavaCodeBlockContainerInternal {
 
 private val JavaCodeBlockContainer.internal: JavaCodeBlockContainerInternal
     get() = when (this) {
-        is JavaMethodScope.Body -> codeBlockContainer
+        is JavaMethodScope.BodyScope -> codeBlockContainer
         is JavaCodeBlockScope -> codeBlockContainer
     }

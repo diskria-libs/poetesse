@@ -1,7 +1,7 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.EagerDelegate
-import io.github.diskria.poetesse.XFunctionName
+import io.github.diskria.poetesse.interop.XFunctionName
 
 sealed interface JavaMethodContainer : JavaMethodFactory {
 

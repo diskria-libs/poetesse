@@ -1,7 +1,7 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.PoetesseJava
-import io.github.diskria.poetesse.XClassName
+import io.github.diskria.poetesse.interop.XClassName
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 
@@ -16,13 +16,13 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
         specBuilder.addMember(name, deferredCode.codeBlock)
     }
 
-    fun argument(name: String, buildValueCode: JavaCodeBuilder) {
-        argument(name, JavaCodeScope.of(buildValueCode))
+    fun argument(name: String, value: JavaCodeBuilder) {
+        argument(name, JavaCodeScope.of(value))
     }
 
     @JvmName("propertyArgument")
-    fun argument(property: ArgumentProperty<A, *>, buildValueCode: JavaCodeBuilder) {
-        argument(property.name, buildValueCode)
+    fun argument(property: ArgumentProperty<A, *>, value: JavaCodeBuilder) {
+        argument(property.name, value)
     }
 
     @JvmName("stringArgument")
@@ -33,7 +33,7 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
     @JvmName("stringArrayArgument")
     fun argument(property: ArrayArgumentProperty<A, String>, values: Iterable<String>) {
         argument(property) {
-            arrayOf_(values) { S(it) }
+            expression.arrayOf(values) { S(it) }
         }
     }
 
@@ -50,7 +50,7 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
     @JvmName("booleanArrayArgument")
     fun argument(property: ArgumentProperty<A, BooleanArray>, values: Iterable<Boolean>) {
         argument(property) {
-            arrayOf_(values) { L(it) }
+            expression.arrayOf(values) { L(it) }
         }
     }
 
@@ -67,7 +67,7 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
     @JvmName("intArrayArgument")
     fun argument(property: ArgumentProperty<A, IntArray>, values: Iterable<Int>) {
         argument(property) {
-            arrayOf_(values) { L(it) }
+            expression.arrayOf(values) { L(it) }
         }
     }
 
@@ -78,13 +78,13 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
 
     @JvmName("classArgument")
     fun argument(property: ArgumentProperty<A, KClass<*>>, value: KClass<*>) {
-        argument(property) { classReference(value) }
+        argument(property) { expression.class_(value) }
     }
 
     @JvmName("classArrayArgument")
     fun argument(property: ArrayArgumentProperty<A, KClass<*>>, values: Iterable<KClass<*>>) {
         argument(property) {
-            arrayOf_(values) { classReference(it) }
+            expression.arrayOf(values) { expression.class_(it) }
         }
     }
 
@@ -95,13 +95,13 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
 
     @JvmName("classNameArgument")
     fun argument(property: ArgumentProperty<A, KClass<*>>, value: XClassName) {
-        argument(property) { classReference(value) }
+        argument(property) { expression.class_(value) }
     }
 
     @JvmName("classNameArrayArgument")
     fun argument(property: ArrayArgumentProperty<A, KClass<*>>, values: Iterable<XClassName>) {
         argument(property) {
-            arrayOf_(values) { classReference(it) }
+            expression.arrayOf(values) { expression.class_(it) }
         }
     }
 
@@ -112,13 +112,13 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
 
     @JvmName("enumArgument")
     inline fun <reified E : Enum<E>> argument(property: ArgumentProperty<A, E>, value: E) {
-        argument(property) { enumEntryReference(value) }
+        argument(property) { expression.enumEntry(value) }
     }
 
     @JvmName("enumArrayArgument")
     inline fun <reified E : Enum<E>> argument(property: ArrayArgumentProperty<A, E>, values: Iterable<E>) {
         argument(property) {
-            arrayOf_(values) { enumEntryReference(it) }
+            expression.arrayOf(values) { expression.enumEntry(it) }
         }
     }
 
@@ -149,7 +149,7 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
         values: Iterable<JavaTypedAnnotationRef<Embedded>>
     ) {
         argument(property.name) {
-            arrayOf_(values) { L(it) }
+            expression.arrayOf(values) { L(it) }
         }
     }
 
@@ -168,7 +168,7 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
     @PublishedApi
     internal companion object {
         fun <A : Annotation> of(className: XClassName): JavaAnnotationScope<A> =
-            JavaAnnotationScope(JPAnnotation.builder(className.java))
+            JavaAnnotationScope(JPAnnotation.builder(className.interopToJava()))
 
         fun <A : Annotation> of(kClass: KClass<out A>): JavaAnnotationScope<A> =
             of(XClassName.of(kClass))

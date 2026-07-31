@@ -2,13 +2,12 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseJava
-import io.github.diskria.poetesse.XClassName
+import io.github.diskria.poetesse.interop.XClassName
 
 @PoetesseJava
 class JavaRootScope(
     internal val settings: Poetesse.Settings
-) : JavaCodeFactory,
-    JavaCodeBlockFactory,
+) : JavaCodeBlockFactory,
     JavaAnnotationFactory,
     JavaTypeFactory,
     JavaMethodFactory {

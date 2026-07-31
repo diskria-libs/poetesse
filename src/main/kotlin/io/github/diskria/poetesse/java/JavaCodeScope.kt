@@ -1,16 +1,19 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.PoetesseJava
-import io.github.diskria.poetesse.XClassName
+import io.github.diskria.poetesse.interop.XClassName
+import io.github.diskria.poetesse.interop.XTypeName
 import kotlin.reflect.KClass
 
 typealias JavaCodeBuilder = JavaCodeScope.() -> String
 
 @PoetesseJava
-@JvmInline
-value class JavaCodeScope private constructor(
+class JavaCodeScope private constructor(
+    private val block: JavaCodeBuilder,
     private val arguments: MutableList<Any> = mutableListOf()
 ) : JavaCodeFactory {
+
+    val expression: ExpressionScope by lazy { ExpressionScope() }
 
     fun S(argument: String): String {
         arguments += argument
@@ -42,38 +45,48 @@ value class JavaCodeScope private constructor(
         return $$"$L"
     }
 
-    fun T(argument: XClassName): String {
-        arguments += argument.java
+    fun L(build: JavaCodeBuilder): String =
+        L(code(build))
+
+    fun T(argument: XTypeName, interop: Boolean = true): String {
+        arguments += argument.toJava(interop)
         return $$"$T"
     }
 
-    fun T(argument: KClass<*>): String {
-        arguments += argument.java
+    fun T(argument: KClass<*>, nullable: Boolean = false, interop: Boolean = true): String {
+        arguments += XTypeName.of(argument, nullable).toJava(interop)
         return $$"$T"
     }
 
-    inline fun <reified T> T(): String =
-        T(T::class)
+    inline fun <reified T : Any> T(nullable: Boolean = false, interop: Boolean = true): String =
+        T(T::class, nullable, interop)
+
+    inner class ExpressionScope {
+
+        fun class_(value: XClassName): String =
+            "${T(value)}.class"
+
+        fun class_(value: KClass<*>): String =
+            "${T(value)}.class"
+
+        inline fun <reified T : Any> class_(): String =
+            "${T<T>()}.class"
+
+        inline fun <reified E : Enum<E>> enumEntry(value: E): String =
+            "${T<E>()}.${L(value.name)}"
+
+        inline fun <reified E> arrayOf(values: Iterable<E>, crossinline transform: (E) -> String): String =
+            values.joinToString(prefix = "{", postfix = "}") { transform(it) }
+
+        fun concat(vararg elements: String): String =
+            elements.joinToString(separator = " + ")
+    }
+
+    internal fun build(): JPCodeBlock =
+        JPCodeBlock.of(block(), *arguments.toTypedArray())
 
     internal companion object {
-        fun of(buildCode: JavaCodeBuilder): JavaCodeRef =
-            JavaCodeScope().let {
-                JavaCodeRef { JPCodeBlock.of(it.buildCode(), *it.arguments.toTypedArray()) }
-            }
+        fun of(block: JavaCodeBuilder): JavaCodeRef =
+            JavaCodeRef { JavaCodeScope(block).build() }
     }
 }
-
-fun JavaCodeScope.classReference(value: XClassName): String =
-    "${T(value)}.class"
-
-fun JavaCodeScope.classReference(value: KClass<*>): String =
-    "${T(value)}.class"
-
-inline fun <reified T> JavaCodeScope.classReference(): String =
-    "${T<T>()}.class"
-
-inline fun <reified E : Enum<E>> JavaCodeScope.enumEntryReference(value: E): String =
-    "${T<E>()}.${L(value.name)}"
-
-inline fun <reified E> JavaCodeScope.arrayOf_(values: Iterable<E>, crossinline transform: (E) -> String): String =
-    values.joinToString(prefix = "{", postfix = "}") { transform(it) }

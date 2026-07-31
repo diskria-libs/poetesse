@@ -1,7 +1,7 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.PoetesseJava
-import io.github.diskria.poetesse.XClassName
+import io.github.diskria.poetesse.interop.XClassName
 
 @PoetesseJava
 class JavaTypeScope private constructor(

@@ -1,6 +1,6 @@
 package io.github.diskria.poetesse.java
 
-import io.github.diskria.poetesse.XClassName
+import io.github.diskria.poetesse.interop.XClassName
 import kotlin.reflect.KClass
 
 sealed interface JavaAnnotationContainer : JavaAnnotationFactory {

@@ -2,6 +2,6 @@ package io.github.diskria.poetesse.java
 
 interface JavaCodeFactory {
 
-    fun code(buildCode: JavaCodeBuilder): JavaCodeRef =
-        JavaCodeScope.of(buildCode)
+    fun code(build: JavaCodeBuilder): JavaCodeRef =
+        JavaCodeScope.of(build)
 }

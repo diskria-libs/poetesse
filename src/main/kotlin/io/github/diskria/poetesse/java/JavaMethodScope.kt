@@ -15,8 +15,8 @@ class JavaMethodScope private constructor(
         append = { specBuilder.addAnnotation(it) },
     )
 
-    fun body(block: Body.() -> Unit) {
-        Body().apply(block)
+    fun body(block: BodyScope.() -> Unit) {
+        BodyScope().apply(block)
     }
 
     fun static() {
@@ -26,7 +26,7 @@ class JavaMethodScope private constructor(
     internal fun build(): JPMethod =
         specBuilder.build()
 
-    inner class Body : JavaCodeBlockContainer {
+    inner class BodyScope : JavaCodeBlockContainer {
         internal val codeBlockContainer = JavaCodeBlockContainerInternal.of(
             append = { specBuilder.addStatement(it) }
         )

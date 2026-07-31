@@ -3,7 +3,7 @@ package io.github.diskria.poetesse.java
 import io.github.diskria.poetesse.PoetesseJava
 
 @PoetesseJava
-class JavaCodeBlockScope : JavaCodeBlockContainer {
+class JavaCodeBlockScope internal constructor(): JavaCodeBlockContainer {
 
     private val codeBlocks: MutableList<JPCodeBlock> = mutableListOf()
 

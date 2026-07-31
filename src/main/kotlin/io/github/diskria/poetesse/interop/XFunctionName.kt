@@ -1,4 +1,4 @@
-package io.github.diskria.poetesse
+package io.github.diskria.poetesse.interop
 
 class XFunctionName private constructor(name: String, jvmName: String) {
 

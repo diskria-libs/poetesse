@@ -1,6 +1,6 @@
 package io.github.diskria.poetesse.kotlin
 
-import io.github.diskria.poetesse.XClassName
+import io.github.diskria.poetesse.interop.XClassName
 
 sealed interface KotlinTypeContainer {
 

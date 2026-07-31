@@ -2,7 +2,7 @@ package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseKotlin
-import io.github.diskria.poetesse.XClassName
+import io.github.diskria.poetesse.interop.XClassName
 
 @PoetesseKotlin
 class KotlinFileScope private constructor(
@@ -14,7 +14,7 @@ class KotlinFileScope private constructor(
 
     internal val typeContainer = KotlinTypeContainerInternal.of(
         holderBuilder = specBuilder,
-        nestedClassName = { name -> XClassName.of(packageName, name) },
+        nestedClassName = { name -> XClassName.of(packageName, isNullable = false, name) },
     )
     internal val functionContainer = KotlinFunctionContainerInternal.of(
         holderBuilder = specBuilder

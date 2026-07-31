@@ -1,7 +1,7 @@
 package io.github.diskria.poetesse.java
 
-interface JavaCodeBlockFactory {
+interface JavaCodeBlockFactory : JavaCodeFactory {
 
-    fun codeBlock(block: JavaCodeBlockScope.() -> Unit): JavaCodeBlockRef =
-        JavaCodeBlockRef(block)
+    fun codeBlock(build: JavaCodeBlockScope.() -> Unit): JavaCodeBlockRef =
+        JavaCodeBlockRef { JavaCodeBlockScope().apply(build).build() }
 }

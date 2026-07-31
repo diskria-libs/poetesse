@@ -1,6 +1,6 @@
 package io.github.diskria.poetesse.kotlin
 
-import io.github.diskria.poetesse.XFunctionName
+import io.github.diskria.poetesse.interop.XFunctionName
 
 sealed interface KotlinFunctionContainer {
 
