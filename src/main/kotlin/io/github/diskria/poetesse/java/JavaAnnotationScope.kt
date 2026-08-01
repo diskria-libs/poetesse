@@ -2,6 +2,7 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.PoetesseJava
 import io.github.diskria.poetesse.interop.XClassName
+import io.github.diskria.poetesse.interop.XTypeName
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 
@@ -94,19 +95,19 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
     }
 
     @JvmName("classNameArgument")
-    fun argument(property: ArgumentProperty<A, KClass<*>>, value: XClassName) {
+    fun argument(property: ArgumentProperty<A, KClass<*>>, value: XTypeName) {
         argument(property) { expression.class_(value) }
     }
 
     @JvmName("classNameArrayArgument")
-    fun argument(property: ArrayArgumentProperty<A, KClass<*>>, values: Iterable<XClassName>) {
+    fun argument(property: ArrayArgumentProperty<A, KClass<*>>, values: Iterable<XTypeName>) {
         argument(property) {
             expression.arrayOf(values) { expression.class_(it) }
         }
     }
 
     @JvmName("classNameArrayArgument")
-    fun argument(property: ArrayArgumentProperty<A, KClass<*>>, vararg values: XClassName) {
+    fun argument(property: ArrayArgumentProperty<A, KClass<*>>, vararg values: XTypeName) {
         argument(property, values.asIterable())
     }
 

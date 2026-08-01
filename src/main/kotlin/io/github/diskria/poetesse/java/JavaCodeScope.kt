@@ -1,7 +1,6 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.PoetesseJava
-import io.github.diskria.poetesse.interop.XClassName
 import io.github.diskria.poetesse.interop.XTypeName
 import kotlin.reflect.KClass
 
@@ -53,24 +52,22 @@ class JavaCodeScope private constructor(
         return $$"$T"
     }
 
-    fun T(argument: KClass<*>, nullable: Boolean = false, interop: Boolean = true): String {
-        arguments += XTypeName.of(argument, nullable).toJava(interop)
-        return $$"$T"
-    }
+    fun T(argument: KClass<out Any>, nullable: Boolean = false, interop: Boolean = true): String =
+        T(XTypeName.of(argument, nullable), interop)
 
     inline fun <reified T : Any> T(nullable: Boolean = false, interop: Boolean = true): String =
         T(T::class, nullable, interop)
 
     inner class ExpressionScope {
 
-        fun class_(value: XClassName): String =
-            "${T(value)}.class"
+        fun class_(value: XTypeName, interop: Boolean = true): String =
+            "${T(value, interop)}.class"
 
-        fun class_(value: KClass<*>): String =
-            "${T(value)}.class"
+        fun class_(value: KClass<out Any>, interop: Boolean = true): String =
+            class_(XTypeName.of(value), interop)
 
-        inline fun <reified T : Any> class_(): String =
-            "${T<T>()}.class"
+        inline fun <reified T : Any> class_(interop: Boolean = true): String =
+            class_(T::class, interop)
 
         inline fun <reified E : Enum<E>> enumEntry(value: E): String =
             "${T<E>()}.${L(value.name)}"

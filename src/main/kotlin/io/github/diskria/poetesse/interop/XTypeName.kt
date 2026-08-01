@@ -25,8 +25,10 @@ sealed interface XTypeName {
     fun toJava(interop: Boolean): JPTypeName = if (interop) interopToJava() else kotlinAsJava
 
     companion object {
-        fun of(kClass: KClass<*>, isNullable: Boolean = false): XTypeName =
-            if (kClass.javaPrimitiveType != null) XPrimitiveTypeName.of(kClass, isNullable)
-            else XClassName.of(kClass, isNullable)
+        fun of(kClass: KClass<out Any>, isNullable: Boolean = false): XTypeName =
+            XPrimitiveTypeName.ofOrNull(kClass, isNullable) ?: XClassName.of(kClass, isNullable)
+
+        inline fun <reified T : Any> of(isNullable: Boolean = false): XTypeName =
+            of(T::class, isNullable)
     }
 }

@@ -1,6 +1,7 @@
 package io.github.diskria.poetesse.interop
 
 import com.squareup.kotlinpoet.asClassName
+import io.github.diskria.poetesse.extensions.setNullable
 import io.github.diskria.poetesse.java.JPClassName
 import io.github.diskria.poetesse.java.JPTypeName
 import io.github.diskria.poetesse.kotlin.KPClassName
@@ -15,7 +16,7 @@ class XPrimitiveTypeName private constructor(
         XClassName.of(kind.kotlin).kotlinAsJava
 
     override fun interopToKotlin(): KPClassName =
-        kind.kotlin.copy(nullable = isNullable) as KPClassName
+        kind.kotlin.setNullable(isNullable)
 
     override fun interopToJava(): JPTypeName =
         if (isNullable) kind.java.box()
@@ -35,13 +36,16 @@ class XPrimitiveTypeName private constructor(
         fun of(kind: XPrimitiveKind, isNullable: Boolean = false): XPrimitiveTypeName =
             XPrimitiveTypeName(kind, isNullable)
 
-        fun of(kotlin: KPClassName): XPrimitiveTypeName {
-            val key = kotlin.copy(nullable = false) as KPClassName
-            val kind = requireNotNull(K2KIND[key]) {
-                "$kotlin is not a primitive Kotlin type"
-            }
+        fun ofOrNull(kotlin: KPClassName): XPrimitiveTypeName? {
+            val key = kotlin.setNullable(false)
+            val kind = K2KIND[key] ?: return null
             return XPrimitiveTypeName(kind, kotlin.isNullable)
         }
+
+        fun of(kotlin: KPClassName): XPrimitiveTypeName =
+            requireNotNull(ofOrNull(kotlin)) {
+                "$kotlin is not a primitive Kotlin type"
+            }
 
         fun of(java: JPTypeName): XPrimitiveTypeName {
             val kind = requireNotNull(J2KIND[java]) {
@@ -51,11 +55,11 @@ class XPrimitiveTypeName private constructor(
             return XPrimitiveTypeName(kind, isNullable)
         }
 
-        fun of(kClass: KClass<out Any>, isNullable: Boolean = false): XPrimitiveTypeName =
-            of(kClass.asClassName().copy(nullable = isNullable) as KPClassName)
+        fun ofOrNull(kClass: KClass<out Any>, isNullable: Boolean = false): XPrimitiveTypeName? =
+            ofOrNull(kClass.asClassName().setNullable(isNullable))
 
-        inline fun <reified T : Any> of(isNullable: Boolean = false): XPrimitiveTypeName =
-            of(T::class, isNullable)
+        inline fun <reified T : Any> ofOrNull(isNullable: Boolean = false): XPrimitiveTypeName? =
+            ofOrNull(T::class, isNullable)
     }
 }
 
