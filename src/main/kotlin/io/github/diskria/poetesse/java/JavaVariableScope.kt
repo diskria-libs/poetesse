@@ -1,6 +1,7 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.PoetesseJava
+import io.github.diskria.poetesse.extensions.joinWithTrailing
 
 typealias JavaVariableBuilder = JavaVariableScope.() -> String
 
@@ -10,19 +11,26 @@ class JavaVariableScope private constructor(
     val type: JavaCodeBuilder,
     private val value: JavaVariableBuilder
 ) : JavaCodeArgumentsScope(),
-    JavaModifierContainer {
+    JavaModifierContainer,
+    JavaAnnotationContainer {
 
     private val modifiers: MutableList<String> = mutableListOf()
+    private val annotations: MutableList<JPAnnotation> = mutableListOf()
 
     internal val modifierContainer = JavaModifierContainerInternal.of(
-        append = { modifiers -> this@JavaVariableScope.modifiers += modifiers.map { it.toString() } }
+        append = { modifiers += it.map { modifier -> modifier.toString() } }
+    )
+    internal val annotationContainer = JavaAnnotationContainerInternal.of(
+        append = { annotations += it },
     )
 
-    private fun build(): JPCodeBlock = build {
-        val type = L(type)
+    private fun build(): JPCodeBlock {
         val value = value()
-        val modifiers = modifiers.distinct().joinToString(separator = "") { "$it " }
-        "$modifiers$type $name = $value"
+        val (annotations, type) = withPrepend {
+            annotations.map { L(it) }.joinWithTrailing(" ") to L(type)
+        }
+        val modifiers = modifiers.joinWithTrailing(" ")
+        return build { "$annotations$modifiers$type $name = $value" }
     }
 
     internal companion object {

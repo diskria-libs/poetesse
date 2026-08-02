@@ -11,52 +11,47 @@ open class JavaCodeArgumentsScope internal constructor(
 
     val expression: ExpressionScope by lazy { ExpressionScope() }
 
-    fun S(argument: String): String {
-        arguments += argument
-        return $$"$S"
-    }
+    private val prependBuffers: ArrayDeque<MutableList<Any>> = ArrayDeque()
 
-    fun L(argument: Boolean): String {
-        arguments += argument
-        return $$"$L"
-    }
-
-    fun L(argument: Int): String {
-        arguments += argument
-        return $$"$L"
-    }
-
-    fun L(argument: String): String {
-        arguments += argument
-        return $$"$L"
-    }
-
-    fun L(argument: JavaAnnotationRef): String {
-        arguments += argument.spec
-        return $$"$L"
-    }
-
-    fun L(argument: JavaCodeRef): String {
-        arguments += argument.codeBlock
-        return $$"$L"
-    }
-
-    fun L(build: JavaCodeBuilder): String =
-        L(code(build))
-
-    fun T(argument: XTypeName, interop: Boolean = true): String {
-        arguments += argument.toJava(interop)
-        return $$"$T"
-    }
-
-    fun T(argument: KClass<out Any>, nullable: Boolean = false, interop: Boolean = true): String =
+    fun T(argument: XTypeName, interop: Boolean = true) = argument.toJava(interop).register('T')
+    fun T(argument: KClass<out Any>, nullable: Boolean = false, interop: Boolean = true) =
         T(XTypeName.of(argument, nullable), interop)
 
-    inline fun <reified T : Any> T(nullable: Boolean = false, interop: Boolean = true): String =
+    fun S(argument: String) = argument.register('S')
+
+    fun L(argument: Boolean) = argument.register()
+    fun L(argument: Int) = argument.register()
+    fun L(argument: String) = argument.register()
+    fun L(argument: JPAnnotation) = argument.register()
+    fun L(argument: JavaAnnotationRef) = L(argument.spec)
+    fun L(argument: JavaCodeRef) = argument.codeBlock.register()
+    fun L(build: JavaCodeBuilder) = L(code(build))
+
+    inline fun <reified T : Any> T(nullable: Boolean = false, interop: Boolean = true) =
         T(T::class, nullable, interop)
+
+    protected fun <R> withPrepend(block: () -> R): R {
+        val currentBuffer = mutableListOf<Any>()
+        prependBuffers.addFirst(currentBuffer)
+        return try {
+            val result = block()
+            val finishedBuffer = prependBuffers.removeFirst()
+            val parentBuffer = prependBuffers.firstOrNull()
+            (parentBuffer ?: arguments).addAll(0, finishedBuffer)
+            result
+        } catch (e: Throwable) {
+            prependBuffers.removeFirstOrNull()
+            throw e
+        }
+    }
 
     protected fun build(format: () -> String): JPCodeBlock =
         JPCodeBlock.of(format(), *arguments.toTypedArray())
+
+    private fun <T : Any> T.register(mask: Char = 'L'): String {
+        (prependBuffers.firstOrNull() ?: arguments) += this
+        return "$$mask"
+    }
 
     inner class ExpressionScope {
 
