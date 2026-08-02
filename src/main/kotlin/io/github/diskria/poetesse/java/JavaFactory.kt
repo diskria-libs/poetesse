@@ -5,12 +5,13 @@ import io.github.diskria.poetesse.PoetesseJava
 import io.github.diskria.poetesse.interop.XClassName
 
 @PoetesseJava
-class JavaRootScope(
+class JavaFactory(
     internal val settings: Poetesse.Settings
-) : JavaCodeBlockFactory,
+) : JavaTypeFactory,
+    JavaFieldFactory,
+    JavaMethodFactory,
     JavaAnnotationFactory,
-    JavaTypeFactory,
-    JavaMethodFactory {
+    JavaCodeBlockFactory {
 
     fun file(packageName: String?, name: String, block: JavaFileScope.() -> Unit): JavaFileRef =
         JavaFileScope.of(packageName, name).apply(block).build(settings)

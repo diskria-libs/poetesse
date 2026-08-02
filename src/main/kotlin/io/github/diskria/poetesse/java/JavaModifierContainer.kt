@@ -57,6 +57,7 @@ internal interface JavaModifierContainerInternal {
 private val JavaModifierContainer.internal: JavaModifierContainerInternal
     get() = when (this) {
         is JavaTypeScope -> modifierContainer
+        is JavaFieldScope -> modifierContainer
         is JavaMethodScope -> modifierContainer
         is JavaVariableScope -> modifierContainer
     }

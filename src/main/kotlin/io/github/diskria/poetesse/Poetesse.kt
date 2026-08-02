@@ -1,14 +1,14 @@
 package io.github.diskria.poetesse
 
-import io.github.diskria.poetesse.java.JavaRootScope
-import io.github.diskria.poetesse.kotlin.KotlinRootScope
+import io.github.diskria.poetesse.java.JavaFactory
+import io.github.diskria.poetesse.kotlin.KotlinFactory
 
 @PoetesseKotlin
 @PoetesseJava
 class Poetesse private constructor(val settings: Settings) {
 
-    val kotlin: KotlinRootScope get() = KotlinRootScope(settings)
-    val java: JavaRootScope get() = JavaRootScope(settings)
+    val kotlin: KotlinFactory get() = KotlinFactory(settings)
+    val java: JavaFactory get() = JavaFactory(settings)
 
     inline operator fun <T> invoke(block: Poetesse.() -> T): T =
         block()

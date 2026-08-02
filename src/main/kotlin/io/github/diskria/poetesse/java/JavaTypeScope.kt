@@ -7,23 +7,27 @@ import io.github.diskria.poetesse.interop.XClassName
 class JavaTypeScope private constructor(
     val className: XClassName,
     private val specBuilder: JPTypeBuilder
-) : JavaAnnotationContainer,
-    JavaVisibilityAllowedModifierContainer,
+) : JavaTypeContainer,
+    JavaFieldContainer,
     JavaMethodContainer,
-    JavaTypeContainer {
+    JavaAnnotationContainer,
+    JavaVisibilityAllowedModifierContainer {
 
+    internal val typeContainer = JavaTypeContainerInternal.of(
+        append = { specBuilder.addType(it) },
+        nestedClassName = { name -> className.nested(name) },
+    )
+    internal val fieldContainer = JavaFieldContainerInternal.of(
+        append = { specBuilder.addField(it) }
+    )
+    internal val methodContainer = JavaMethodContainerInternal.of(
+        append = { specBuilder.addMethod(it) }
+    )
     internal val annotationContainer = JavaAnnotationContainerInternal.of(
         append = { specBuilder.addAnnotation(it) },
     )
     internal val modifierContainer = JavaModifierContainerInternal.of(
         append = { specBuilder.addModifiers(*it) }
-    )
-    internal val methodContainer = JavaMethodContainerInternal.of(
-        append = { specBuilder.addMethod(it) }
-    )
-    internal val typeContainer = JavaTypeContainerInternal.of(
-        append = { specBuilder.addType(it) },
-        nestedClassName = { name -> className.nested(name) },
     )
 
     fun abstract() {

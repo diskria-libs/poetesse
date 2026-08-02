@@ -49,6 +49,7 @@ private val JavaAnnotationContainer.factory: JavaAnnotationFactory
 private val JavaAnnotationContainer.internal: JavaAnnotationContainerInternal
     get() = when (this) {
         is JavaTypeScope -> annotationContainer
+        is JavaFieldScope -> annotationContainer
         is JavaMethodScope -> annotationContainer
         is JavaVariableScope -> annotationContainer
     }

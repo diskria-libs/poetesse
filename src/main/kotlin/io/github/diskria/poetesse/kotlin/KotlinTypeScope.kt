@@ -7,19 +7,19 @@ import io.github.diskria.poetesse.interop.XClassName
 class KotlinTypeScope private constructor(
     val className: XClassName,
     private val specBuilder: KPTypeBuilder
-) : KotlinModifierContainer,
-    KotlinTypeContainer,
-    KotlinFunctionContainer {
+) : KotlinTypeContainer,
+    KotlinFunctionContainer,
+    KotlinModifierContainer {
 
-    internal val modifierContainer = KotlinModifierContainerInternal.of(
-        append = { specBuilder.addModifiers(*it) }
-    )
     internal val typeContainer = KotlinTypeContainerInternal.of(
         holderBuilder = specBuilder,
         nestedClassName = { name -> className.nested(name) },
     )
     internal val functionContainer = KotlinFunctionContainerInternal.of(
         holderBuilder = specBuilder
+    )
+    internal val modifierContainer = KotlinModifierContainerInternal.of(
+        append = { specBuilder.addModifiers(*it) }
     )
 
     fun sealed() {

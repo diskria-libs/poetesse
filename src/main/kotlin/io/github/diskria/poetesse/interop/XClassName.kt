@@ -72,9 +72,9 @@ class XClassName private constructor(
                 Enum.Companion::class, String.Companion::class,
             ).forEach { put(it.asKPClassName(), it.asJPClassName()) }
 
-            // Typealiases defined in Kotlin stdlib 2.3.20 (e.g. `typealias Exception = java.lang.Exception`).
-            // Using `KClass.asClassName()` on typealiases resolves them to the target Java class at compile time,
-            // losing the original Kotlin qualifier. We explicitly reconstruct KPClassName using explicit packages.
+            // Typealiases defined in Kotlin 2.3.20 stdlib.
+            // Using `::class` resolves them to the target Java class, losing the original Kotlin FQCN.
+            // We explicitly reconstruct KPClassName using explicit packages.
             @Suppress("RemoveRedundantQualifierName")
             mapOf(
                 // jvmMain/kotlin
