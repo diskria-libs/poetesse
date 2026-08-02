@@ -1,6 +1,8 @@
 package io.github.diskria.poetesse.interop
 
-import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.asClassName
+import io.github.diskria.poetesse.extensions.asJPClassName
+import io.github.diskria.poetesse.extensions.asKPClassName
 import io.github.diskria.poetesse.extensions.setNullable
 import io.github.diskria.poetesse.java.JPClassName
 import io.github.diskria.poetesse.kotlin.KPClassName
@@ -39,28 +41,83 @@ class XClassName private constructor(
         XClassName(packageName, simpleNames + name, false)
 
     companion object {
-        private val K2J: Map<KPClassName, JPClassName> = listOf(
-            ANY to Object::class,
-            STRING to String::class,
-            CHAR_SEQUENCE to CharSequence::class,
-            COMPARABLE to Comparable::class,
-            THROWABLE to Throwable::class,
-            ANNOTATION to Annotation::class,
-            NUMBER to Number::class,
-            MUTABLE_ITERABLE to MutableIterable::class,
-            ITERABLE to Iterable::class,
-            MUTABLE_COLLECTION to Collection::class,
-            COLLECTION to Collection::class,
-            MUTABLE_LIST to List::class,
-            LIST to List::class,
-            MUTABLE_SET to MutableSet::class,
-            SET to Set::class,
-            MUTABLE_MAP to Map::class,
-            MAP to Map::class,
-        ).associate { (className, kClass) -> className to JPClassName.get(kClass.java) }
+        private val K2J: Map<KPClassName, JPClassName> = buildMap {
+            sequenceOf(
+                Any::class, String::class, CharSequence::class, Throwable::class, Cloneable::class, Comparable::class,
+                Enum::class, Number::class, Annotation::class,
 
-        private val J2K: Map<JPClassName, KPClassName> =
-            K2J.entries.associate { (k, j) -> j to k }
+                Boolean.Companion::class, Byte.Companion::class, Short.Companion::class, Int.Companion::class,
+                Long.Companion::class, Char.Companion::class, Float.Companion::class, Double.Companion::class,
+                Enum.Companion::class, String.Companion::class,
+            ).forEach { put(it.asKPClassName(), it.asJPClassName()) }
+
+            sequenceOf(
+                Iterable::class, Collection::class, List::class, Set::class, Map::class, Map.Entry::class,
+                Iterator::class, ListIterator::class,
+            ).forEach { kClass ->
+                val kp = kClass.asKPClassName()
+                val jp = kClass.asJPClassName()
+                put(kp, jp)
+                put(KPClassName(kp.packageName, kp.simpleNames.map { "Mutable$it" }), jp)
+            }
+
+            (0..22).forEach { i ->
+                val name = "Function$i"
+                put(KPClassName("kotlin", name), JPClassName.get("kotlin.jvm.functions", name))
+            }
+
+            // Typealiases defined in Kotlin stdlib 2.3.20 (e.g. `typealias Exception = java.lang.Exception`).
+            // Using `KClass.asClassName()` on typealiases resolves them to the target Java class at compile time,
+            // losing the original Kotlin qualifier. We explicitly reconstruct KPClassName using explicit packages.
+            @Suppress("RemoveRedundantQualifierName")
+            mapOf(
+                // jvmMain/kotlin
+                "kotlin" to arrayOf(
+                    // TypeAliases.kt
+                    kotlin.Error::class,
+                    kotlin.Exception::class,
+                    kotlin.RuntimeException::class,
+                    kotlin.IllegalArgumentException::class,
+                    kotlin.IllegalStateException::class,
+                    kotlin.IndexOutOfBoundsException::class,
+                    kotlin.UnsupportedOperationException::class,
+                    kotlin.ArithmeticException::class,
+                    kotlin.NumberFormatException::class,
+                    kotlin.NullPointerException::class,
+                    kotlin.ClassCastException::class,
+                    kotlin.AssertionError::class,
+                    kotlin.NoSuchElementException::class,
+                    kotlin.ConcurrentModificationException::class,
+                    kotlin.Comparator::class,
+
+                    // AutoCloseableJVM.kt
+                    kotlin.AutoCloseable::class,
+                ),
+                // jvmMain/kotlin/collections/TypeAliases.kt
+                "kotlin.collections" to arrayOf(
+                    kotlin.collections.RandomAccess::class,
+                    kotlin.collections.ArrayList::class,
+                    kotlin.collections.LinkedHashMap::class,
+                    kotlin.collections.HashMap::class,
+                    kotlin.collections.LinkedHashSet::class,
+                    kotlin.collections.HashSet::class,
+                ),
+                // jvmMain/kotlin/text/TypeAliases.kt
+                "kotlin.text" to arrayOf(
+                    kotlin.text.Appendable::class,
+                    kotlin.text.StringBuilder::class,
+                    kotlin.text.CharacterCodingException::class,
+                ),
+                // jvmMain/kotlin/coroutines/cancellation/CancellationException.kt
+                "kotlin.coroutines.cancellation" to arrayOf(
+                    kotlin.coroutines.cancellation.CancellationException::class,
+                ),
+            ).forEach { (packageName, typeAliases) ->
+                typeAliases.forEach { put(KPClassName(packageName, it.java.simpleName), it.asJPClassName()) }
+            }
+        }.also { println(it) }
+
+        private val J2K: Map<JPClassName, KPClassName> = K2J.entries.associate { (k, j) -> j to k }
 
         fun of(packageName: String?, isNullable: Boolean = false, vararg simpleNames: String): XClassName =
             XClassName(packageName, simpleNames.toList(), isNullable)

@@ -8,7 +8,7 @@ typealias JavaVariableBuilder = JavaVariableScope.() -> String
 @PoetesseJava
 class JavaVariableScope private constructor(
     val name: String,
-    val type: JavaCodeBuilder,
+    private val type: JavaCodeBuilder,
     private val value: JavaVariableBuilder
 ) : JavaCodeArgumentsScope(),
     JavaModifierContainer,
@@ -24,13 +24,14 @@ class JavaVariableScope private constructor(
         append = { annotations += it },
     )
 
-    private fun build(): JPCodeBlock {
+    private fun build(): JPCodeBlock = build {
         val value = value()
-        val (annotations, type) = withPrepend {
-            annotations.map { L(it) }.joinWithTrailing(" ") to L(type)
+        withPrepend {
+            val annotations = annotations.map { L(it) }.joinWithTrailing(" ")
+            val modifiers = modifiers.joinWithTrailing(" ")
+            val type = L(type)
+            "$annotations$modifiers$type $name = $value"
         }
-        val modifiers = modifiers.joinWithTrailing(" ")
-        return build { "$annotations$modifiers$type $name = $value" }
     }
 
     internal companion object {

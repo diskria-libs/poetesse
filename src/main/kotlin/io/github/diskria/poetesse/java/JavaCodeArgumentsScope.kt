@@ -17,18 +17,18 @@ open class JavaCodeArgumentsScope internal constructor(
     fun T(argument: KClass<out Any>, nullable: Boolean = false, interop: Boolean = true) =
         T(XTypeName.of(argument, nullable), interop)
 
+    inline fun <reified T : Any> T(nullable: Boolean = false, interop: Boolean = true) =
+        T(T::class, nullable, interop)
+
     fun S(argument: String) = argument.register('S')
 
     fun L(argument: Boolean) = argument.register()
     fun L(argument: Int) = argument.register()
     fun L(argument: String) = argument.register()
-    fun L(argument: JPAnnotation) = argument.register()
+    protected fun L(argument: JPAnnotation) = argument.register()
     fun L(argument: JavaAnnotationRef) = L(argument.spec)
     fun L(argument: JavaCodeRef) = argument.codeBlock.register()
     fun L(build: JavaCodeBuilder) = L(code(build))
-
-    inline fun <reified T : Any> T(nullable: Boolean = false, interop: Boolean = true) =
-        T(T::class, nullable, interop)
 
     protected fun <R> withPrepend(block: () -> R): R {
         val currentBuffer = mutableListOf<Any>()
