@@ -42,18 +42,18 @@ class XClassName private constructor(
 
     companion object {
         private val K2J: Map<KPClassName, JPClassName> = buildMap {
+            // Order and structure reflect org.jetbrains.kotlin.metadata.jvm.deserialization.ClassMapperLite,
+            // adapted for Poet classes instead of JVM descriptors.
             sequenceOf(
-                Any::class, String::class, CharSequence::class, Throwable::class, Cloneable::class, Comparable::class,
-                Enum::class, Number::class, Annotation::class,
+                Any::class, Nothing::class, Annotation::class,
 
-                Boolean.Companion::class, Byte.Companion::class, Short.Companion::class, Int.Companion::class,
-                Long.Companion::class, Char.Companion::class, Float.Companion::class, Double.Companion::class,
-                Enum.Companion::class, String.Companion::class,
+                String::class, CharSequence::class, Throwable::class, Cloneable::class, Number::class,
+                Comparable::class, Enum::class,
             ).forEach { put(it.asKPClassName(), it.asJPClassName()) }
 
             sequenceOf(
-                Iterable::class, Collection::class, List::class, Set::class, Map::class, Map.Entry::class,
-                Iterator::class, ListIterator::class,
+                Iterator::class, Collection::class, List::class, Set::class, Map::class, ListIterator::class,
+                Iterable::class, Map.Entry::class
             ).forEach { kClass ->
                 val kp = kClass.asKPClassName()
                 val jp = kClass.asJPClassName()
@@ -65,6 +65,12 @@ class XClassName private constructor(
                 val name = "Function$i"
                 put(KPClassName("kotlin", name), JPClassName.get("kotlin.jvm.functions", name))
             }
+
+            sequenceOf(
+                Boolean.Companion::class, Byte.Companion::class, Short.Companion::class, Int.Companion::class,
+                Long.Companion::class, Char.Companion::class, Float.Companion::class, Double.Companion::class,
+                Enum.Companion::class, String.Companion::class,
+            ).forEach { put(it.asKPClassName(), it.asJPClassName()) }
 
             // Typealiases defined in Kotlin stdlib 2.3.20 (e.g. `typealias Exception = java.lang.Exception`).
             // Using `KClass.asClassName()` on typealiases resolves them to the target Java class at compile time,
@@ -115,7 +121,7 @@ class XClassName private constructor(
             ).forEach { (packageName, typeAliases) ->
                 typeAliases.forEach { put(KPClassName(packageName, it.java.simpleName), it.asJPClassName()) }
             }
-        }.also { println(it) }
+        }
 
         private val J2K: Map<JPClassName, KPClassName> = K2J.entries.associate { (k, j) -> j to k }
 
