@@ -5,7 +5,7 @@ import io.github.diskria.poetesse.PoetesseJava
 @PoetesseJava
 class JavaMethodScope private constructor(
     private val specBuilder: JPMethodBuilder
-) : JavaModifierContainer,
+) : JavaVisibilityAllowedModifierContainer,
     JavaAnnotationContainer {
 
     internal val modifierContainer = JavaModifierContainerInternal.of(

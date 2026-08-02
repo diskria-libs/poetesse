@@ -8,7 +8,7 @@ class JavaTypeScope private constructor(
     val className: XClassName,
     private val specBuilder: JPTypeBuilder
 ) : JavaAnnotationContainer,
-    JavaModifierContainer,
+    JavaVisibilityAllowedModifierContainer,
     JavaMethodContainer,
     JavaTypeContainer {
 

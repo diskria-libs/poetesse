@@ -6,6 +6,13 @@ sealed interface JavaModifierContainer {
         internal.append(*modifiers)
     }
 
+    fun final() {
+        modifiers(JPModifier.FINAL)
+    }
+}
+
+sealed interface JavaVisibilityAllowedModifierContainer : JavaModifierContainer {
+
     fun visibility(visibility: JavaVisibility) {
         if (visibility == JavaVisibility.PACKAGE_PRIVATE) return
         modifiers(
@@ -32,10 +39,6 @@ sealed interface JavaModifierContainer {
     fun private() {
         visibility(JavaVisibility.PRIVATE)
     }
-
-    fun final() {
-        modifiers(JPModifier.FINAL)
-    }
 }
 
 internal interface JavaModifierContainerInternal {
@@ -55,4 +58,5 @@ private val JavaModifierContainer.internal: JavaModifierContainerInternal
     get() = when (this) {
         is JavaTypeScope -> modifierContainer
         is JavaMethodScope -> modifierContainer
+        is JavaVariableScope -> modifierContainer
     }

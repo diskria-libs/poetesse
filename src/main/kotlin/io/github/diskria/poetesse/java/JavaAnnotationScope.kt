@@ -79,13 +79,13 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
 
     @JvmName("classArgument")
     fun argument(property: ArgumentProperty<A, KClass<*>>, value: KClass<*>) {
-        argument(property) { expression.class_(value) }
+        argument(property) { expression.classRef(value) }
     }
 
     @JvmName("classArrayArgument")
     fun argument(property: ArrayArgumentProperty<A, KClass<*>>, values: Iterable<KClass<*>>) {
         argument(property) {
-            expression.arrayOf(values) { expression.class_(it) }
+            expression.arrayOf(values) { expression.classRef(it) }
         }
     }
 
@@ -96,13 +96,13 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
 
     @JvmName("classNameArgument")
     fun argument(property: ArgumentProperty<A, KClass<*>>, value: XTypeName) {
-        argument(property) { expression.class_(value) }
+        argument(property) { expression.classRef(value) }
     }
 
     @JvmName("classNameArrayArgument")
     fun argument(property: ArrayArgumentProperty<A, KClass<*>>, values: Iterable<XTypeName>) {
         argument(property) {
-            expression.arrayOf(values) { expression.class_(it) }
+            expression.arrayOf(values) { expression.classRef(it) }
         }
     }
 

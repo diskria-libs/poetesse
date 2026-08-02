@@ -19,66 +19,57 @@ sealed interface JavaCodeBlockContainer : JavaCodeBlockFactory {
     }
 }
 
-fun JavaCodeBlockContainer.variable(name: String, mutable: Boolean = false, value: JavaCodeBuilder): String =
-    variable(name, { L("var") }, mutable, value)
+fun JavaCodeBlockContainer.variable(
+    name: String,
+    build: JavaVariableBuilder
+): String = variable(name, type = { L("var") }, build)
 
 fun JavaCodeBlockContainer.variable(
     name: String,
     type: XTypeName,
-    mutable: Boolean = false,
     interop: Boolean = true,
-    value: JavaCodeBuilder
-): String = variable(name, { T(type, interop) }, mutable, value)
+    build: JavaVariableBuilder
+): String = variable(name, { T(type, interop) }, build)
 
 fun JavaCodeBlockContainer.variable(
     type: XTypeName,
-    mutable: Boolean = false,
     interop: Boolean = true,
-    value: JavaCodeBuilder
-) = EagerDelegate { name -> variable(name, type, mutable, interop, value) }
+    build: JavaVariableBuilder
+) = EagerDelegate { name -> variable(name, type, interop, build) }
 
 fun JavaCodeBlockContainer.variable(
     name: String,
     type: KClass<out Any>,
-    mutable: Boolean = false,
     nullable: Boolean = false,
     interop: Boolean = true,
-    value: JavaCodeBuilder
-): String = variable(name, XTypeName.of(type, nullable), mutable, interop, value)
+    build: JavaVariableBuilder
+): String = variable(name, XTypeName.of(type, nullable), interop, build)
 
 fun JavaCodeBlockContainer.variable(
     type: KClass<out Any>,
-    mutable: Boolean = false,
     nullable: Boolean = false,
     interop: Boolean = true,
-    value: JavaCodeBuilder
-) = EagerDelegate { name -> variable(name, type, mutable, nullable, interop, value) }
+    build: JavaVariableBuilder
+) = EagerDelegate { name -> variable(name, type, nullable, interop, build) }
 
 inline fun <reified T : Any> JavaCodeBlockContainer.variable(
     name: String,
-    mutable: Boolean = false,
     nullable: Boolean = false,
     interop: Boolean = true,
-    noinline value: JavaCodeBuilder
-): String = variable(name, T::class, mutable, nullable, interop, value)
+    noinline build: JavaVariableBuilder
+): String = variable(name, T::class, nullable, interop, build)
 
 inline fun <reified T : Any> JavaCodeBlockContainer.variable(
-    mutable: Boolean = false,
     nullable: Boolean = false,
     interop: Boolean = true,
-    noinline value: JavaCodeBuilder
-) = EagerDelegate { name -> variable<T>(name, mutable, nullable, interop, value) }
+    noinline build: JavaVariableBuilder
+) = EagerDelegate { name -> variable<T>(name, nullable, interop, build) }
 
-fun JavaCodeBlockContainer.variable(mutable: Boolean = false, value: JavaCodeBuilder) =
-    EagerDelegate { name -> variable(name, mutable, value) }
+fun JavaCodeBlockContainer.variable(build: JavaVariableBuilder) =
+    EagerDelegate { name -> variable(name, build) }
 
-private fun JavaCodeBlockContainer.variable(
-    name: String,
-    type: JavaCodeBuilder,
-    mutable: Boolean = false,
-    value: JavaCodeBuilder
-): String {
-    line { (if (mutable) "" else "final ") + "${L(type)} $name = ${L(value)}" }
+private fun JavaCodeBlockContainer.variable(name: String, type: JavaCodeBuilder, build: JavaVariableBuilder): String {
+    line { L(JavaVariableScope.of(name, type, build)) }
     return name
 }
 
