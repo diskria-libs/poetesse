@@ -15,7 +15,10 @@ fun JavaFieldContainer.field(
     type: XTypeName,
     interop: Boolean = true,
     block: JavaFieldScope.() -> Unit = {}
-) = +factory.field(name, type, interop, block)
+): String {
+    +factory.field(name, type, interop, block)
+    return name
+}
 
 fun JavaFieldContainer.field(
     type: XTypeName,

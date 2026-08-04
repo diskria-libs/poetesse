@@ -4,7 +4,9 @@ import com.squareup.kotlinpoet.asClassName
 import io.github.diskria.poetesse.extensions.asJPClassName
 import io.github.diskria.poetesse.extensions.asKPClassName
 import io.github.diskria.poetesse.extensions.setNullable
+import io.github.diskria.poetesse.java.JPArrayTypeName
 import io.github.diskria.poetesse.java.JPClassName
+import io.github.diskria.poetesse.java.JPTypeName
 import io.github.diskria.poetesse.kotlin.KPClassName
 import kotlin.reflect.KClass
 
@@ -28,13 +30,19 @@ class XClassName private constructor(
     )
 
     override fun interopToKotlin(): KPClassName {
-        val mapped = J2K[kotlinAsJava] ?: javaAsKotlin
-        return mapped.setNullable(isNullable)
+        val kpClassName = J2K[kotlinAsJava] ?: javaAsKotlin
+        return kpClassName.setNullable(isNullable)
     }
 
-    override fun interopToJava(): JPClassName {
-        val key = javaAsKotlin.setNullable(false)
-        return K2J[key] ?: kotlinAsJava
+    override fun interopToJava(): JPTypeName {
+        val kpClassName = javaAsKotlin.setNullable(false)
+        XPrimitiveKind.entries.forEach {
+            if (it == XPrimitiveKind.VOID) return@forEach
+            if (kpClassName == it.kotlin.peerClass(it.kotlin.simpleName + "Array")) {
+                return JPArrayTypeName.of(if (isNullable) it.java.box() else it.java)
+            }
+        }
+        return K2J[kpClassName] ?: kotlinAsJava
     }
 
     fun nested(name: String): XClassName =

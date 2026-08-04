@@ -1,15 +1,13 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.PoetesseJava
-import io.github.diskria.poetesse.interop.XTypeName
-import kotlin.reflect.KClass
 
 @PoetesseJava
-class JavaMethodScope private constructor(
+class JavaConstructorScope private constructor(
     private val specBuilder: JPMethodBuilder
 ) : JavaParameterContainer,
     JavaAnnotationContainer,
-    JavaFinalWithVisibilityModifierContainer {
+    JavaVisibilityOnlyModifierContainer {
 
     internal val parameterContainer = JavaParameterContainerInternal.of(
         append = { specBuilder.addParameter(it) }
@@ -21,23 +19,9 @@ class JavaMethodScope private constructor(
         append = { specBuilder.addModifiers(*it) }
     )
 
-    fun static() {
-        modifiers(JPModifier.STATIC)
-    }
-
     fun body(block: BodyScope.() -> Unit) {
         BodyScope().apply(block)
     }
-
-    fun returnType(type: XTypeName, interop: Boolean = true) {
-        specBuilder.returns(type.toJava(interop))
-    }
-
-    fun returnType(type: KClass<out Any>, nullable: Boolean = false, interop: Boolean = true) =
-        returnType(XTypeName.of(type, nullable), interop)
-
-    inline fun <reified T : Any> returnType(nullable: Boolean = false, interop: Boolean = true) =
-        returnType(T::class, nullable, interop)
 
     internal fun build(): JPMethod =
         specBuilder.build()
@@ -49,7 +33,7 @@ class JavaMethodScope private constructor(
     }
 
     internal companion object {
-        fun of(name: String): JavaMethodScope =
-            JavaMethodScope(JPMethod.methodBuilder(name))
+        fun of(): JavaConstructorScope =
+            JavaConstructorScope(JPMethod.constructorBuilder())
     }
 }

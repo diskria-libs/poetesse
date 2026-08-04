@@ -50,6 +50,8 @@ private val JavaAnnotationContainer.internal: JavaAnnotationContainerInternal
     get() = when (this) {
         is JavaTypeScope -> annotationContainer
         is JavaFieldScope -> annotationContainer
+        is JavaConstructorScope -> annotationContainer
         is JavaMethodScope -> annotationContainer
+        is JavaParameterScope -> annotationContainer
         is JavaVariableScope -> annotationContainer
     }

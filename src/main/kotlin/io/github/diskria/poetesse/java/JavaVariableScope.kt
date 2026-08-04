@@ -3,39 +3,41 @@ package io.github.diskria.poetesse.java
 import io.github.diskria.poetesse.PoetesseJava
 import io.github.diskria.poetesse.extensions.joinWithTrailing
 
-typealias JavaVariableBuilder = JavaVariableScope.() -> String
-
 @PoetesseJava
-class JavaVariableScope private constructor(
+class JavaVariableScope internal constructor(
     val name: String,
-    private val type: JavaCodeBuilder,
-    private val value: JavaVariableBuilder
-) : JavaCodeArgumentsScope(),
-    JavaModifierContainer,
+    private val type: JavaCodeRef?,
+) : JavaFinalOnlyModifierContainer,
     JavaAnnotationContainer {
 
-    private val modifiers: MutableList<String> = mutableListOf()
+    private val modifiers: MutableList<JPModifier> = mutableListOf()
     private val annotations: MutableList<JPAnnotation> = mutableListOf()
 
+    private var initializer: JavaCodeRef? = null
+
     internal val modifierContainer = JavaModifierContainerInternal.of(
-        append = { modifiers += it.map { modifier -> modifier.toString() } }
+        append = { modifiers += it }
     )
     internal val annotationContainer = JavaAnnotationContainerInternal.of(
         append = { annotations += it },
     )
 
-    private fun build(): JPCodeBlock = build {
-        val value = value()
-        withPrepend {
-            val annotations = annotations.map { L(it) }.joinWithTrailing(" ")
-            val modifiers = modifiers.joinWithTrailing(" ")
-            val type = L(type)
-            "$annotations$modifiers$type $name = $value"
-        }
+    fun initializer(block: JavaCodeBuilder) {
+        initializer = JavaCodeScope.of(block)
     }
 
-    internal companion object {
-        fun of(name: String, type: JavaCodeBuilder, value: JavaVariableBuilder): JavaCodeRef =
-            JavaCodeRef { JavaVariableScope(name, type, value).build() }
+    internal fun build(): JavaCodeBuilder {
+        val annotations = this@JavaVariableScope.annotations
+        val modifiers = this@JavaVariableScope.modifiers
+        val type = this@JavaVariableScope.type
+        val name = this@JavaVariableScope.name
+        val initializer = this@JavaVariableScope.initializer
+        return {
+            val annotations = annotations.joinWithTrailing(" ") { L(it) }
+            val modifiers = modifiers.joinWithTrailing(" ")
+            val type = type?.let { L(it) } ?: L("var")
+            val initializer = initializer?.takeIf { !it.codeBlock.isEmpty }?.let { " = ${L(it)}" }.orEmpty()
+            "$annotations$modifiers$type $name$initializer"
+        }
     }
 }

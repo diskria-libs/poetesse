@@ -1,19 +1,18 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.EagerDelegate
-import io.github.diskria.poetesse.interop.XFunctionName
 
 sealed interface JavaMethodContainer : JavaMethodFactory {
 
-    operator fun JavaMethodRef.unaryPlus(): XFunctionName {
+    operator fun JavaMethodRef.unaryPlus(): String {
         internal.append(spec)
-        return XFunctionName.of(name)
+        return name
     }
 
-    fun method(name: String, block: JavaMethodScope.() -> Unit = {}): XFunctionName =
+    fun method(name: String, block: JavaMethodScope.() -> Unit = {}): String =
         +factory.method(name, block)
 
-    fun method(block: JavaMethodScope.() -> Unit = {}): EagerDelegate<XFunctionName> =
+    fun method(block: JavaMethodScope.() -> Unit = {}): EagerDelegate<String> =
         EagerDelegate { name -> method(name, block) }
 }
 

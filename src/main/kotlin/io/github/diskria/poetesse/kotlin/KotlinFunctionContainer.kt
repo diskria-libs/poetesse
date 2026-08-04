@@ -1,12 +1,10 @@
 package io.github.diskria.poetesse.kotlin
 
-import io.github.diskria.poetesse.interop.XFunctionName
-
 sealed interface KotlinFunctionContainer {
 
-    fun fun_(name: String, block: KotlinFunctionScope.() -> Unit = {}): XFunctionName {
+    fun fun_(name: String, block: KotlinFunctionScope.() -> Unit = {}): String {
         internal.holderBuilder.addFunction(KotlinFunctionScope.of(name).apply(block).build())
-        return XFunctionName.of(name)
+        return name
     }
 }
 

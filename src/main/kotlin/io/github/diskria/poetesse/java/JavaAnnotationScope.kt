@@ -13,8 +13,12 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
     private typealias ArgumentProperty<A, V> = KProperty1<out A, V>
     private typealias ArrayArgumentProperty<A, E> = ArgumentProperty<A, Array<out E>>
 
+    fun argument(name: String, value: JPCodeBlock) {
+        specBuilder.addMember(name, value)
+    }
+
     fun argument(name: String, deferredCode: JavaCodeRef) {
-        specBuilder.addMember(name, deferredCode.codeBlock)
+        argument(name, deferredCode.codeBlock)
     }
 
     fun argument(name: String, value: JavaCodeBuilder) {
@@ -169,7 +173,7 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
     @PublishedApi
     internal companion object {
         fun <A : Annotation> of(className: XClassName): JavaAnnotationScope<A> =
-            JavaAnnotationScope(JPAnnotation.builder(className.interopToJava()))
+            JavaAnnotationScope(JPAnnotation.builder(className.kotlinAsJava))
 
         fun <A : Annotation> of(kClass: KClass<out A>): JavaAnnotationScope<A> =
             of(XClassName.of(kClass))

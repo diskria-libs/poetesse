@@ -15,61 +15,111 @@ sealed interface JavaCodeBlockContainer : JavaCodeBlockFactory {
     }
 
     private operator fun JPCodeBlock.unaryPlus() {
+        if (isEmpty) return
         internal.append(this)
     }
 }
 
-fun JavaCodeBlockContainer.variable(
+fun JavaCodeBlockContainer.fullVariable(name: String, block: JavaVariableScope.() -> Unit) =
+    fullVariable(name, type = null, block)
+
+fun JavaCodeBlockContainer.variable(name: String, initializer: JavaCodeBuilder) =
+    fullVariable(name) { initializer(initializer) }
+
+fun JavaCodeBlockContainer.fullVariable(
     name: String,
-    build: JavaVariableBuilder
-): String = variable(name, type = { L("var") }, build)
+    type: XTypeName,
+    interop: Boolean = true,
+    block: JavaVariableScope.() -> Unit
+) = fullVariable(name, { T(type, interop) }, block)
 
 fun JavaCodeBlockContainer.variable(
     name: String,
     type: XTypeName,
     interop: Boolean = true,
-    build: JavaVariableBuilder
-): String = variable(name, { T(type, interop) }, build)
+    initializer: JavaCodeBuilder
+) = fullVariable(name, type, interop) { initializer(initializer) }
+
+fun JavaCodeBlockContainer.fullVariable(
+    type: XTypeName,
+    interop: Boolean = true,
+    block: JavaVariableScope.() -> Unit
+) = EagerDelegate { name -> fullVariable(name, type, interop, block) }
 
 fun JavaCodeBlockContainer.variable(
     type: XTypeName,
     interop: Boolean = true,
-    build: JavaVariableBuilder
-) = EagerDelegate { name -> variable(name, type, interop, build) }
+    initializer: JavaCodeBuilder
+) = fullVariable(type, interop) { initializer(initializer) }
+
+fun JavaCodeBlockContainer.fullVariable(
+    name: String,
+    type: KClass<out Any>,
+    nullable: Boolean = false,
+    interop: Boolean = true,
+    block: JavaVariableScope.() -> Unit
+) = fullVariable(name, XTypeName.of(type, nullable), interop, block)
 
 fun JavaCodeBlockContainer.variable(
     name: String,
     type: KClass<out Any>,
     nullable: Boolean = false,
     interop: Boolean = true,
-    build: JavaVariableBuilder
-): String = variable(name, XTypeName.of(type, nullable), interop, build)
+    initializer: JavaCodeBuilder
+) = fullVariable(name, type, nullable, interop) { initializer(initializer) }
+
+fun JavaCodeBlockContainer.fullVariable(
+    type: KClass<out Any>,
+    nullable: Boolean = false,
+    interop: Boolean = true,
+    block: JavaVariableScope.() -> Unit
+) = EagerDelegate { name -> fullVariable(name, type, nullable, interop, block) }
 
 fun JavaCodeBlockContainer.variable(
     type: KClass<out Any>,
     nullable: Boolean = false,
     interop: Boolean = true,
-    build: JavaVariableBuilder
-) = EagerDelegate { name -> variable(name, type, nullable, interop, build) }
+    initializer: JavaCodeBuilder
+) = fullVariable(type, nullable, interop) { initializer(initializer) }
+
+inline fun <reified T : Any> JavaCodeBlockContainer.fullVariable(
+    name: String,
+    nullable: Boolean = false,
+    interop: Boolean = true,
+    noinline block: JavaVariableScope.() -> Unit
+) = fullVariable(name, T::class, nullable, interop, block)
 
 inline fun <reified T : Any> JavaCodeBlockContainer.variable(
     name: String,
     nullable: Boolean = false,
     interop: Boolean = true,
-    noinline build: JavaVariableBuilder
-): String = variable(name, T::class, nullable, interop, build)
+    noinline initializer: JavaCodeBuilder
+) = fullVariable<T>(name, nullable, interop) { initializer(initializer) }
+
+inline fun <reified T : Any> JavaCodeBlockContainer.fullVariable(
+    nullable: Boolean = false,
+    interop: Boolean = true,
+    noinline block: JavaVariableScope.() -> Unit
+) = EagerDelegate { name -> fullVariable<T>(name, nullable, interop, block) }
 
 inline fun <reified T : Any> JavaCodeBlockContainer.variable(
     nullable: Boolean = false,
     interop: Boolean = true,
-    noinline build: JavaVariableBuilder
-) = EagerDelegate { name -> variable<T>(name, nullable, interop, build) }
+    noinline initializer: JavaCodeBuilder,
+) = fullVariable<T>(nullable, interop) { initializer(initializer) }
 
-fun JavaCodeBlockContainer.variable(build: JavaVariableBuilder) =
-    EagerDelegate { name -> variable(name, build) }
+fun JavaCodeBlockContainer.fullVariable(block: JavaVariableScope.() -> Unit) =
+    EagerDelegate { name -> fullVariable(name, block) }
 
-private fun JavaCodeBlockContainer.variable(name: String, type: JavaCodeBuilder, build: JavaVariableBuilder): String {
-    line { L(JavaVariableScope.of(name, type, build)) }
+fun JavaCodeBlockContainer.variable(initializer: JavaCodeBuilder) =
+    fullVariable { initializer(initializer) }
+
+private fun JavaCodeBlockContainer.fullVariable(
+    name: String,
+    type: JavaCodeBuilder?,
+    block: JavaVariableScope.() -> Unit
+): String {
+    line(JavaVariableScope(name, type?.let { code(it) }).apply(block).build())
     return name
 }
 
@@ -88,6 +138,7 @@ internal interface JavaCodeBlockContainerInternal {
 
 private val JavaCodeBlockContainer.internal: JavaCodeBlockContainerInternal
     get() = when (this) {
+        is JavaConstructorScope.BodyScope -> codeBlockContainer
         is JavaMethodScope.BodyScope -> codeBlockContainer
         is JavaCodeBlockScope -> codeBlockContainer
     }

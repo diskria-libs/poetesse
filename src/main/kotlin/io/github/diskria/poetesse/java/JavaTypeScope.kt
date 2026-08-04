@@ -9,9 +9,10 @@ class JavaTypeScope private constructor(
     private val specBuilder: JPTypeBuilder
 ) : JavaTypeContainer,
     JavaFieldContainer,
+    JavaConstructorContainer,
     JavaMethodContainer,
     JavaAnnotationContainer,
-    JavaVisibilityAllowedModifierContainer {
+    JavaFinalWithVisibilityModifierContainer {
 
     internal val typeContainer = JavaTypeContainerInternal.of(
         append = { specBuilder.addType(it) },
@@ -19,6 +20,9 @@ class JavaTypeScope private constructor(
     )
     internal val fieldContainer = JavaFieldContainerInternal.of(
         append = { specBuilder.addField(it) }
+    )
+    internal val constructorContainer = JavaConstructorContainerInternal.of(
+        append = { specBuilder.addMethod(it) }
     )
     internal val methodContainer = JavaMethodContainerInternal.of(
         append = { specBuilder.addMethod(it) }

@@ -9,7 +9,9 @@ class JavaFactory(
     internal val settings: Poetesse.Settings
 ) : JavaTypeFactory,
     JavaFieldFactory,
+    JavaConstructorFactory,
     JavaMethodFactory,
+    JavaParameterFactory,
     JavaAnnotationFactory,
     JavaCodeBlockFactory {
 
