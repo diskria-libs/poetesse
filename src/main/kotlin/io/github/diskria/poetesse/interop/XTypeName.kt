@@ -33,8 +33,9 @@ sealed class XTypeName {
 }
 
 fun KPTypeName.asXTypeName(): XTypeName = when (this) {
-    is ClassName -> asXVoidTypeNameOrNull() ?: asXPrimitiveTypeNameOrNull() ?: asXArrayTypeNameOrNull()
-    ?: asXClassName()
+    is ClassName -> {
+        asXVoidTypeNameOrNull() ?: asXPrimitiveTypeNameOrNull() ?: asXArrayTypeNameOrNull() ?: asXClassName()
+    }
 
     is ParameterizedTypeName -> asXArrayTypeNameOrNull() ?: asXParameterizedTypeName()
     is TypeVariableName -> TODO("XTypeVariableName is not implemented")
@@ -53,7 +54,7 @@ fun JPTypeName.asXTypeName(): XTypeName = when (this) {
 }
 
 fun KClass<out Any>.asXTypeName(): XTypeName =
-    asXPrimitiveTypeNameOrNull() ?: asXClassName()
+    asXVoidTypeNameOrNull() ?: asXPrimitiveTypeNameOrNull() ?: asXClassName()
 
 @Suppress("UNCHECKED_CAST")
 fun <T : XTypeName> T.setNullable(nullable: Boolean): T =
