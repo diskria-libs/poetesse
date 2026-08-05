@@ -2,6 +2,8 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.LazyDelegate
 import io.github.diskria.poetesse.interop.XTypeName
+import io.github.diskria.poetesse.interop.asXTypeName
+import io.github.diskria.poetesse.interop.setNullable
 import kotlin.reflect.KClass
 
 interface JavaFieldFactory
@@ -25,7 +27,7 @@ fun JavaFieldFactory.field(
     nullable: Boolean = false,
     interop: Boolean = true,
     block: JavaFieldScope.() -> Unit = {}
-) = field(name, XTypeName.of(type, nullable), interop, block)
+) = field(name, type.asXTypeName().setNullable(nullable), interop, block)
 
 fun JavaFieldFactory.field(
     type: KClass<out Any>,

@@ -2,6 +2,8 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.EagerDelegate
 import io.github.diskria.poetesse.interop.XTypeName
+import io.github.diskria.poetesse.interop.asXTypeName
+import io.github.diskria.poetesse.interop.setNullable
 import kotlin.reflect.KClass
 
 sealed interface JavaParameterContainer : JavaParameterFactory {
@@ -32,7 +34,7 @@ fun JavaParameterContainer.parameter(
     nullable: Boolean = false,
     interop: Boolean = true,
     block: JavaParameterScope.() -> Unit = {}
-) = parameter(name, XTypeName.of(type, nullable), interop, block)
+) = parameter(name, type.asXTypeName().setNullable(nullable), interop, block)
 
 fun JavaParameterContainer.parameter(
     type: KClass<out Any>,
@@ -46,7 +48,7 @@ inline fun <reified T : Any> JavaParameterContainer.parameter(
     nullable: Boolean = false,
     interop: Boolean = true,
     noinline block: JavaParameterScope.() -> Unit = {}
-) = parameter(name, XTypeName.of<T>(nullable), interop, block)
+) = parameter(name, XTypeName.of<T>().setNullable(nullable), interop, block)
 
 inline fun <reified T : Any> JavaParameterContainer.parameter(
     nullable: Boolean = false,

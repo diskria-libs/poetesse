@@ -3,6 +3,7 @@ package io.github.diskria.poetesse.kotlin
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseKotlin
 import io.github.diskria.poetesse.interop.XClassName
+import io.github.diskria.poetesse.interop.setNullable
 
 @PoetesseKotlin
 class KotlinFileScope private constructor(
@@ -14,7 +15,7 @@ class KotlinFileScope private constructor(
 
     internal val typeContainer = KotlinTypeContainerInternal.of(
         holderBuilder = specBuilder,
-        nestedClassName = { name -> XClassName.of(packageName, isNullable = false, name) },
+        nestedClassName = { name -> XClassName.of(packageName, name).setNullable(false) },
     )
     internal val functionContainer = KotlinFunctionContainerInternal.of(
         holderBuilder = specBuilder

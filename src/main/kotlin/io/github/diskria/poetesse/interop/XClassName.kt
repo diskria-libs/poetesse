@@ -4,49 +4,37 @@ import com.squareup.kotlinpoet.asClassName
 import io.github.diskria.poetesse.extensions.asJPClassName
 import io.github.diskria.poetesse.extensions.asKPClassName
 import io.github.diskria.poetesse.extensions.setNullable
-import io.github.diskria.poetesse.java.JPArrayTypeName
 import io.github.diskria.poetesse.java.JPClassName
-import io.github.diskria.poetesse.java.JPTypeName
 import io.github.diskria.poetesse.kotlin.KPClassName
 import kotlin.reflect.KClass
 
 class XClassName private constructor(
     val packageName: String?,
     val simpleNames: List<String>,
-    override val isNullable: Boolean,
-) : XTypeName {
+    override val nullable: Boolean = false,
+) : XTypeName() {
 
     val simpleName: String = simpleNames.last()
     val nestedName: String = simpleNames.joinToString(".")
     val qualifiedName: String = listOfNotNull(packageName, nestedName).joinToString(".")
 
     override val javaAsKotlin: KPClassName =
-        KPClassName(packageName.orEmpty(), simpleNames).setNullable(isNullable)
+        KPClassName(packageName.orEmpty(), simpleNames).setNullable(nullable)
 
-    override val kotlinAsJava: JPClassName = JPClassName.get(
-        packageName.orEmpty(),
-        simpleNames.first(),
-        *simpleNames.drop(1).toTypedArray()
-    )
+    override val kotlinAsJava: JPClassName =
+        JPClassName.get(packageName.orEmpty(), simpleNames.first(), *simpleNames.drop(1).toTypedArray())
 
-    override fun interopToKotlin(): KPClassName {
-        val kpClassName = J2K[kotlinAsJava] ?: javaAsKotlin
-        return kpClassName.setNullable(isNullable)
-    }
+    override fun interopToKotlin(): KPClassName =
+        (J2K[kotlinAsJava] ?: javaAsKotlin).setNullable(nullable)
 
-    override fun interopToJava(): JPTypeName {
-        val kpClassName = javaAsKotlin.setNullable(false)
-        XPrimitiveKind.entries.forEach {
-            if (it == XPrimitiveKind.VOID) return@forEach
-            if (kpClassName == it.kotlin.peerClass(it.kotlin.simpleName + "Array")) {
-                return JPArrayTypeName.of(if (isNullable) it.java.box() else it.java)
-            }
-        }
-        return K2J[kpClassName] ?: kotlinAsJava
-    }
+    override fun interopToJava(): JPClassName =
+        K2J[javaAsKotlin.setNullable(false)] ?: kotlinAsJava
+
+    override fun setNullableInternal(nullable: Boolean): XClassName =
+        XClassName(packageName, simpleNames, nullable)
 
     fun nested(name: String): XClassName =
-        XClassName(packageName, simpleNames + name, false)
+        of(packageName, simpleNames = (simpleNames + name).toTypedArray())
 
     companion object {
         private val K2J: Map<KPClassName, JPClassName> = buildMap {
@@ -131,29 +119,22 @@ class XClassName private constructor(
             }
         }
 
-        private val J2K: Map<JPClassName, KPClassName> = K2J.entries.associate { (k, j) -> j to k }
+        private val J2K: Map<JPClassName, KPClassName> =
+            K2J.entries.associate { (k, j) -> j to k }
 
-        fun of(packageName: String?, isNullable: Boolean = false, vararg simpleNames: String): XClassName =
-            XClassName(packageName, simpleNames.toList(), isNullable)
+        fun of(packageName: String?, vararg simpleNames: String): XClassName =
+            XClassName(packageName, simpleNames.toList())
 
-        fun of(kotlin: KPClassName): XClassName =
-            of(
-                kotlin.packageName.takeIf { it.isNotEmpty() },
-                kotlin.isNullable,
-                *kotlin.simpleNames.toTypedArray(),
-            )
-
-        fun of(java: JPClassName): XClassName =
-            of(
-                java.packageName(),
-                false,
-                *java.simpleNames().toTypedArray(),
-            )
-
-        fun of(kClass: KClass<out Any>, isNullable: Boolean = false): XClassName =
-            of(kClass.asClassName().setNullable(isNullable))
-
-        inline fun <reified T : Any> of(isNullable: Boolean = false): XClassName =
-            of(T::class, isNullable)
+        inline fun <reified T : Any> of(): XClassName =
+            T::class.asXClassName()
     }
 }
+
+fun KPClassName.asXClassName(): XClassName =
+    XClassName.of(packageName.takeIf { it.isNotEmpty() }, *simpleNames.toTypedArray())
+
+fun JPClassName.asXClassName(): XClassName =
+    XClassName.of(packageName(), *simpleNames().toTypedArray())
+
+fun KClass<out Any>.asXClassName(): XClassName =
+    asClassName().asXClassName()

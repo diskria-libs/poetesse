@@ -2,6 +2,8 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.PoetesseJava
 import io.github.diskria.poetesse.interop.XTypeName
+import io.github.diskria.poetesse.interop.asXTypeName
+import io.github.diskria.poetesse.interop.setNullable
 import kotlin.reflect.KClass
 
 @PoetesseJava
@@ -34,7 +36,7 @@ class JavaMethodScope private constructor(
     }
 
     fun returnType(type: KClass<out Any>, nullable: Boolean = false, interop: Boolean = true) =
-        returnType(XTypeName.of(type, nullable), interop)
+        returnType(type.asXTypeName().setNullable(nullable), interop)
 
     inline fun <reified T : Any> returnType(nullable: Boolean = false, interop: Boolean = true) =
         returnType(T::class, nullable, interop)

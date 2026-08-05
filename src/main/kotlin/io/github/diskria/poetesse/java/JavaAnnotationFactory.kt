@@ -1,6 +1,7 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.interop.XClassName
+import io.github.diskria.poetesse.interop.asXClassName
 import kotlin.reflect.KClass
 
 interface JavaAnnotationFactory
@@ -13,10 +14,10 @@ fun <A : Annotation> JavaAnnotationFactory.annotation(
 }
 
 fun <A : Annotation> JavaAnnotationFactory.annotation(
-    kClass: KClass<out A>,
+    type: KClass<out A>,
     block: JavaAnnotationScope<A>.() -> Unit = {}
 ): JavaTypedAnnotationRef<A> =
-    annotation(XClassName.of(kClass), block)
+    annotation(type.asXClassName(), block)
 
 inline fun <reified A : Annotation> JavaAnnotationFactory.annotation(
     noinline block: JavaAnnotationScope<A>.() -> Unit = {}

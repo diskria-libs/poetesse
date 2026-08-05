@@ -2,6 +2,8 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.EagerDelegate
 import io.github.diskria.poetesse.interop.XTypeName
+import io.github.diskria.poetesse.interop.asXTypeName
+import io.github.diskria.poetesse.interop.setNullable
 import kotlin.reflect.KClass
 
 sealed interface JavaFieldContainer : JavaFieldFactory {
@@ -32,7 +34,7 @@ fun JavaFieldContainer.field(
     nullable: Boolean = false,
     interop: Boolean = true,
     block: JavaFieldScope.() -> Unit = {}
-) = field(name, XTypeName.of(type, nullable), interop, block)
+) = field(name, type.asXTypeName().setNullable(nullable), interop, block)
 
 fun JavaFieldContainer.field(
     type: KClass<out Any>,
@@ -46,7 +48,7 @@ inline fun <reified T : Any> JavaFieldContainer.field(
     nullable: Boolean = false,
     interop: Boolean = true,
     noinline block: JavaFieldScope.() -> Unit = {}
-) = field(name, XTypeName.of<T>(nullable), interop, block)
+) = field(name, XTypeName.of<T>().setNullable(nullable), interop, block)
 
 inline fun <reified T : Any> JavaFieldContainer.field(
     nullable: Boolean = false,

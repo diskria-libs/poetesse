@@ -3,6 +3,7 @@ package io.github.diskria.poetesse.java
 import io.github.diskria.poetesse.PoetesseJava
 import io.github.diskria.poetesse.interop.XClassName
 import io.github.diskria.poetesse.interop.XTypeName
+import io.github.diskria.poetesse.interop.asXClassName
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 
@@ -17,8 +18,8 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
         specBuilder.addMember(name, value)
     }
 
-    fun argument(name: String, deferredCode: JavaCodeRef) {
-        argument(name, deferredCode.codeBlock)
+    fun argument(name: String, value: JavaCodeRef) {
+        argument(name, value.codeBlock)
     }
 
     fun argument(name: String, value: JavaCodeBuilder) {
@@ -175,8 +176,8 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
         fun <A : Annotation> of(className: XClassName): JavaAnnotationScope<A> =
             JavaAnnotationScope(JPAnnotation.builder(className.kotlinAsJava))
 
-        fun <A : Annotation> of(kClass: KClass<out A>): JavaAnnotationScope<A> =
-            of(XClassName.of(kClass))
+        fun <A : Annotation> of(type: KClass<out A>): JavaAnnotationScope<A> =
+            of(type.asXClassName())
 
         inline fun <reified A : Annotation> of(): JavaAnnotationScope<A> =
             of(A::class)

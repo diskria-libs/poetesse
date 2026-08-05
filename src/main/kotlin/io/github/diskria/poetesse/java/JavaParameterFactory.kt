@@ -2,6 +2,8 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.LazyDelegate
 import io.github.diskria.poetesse.interop.XTypeName
+import io.github.diskria.poetesse.interop.asXTypeName
+import io.github.diskria.poetesse.interop.setNullable
 import kotlin.reflect.KClass
 
 interface JavaParameterFactory
@@ -25,7 +27,7 @@ fun JavaParameterFactory.parameter(
     nullable: Boolean = false,
     interop: Boolean = true,
     block: JavaParameterScope.() -> Unit = {}
-) = parameter(name, XTypeName.of(type, nullable), interop, block)
+) = parameter(name, type.asXTypeName().setNullable(nullable), interop, block)
 
 fun JavaParameterFactory.parameter(
     type: KClass<out Any>,

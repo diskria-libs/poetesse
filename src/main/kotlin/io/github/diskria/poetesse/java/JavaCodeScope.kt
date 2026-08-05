@@ -2,6 +2,8 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.PoetesseJava
 import io.github.diskria.poetesse.interop.XTypeName
+import io.github.diskria.poetesse.interop.asXTypeName
+import io.github.diskria.poetesse.interop.setNullable
 import kotlin.reflect.KClass
 
 typealias JavaCodeBuilder = JavaCodeScope.() -> String
@@ -14,39 +16,38 @@ class JavaCodeScope internal constructor(
 
     val expression: ExpressionScope by lazy { ExpressionScope() }
 
-    fun T(argument: XTypeName, interop: Boolean = true) = argument.toJava(interop).registerArgument('T')
+    fun argument(argument: Any?, mask: Char): String {
+        arguments += argument
+        return "$$mask"
+    }
 
-    fun T(argument: KClass<out Any>, nullable: Boolean = false, interop: Boolean = true) =
-        T(XTypeName.of(argument, nullable), interop)
+    fun T(value: XTypeName, interop: Boolean = true) = argument(value.toJava(interop), 'T')
+
+    fun T(value: KClass<out Any>, nullable: Boolean = false, interop: Boolean = true) =
+        T(value.asXTypeName().setNullable(nullable), interop)
 
     inline fun <reified T : Any> T(nullable: Boolean = false, interop: Boolean = true) =
         T(T::class, nullable, interop)
 
-    fun S(argument: CharSequence) = argument.registerArgument('S')
+    fun S(value: CharSequence) = argument(value, 'S')
 
-    fun L(argument: Boolean) = argument.registerArgument()
-    fun L(argument: Int) = argument.registerArgument()
-    fun L(argument: String) = argument.registerArgument()
-    fun L(argument: JavaAnnotationRef) = L(argument.spec)
-    fun L(argument: JavaCodeRef) = argument.codeBlock.registerArgument()
+    fun L(value: Boolean) = argument(value, 'L')
+    fun L(value: Int) = argument(value, 'L')
+    fun L(value: String) = argument(value, 'L')
+
+    fun L(value: JPAnnotation) = argument(value, 'L')
+    fun L(value: JavaAnnotationRef) = L(value.spec)
+
+    fun L(code: JavaCodeRef) = argument(code.codeBlock, 'L')
     fun L(build: JavaCodeBuilder) = L(code(build))
-
-    fun argument(mask: Char, argument: Any?) = argument.registerArgument(mask)
-
-    internal fun L(argument: JPAnnotation) = argument.registerArgument()
-
-    private fun <T> T.registerArgument(mask: Char = 'L'): String {
-        arguments += this
-        return "$$mask"
-    }
 
     inner class ExpressionScope {
 
         fun classRef(value: XTypeName, interop: Boolean = true): String =
             "${T(value, interop)}.class"
 
-        fun classRef(value: KClass<out Any>, interop: Boolean = true): String =
-            classRef(XTypeName.of(value), interop)
+        fun classRef(type: KClass<out Any>, interop: Boolean = true): String =
+            classRef(type.asXTypeName(), interop)
 
         inline fun <reified T : Any> classRef(interop: Boolean = true): String =
             classRef(T::class, interop)

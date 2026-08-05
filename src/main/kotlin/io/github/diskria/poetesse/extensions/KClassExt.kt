@@ -5,6 +5,6 @@ import io.github.diskria.poetesse.java.JPClassName
 import io.github.diskria.poetesse.kotlin.KPClassName
 import kotlin.reflect.KClass
 
-internal fun KClass<*>.asKPClassName(): KPClassName = asClassName()
+fun KClass<*>.asKPClassName(): KPClassName = asClassName()
 
-internal fun KClass<*>.asJPClassName(): JPClassName = JPClassName.get(java)
+fun KClass<*>.asJPClassName(): JPClassName = JPClassName.get(java)

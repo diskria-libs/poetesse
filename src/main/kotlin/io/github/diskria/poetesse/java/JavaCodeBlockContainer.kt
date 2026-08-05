@@ -2,6 +2,8 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.EagerDelegate
 import io.github.diskria.poetesse.interop.XTypeName
+import io.github.diskria.poetesse.interop.asXTypeName
+import io.github.diskria.poetesse.interop.setNullable
 import kotlin.reflect.KClass
 
 sealed interface JavaCodeBlockContainer : JavaCodeBlockFactory {
@@ -58,7 +60,7 @@ fun JavaCodeBlockContainer.fullVariable(
     nullable: Boolean = false,
     interop: Boolean = true,
     block: JavaVariableScope.() -> Unit
-) = fullVariable(name, XTypeName.of(type, nullable), interop, block)
+) = fullVariable(name, type.asXTypeName().setNullable(nullable), interop, block)
 
 fun JavaCodeBlockContainer.variable(
     name: String,
