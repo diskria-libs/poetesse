@@ -1,20 +1,15 @@
 package io.github.diskria.poetesse.extensions
 
-import io.github.diskria.poetesse.java.JPArrayTypeName
-import io.github.diskria.poetesse.java.JPClassName
-import io.github.diskria.poetesse.java.JPParameterizedTypeName
-import io.github.diskria.poetesse.java.JPTypeName
-
-private val BOXED_VOID: JPTypeName = JPTypeName.VOID.box()
+import io.github.diskria.poetesse.java.*
 
 val JPTypeName.isVoid: Boolean
-    get() = withoutAnnotations() == JPTypeName.VOID
+    get() = withoutAnnotations() == JPVoid
 
 val JPTypeName.isVoidOrPrimitive: Boolean
     get() = isVoid || isPrimitive
 
 val JPTypeName.isBoxedVoid: Boolean
-    get() = withoutAnnotations() == BOXED_VOID
+    get() = withoutAnnotations() == JPBoxedVoid
 
 val JPTypeName.isBoxedVoidOrPrimitive: Boolean
     get() = isBoxedVoid || isBoxedPrimitive

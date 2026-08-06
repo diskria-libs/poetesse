@@ -7,7 +7,6 @@ import io.github.diskria.poetesse.extensions.setNullable
 import io.github.diskria.poetesse.extensions.withoutAnnotations
 import io.github.diskria.poetesse.interop.XPrimitiveTypeName.Companion.J2KIND
 import io.github.diskria.poetesse.interop.XPrimitiveTypeName.Companion.K2KIND
-import io.github.diskria.poetesse.java.JPClassName
 import io.github.diskria.poetesse.java.JPTypeName
 import io.github.diskria.poetesse.kotlin.KPClassName
 import io.github.diskria.poetesse.kotlin.KPTypeName
@@ -17,9 +16,6 @@ class XPrimitiveTypeName internal constructor(
     internal val kind: XPrimitiveKind,
     override val nullable: Boolean = false,
 ) : XTypeName() {
-
-    override val kotlinAsJava: JPClassName =
-        kind.kotlin.asXClassName().kotlinAsJava
 
     override fun interopToKotlin(): KPClassName =
         kind.kotlin.setNullable(nullable)

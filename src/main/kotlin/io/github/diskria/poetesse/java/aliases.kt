@@ -32,3 +32,17 @@ typealias JPArrayTypeName = ArrayTypeName
 typealias JPParameterizedTypeName = ParameterizedTypeName
 typealias JPTypeVariableName = TypeVariableName
 typealias JPWildcardTypeName = WildcardTypeName
+
+val JPVoid: JPTypeName = JPTypeName.VOID
+val JPBoxedVoid: JPClassName = JPVoid.box() as JPClassName
+
+val JPBoolean: JPTypeName = JPTypeName.BOOLEAN
+val JPByte: JPTypeName = JPTypeName.BYTE
+val JPShort: JPTypeName = JPTypeName.SHORT
+val JPInt: JPTypeName = JPTypeName.INT
+val JPLong: JPTypeName = JPTypeName.LONG
+val JPChar: JPTypeName = JPTypeName.CHAR
+val JPFloat: JPTypeName = JPTypeName.FLOAT
+val JPDouble: JPTypeName = JPTypeName.DOUBLE
+
+val JPObject: JPClassName = JPClassName.OBJECT

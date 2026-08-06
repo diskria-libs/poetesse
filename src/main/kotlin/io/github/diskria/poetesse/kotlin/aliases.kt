@@ -39,3 +39,20 @@ typealias KPTypeVariableName = TypeVariableName
 typealias KPWildcardTypeName = WildcardTypeName
 typealias KPLambdaTypeName = LambdaTypeName
 typealias KPDynamic = Dynamic
+
+val KPUnit: KPClassName = UNIT
+
+val KPBoolean: KPClassName = BOOLEAN
+val KPByte: KPClassName = BYTE
+val KPShort: KPClassName = SHORT
+val KPInt: KPClassName = INT
+val KPLong: KPClassName = LONG
+val KPChar: KPClassName = CHAR
+val KPFloat: KPClassName = FLOAT
+val KPDouble: KPClassName = DOUBLE
+
+val KPArray: KPClassName = ARRAY
+
+val KPAny: KPClassName = ANY
+
+val KPStar: KPWildcardTypeName = STAR

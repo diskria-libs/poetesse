@@ -57,11 +57,6 @@ class XClassName private constructor(
                 put(KPClassName(kp.packageName, kp.simpleNames.map { "Mutable$it" }), jp)
             }
 
-            (0..22).forEach { i ->
-                val name = "Function$i"
-                put(KPClassName("kotlin", name), JPClassName.get("kotlin.jvm.functions", name))
-            }
-
             sequenceOf(
                 Boolean.Companion::class, Byte.Companion::class, Short.Companion::class, Int.Companion::class,
                 Long.Companion::class, Char.Companion::class, Float.Companion::class, Double.Companion::class,

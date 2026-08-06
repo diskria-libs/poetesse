@@ -1,9 +1,8 @@
 package io.github.diskria.poetesse.interop
 
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import io.github.diskria.poetesse.extensions.parameterizedBy
 import io.github.diskria.poetesse.java.JPArrayTypeName
-import io.github.diskria.poetesse.java.JPTypeName
+import io.github.diskria.poetesse.kotlin.KPArray
 import io.github.diskria.poetesse.kotlin.KPClassName
 import io.github.diskria.poetesse.kotlin.KPParameterizedTypeName
 import io.github.diskria.poetesse.kotlin.KPTypeName
@@ -14,15 +13,11 @@ class XArrayTypeName internal constructor(
     override val nullable: Boolean = false
 ) : XTypeName() {
 
-    override val kotlinAsJava: JPTypeName
-        get() = com.squareup.kotlinpoet.ARRAY.asXClassName().kotlinAsJava
-            .parameterizedBy(componentType.kotlinAsJava)
-
     override fun interopToKotlin(): KPTypeName =
         if (componentType is XPrimitiveTypeName) {
             componentType.kind.kotlinArrayClassName
         } else {
-            com.squareup.kotlinpoet.ARRAY.parameterizedBy(componentType.interopToKotlin())
+            KPArray.parameterizedBy(componentType.interopToKotlin())
         }
 
     override fun interopToJava(): JPArrayTypeName =
