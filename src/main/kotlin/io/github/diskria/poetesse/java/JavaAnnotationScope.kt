@@ -174,7 +174,7 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
     @PublishedApi
     internal companion object {
         fun <A : Annotation> of(className: XClassName): JavaAnnotationScope<A> =
-            JavaAnnotationScope(JPAnnotation.builder(className.kotlinAsJava))
+            JavaAnnotationScope(JPAnnotation.builder(className.interopToJava()))
 
         fun <A : Annotation> of(type: KClass<out A>): JavaAnnotationScope<A> =
             of(type.asXClassName())

@@ -10,7 +10,7 @@ import kotlin.reflect.KClass
 
 class XArrayTypeName internal constructor(
     val componentType: XTypeName,
-    override val nullable: Boolean = false
+    override val nullable: Boolean = false,
 ) : XTypeName() {
 
     override fun interopToKotlin(): KPTypeName =

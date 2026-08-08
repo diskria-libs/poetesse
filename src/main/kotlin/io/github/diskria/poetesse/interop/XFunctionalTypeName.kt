@@ -1,50 +1,55 @@
 package io.github.diskria.poetesse.interop
 
+import com.squareup.kotlinpoet.ExperimentalKotlinPoetApi
 import io.github.diskria.poetesse.extensions.setNullable
 import io.github.diskria.poetesse.java.JPClassName
 import io.github.diskria.poetesse.java.JPParameterizedTypeName
-import io.github.diskria.poetesse.kotlin.KPLambdaTypeName
+import io.github.diskria.poetesse.kotlin.KPFunctionalTypeName
 
 class XFunctionalTypeName(
+    val contextParameters: List<XTypeName> = emptyList(),
     val receiver: XTypeName? = null,
-    val parameters: List<XNamedType> = emptyList(),
+    val parameters: List<XParameter> = emptyList(),
     val returnType: XTypeName,
     override val nullable: Boolean = false,
 ) : XTypeName() {
 
-    override fun interopToKotlin(): KPLambdaTypeName =
-        KPLambdaTypeName.get(
+    @OptIn(ExperimentalKotlinPoetApi::class)
+    override fun interopToKotlin(): KPFunctionalTypeName =
+        KPFunctionalTypeName.get(
+            contextParameters = contextParameters.map { it.interopToKotlin() },
             receiver = receiver?.interopToKotlin(),
-            parameters = parameters.map { it.interopToKotlinFunctionalTypeParameter() },
+            parameters = parameters.map { it.interopToKotlin(fallbackName = "") },
             returnType = returnType.interopToKotlin(),
         ).setNullable(nullable)
 
     override fun interopToJava(): JPParameterizedTypeName {
         val allArguments = buildList {
+            contextParameters.forEach { add(it.interopToJava()) }
             if (receiver != null) {
                 add(receiver.interopToJava())
             }
             parameters.forEach { add(it.type.interopToJava()) }
         }
-
         val arity = allArguments.size
         if (arity > 22) {
             error("Function arity $arity exceeds max supported JVM function arity of 22")
         }
-
         val functionClass = JPClassName.get("kotlin.jvm.functions", "Function$arity")
         val typeArguments = (allArguments + returnType.interopToJava()).toTypedArray()
         return JPParameterizedTypeName.get(functionClass, *typeArguments)
     }
 
     override fun setNullableInternal(nullable: Boolean): XTypeName =
-        XFunctionalTypeName(receiver, parameters, returnType, nullable)
+        XFunctionalTypeName(contextParameters, receiver, parameters, returnType, nullable)
 }
 
-fun KPLambdaTypeName.asXFunctionalTypeName(): XFunctionalTypeName =
+@OptIn(ExperimentalKotlinPoetApi::class)
+fun KPFunctionalTypeName.asXFunctionalTypeName(): XFunctionalTypeName =
     XFunctionalTypeName(
+        contextParameters = contextParameters.map { it.asXTypeName() },
         receiver = receiver?.asXTypeName(),
-        parameters = parameters.map { it.asXNamedType() },
+        parameters = parameters.map { it.asXParameter() },
         returnType = returnType.asXTypeName(),
         nullable = isNullable,
     )
@@ -62,8 +67,7 @@ fun JPParameterizedTypeName.asXFunctionalTypeNameOrNull(): XFunctionalTypeName? 
     val parameterTypes = typeArguments.dropLast(1)
     val returnType = typeArguments.last()
     return XFunctionalTypeName(
-        receiver = null,
-        parameters = parameterTypes.map { XNamedType(type = it.asXTypeName()) },
+        parameters = parameterTypes.map { XParameter(type = it.asXTypeName()) },
         returnType = returnType.asXTypeName(),
     )
 }

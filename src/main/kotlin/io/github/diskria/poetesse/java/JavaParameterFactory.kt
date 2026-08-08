@@ -11,40 +11,34 @@ interface JavaParameterFactory
 fun JavaParameterFactory.parameter(
     name: String,
     type: XTypeName,
-    interop: Boolean = true,
     block: JavaParameterScope.() -> Unit
-) = JavaParameterRef(name) { JavaParameterScope.of(name, type, interop).apply(block).build() }
+) = JavaParameterRef(name) { JavaParameterScope.of(name, type).apply(block).build() }
 
 fun JavaParameterFactory.parameter(
     type: XTypeName,
-    interop: Boolean = true,
     block: JavaParameterScope.() -> Unit = {}
-) = LazyDelegate { name -> parameter(name, type, interop, block) }
+) = LazyDelegate { name -> parameter(name, type, block) }
 
 fun JavaParameterFactory.parameter(
     name: String,
     type: KClass<out Any>,
     nullable: Boolean = false,
-    interop: Boolean = true,
     block: JavaParameterScope.() -> Unit = {}
-) = parameter(name, type.asXTypeName().setNullable(nullable), interop, block)
+) = parameter(name, type.asXTypeName().setNullable(nullable), block)
 
 fun JavaParameterFactory.parameter(
     type: KClass<out Any>,
     nullable: Boolean = false,
-    interop: Boolean = true,
     block: JavaParameterScope.() -> Unit = {}
-) = LazyDelegate { name -> parameter(name, type, nullable, interop, block) }
+) = LazyDelegate { name -> parameter(name, type, nullable, block) }
 
 inline fun <reified T : Any> JavaParameterFactory.parameter(
     name: String,
     nullable: Boolean = false,
-    interop: Boolean = true,
     noinline block: JavaParameterScope.() -> Unit = {}
-) = parameter(name, T::class, nullable, interop, block)
+) = parameter(name, T::class, nullable, block)
 
 inline fun <reified T : Any> JavaParameterFactory.parameter(
     nullable: Boolean = false,
-    interop: Boolean = true,
     noinline block: JavaParameterScope.() -> Unit = {}
-) = LazyDelegate { name -> parameter<T>(name, nullable, interop, block) }
+) = LazyDelegate { name -> parameter<T>(name, nullable, block) }

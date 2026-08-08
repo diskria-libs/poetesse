@@ -24,7 +24,7 @@ class JavaFieldScope private constructor(
         specBuilder.build()
 
     internal companion object {
-        fun of(name: String, type: XTypeName, interop: Boolean): JavaFieldScope =
-            JavaFieldScope(JPField.builder(type.toJava(interop), name))
+        fun of(name: String, type: XTypeName): JavaFieldScope =
+            JavaFieldScope(JPField.builder(type.interopToJava(), name))
     }
 }

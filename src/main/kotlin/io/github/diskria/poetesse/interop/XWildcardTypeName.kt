@@ -13,28 +13,24 @@ class XWildcardTypeName(
     override val nullable: Boolean = false,
 ) : XTypeName() {
 
-    override fun interopToKotlin(): KPWildcardTypeName {
-        return when {
-            inType != null -> KPWildcardTypeName.consumerOf(inType.interopToKotlin())
-            outType != null -> {
-                val kotlinBound = outType.interopToKotlin()
-                if (kotlinBound == KPAny.copy(nullable = true)) {
-                    KPStar
-                } else {
-                    KPWildcardTypeName.producerOf(kotlinBound)
-                }
+    override fun interopToKotlin(): KPWildcardTypeName = when {
+        inType != null -> KPWildcardTypeName.consumerOf(inType.interopToKotlin())
+        outType != null -> {
+            val kotlinBound = outType.interopToKotlin()
+            if (kotlinBound == KPAny.copy(nullable = true)) {
+                KPStar
+            } else {
+                KPWildcardTypeName.producerOf(kotlinBound)
             }
-
-            else -> KPStar
-        }.setNullable(nullable)
-    }
-
-    override fun interopToJava(): JPWildcardTypeName {
-        return when {
-            inType != null -> JPWildcardTypeName.supertypeOf(inType.interopToJava())
-            outType != null -> JPWildcardTypeName.subtypeOf(outType.interopToJava())
-            else -> JPWildcardTypeName.subtypeOf(JPObject)
         }
+
+        else -> KPStar
+    }.setNullable(nullable)
+
+    override fun interopToJava(): JPWildcardTypeName = when {
+        inType != null -> JPWildcardTypeName.supertypeOf(inType.interopToJava())
+        outType != null -> JPWildcardTypeName.subtypeOf(outType.interopToJava())
+        else -> JPWildcardTypeName.subtypeOf(JPObject)
     }
 
     override fun setNullableInternal(nullable: Boolean): XWildcardTypeName =

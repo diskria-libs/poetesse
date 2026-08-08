@@ -7,30 +7,17 @@ import kotlin.reflect.KClass
 
 sealed class XTypeName {
 
-    internal open val javaAsKotlin: KPTypeName
-        get() = throw UnsupportedOperationException(
-            "This type does not have a raw syntactic projection in Kotlin. Use interopToKotlin() instead."
-        )
-
-    internal open val kotlinAsJava: JPTypeName
-        get() = throw UnsupportedOperationException(
-            "This type does not have a raw syntactic projection in Java. Use interopToJava() instead."
-        )
-
     abstract val nullable: Boolean
 
     abstract fun interopToKotlin(): KPTypeName
     abstract fun interopToJava(): JPTypeName
     internal abstract fun setNullableInternal(nullable: Boolean): XTypeName
-
-    fun toKotlin(interop: Boolean): KPTypeName = if (interop) interopToKotlin() else javaAsKotlin
-    fun toJava(interop: Boolean): JPTypeName = if (interop) interopToJava() else kotlinAsJava
-
-    companion object {
-        inline fun <reified T : Any> of(): XTypeName =
-            T::class.asXTypeName()
-    }
 }
+
+@Suppress("UNCHECKED_CAST")
+fun <T : XTypeName> T.setNullable(nullable: Boolean): T =
+    if (nullable == this.nullable) this
+    else setNullableInternal(nullable) as T
 
 fun KPTypeName.asXTypeName(): XTypeName = when (this) {
     is ClassName -> {
@@ -55,11 +42,6 @@ fun JPTypeName.asXTypeName(): XTypeName = when (this) {
 
 fun KClass<out Any>.asXTypeName(): XTypeName =
     asXVoidTypeNameOrNull() ?: asXPrimitiveTypeNameOrNull() ?: asXClassName()
-
-@Suppress("UNCHECKED_CAST")
-fun <T : XTypeName> T.setNullable(nullable: Boolean): T =
-    if (nullable == this.nullable) this
-    else setNullableInternal(nullable) as T
 
 fun KPTypeName.interopToJavaPoet(): JPTypeName =
     asXTypeName().interopToJava()

@@ -18,11 +18,14 @@ class XClassName private constructor(
     val nestedName: String = simpleNames.joinToString(".")
     val qualifiedName: String = listOfNotNull(packageName, nestedName).joinToString(".")
 
-    override val javaAsKotlin: KPClassName =
+    private val javaAsKotlin: KPClassName =
         KPClassName(packageName.orEmpty(), simpleNames).setNullable(nullable)
 
-    override val kotlinAsJava: JPClassName =
+    private val kotlinAsJava: JPClassName =
         JPClassName.get(packageName.orEmpty(), simpleNames.first(), *simpleNames.drop(1).toTypedArray())
+
+    fun nested(name: String): XClassName =
+        of(packageName, simpleNames = (simpleNames + name).toTypedArray())
 
     override fun interopToKotlin(): KPClassName =
         (J2K[kotlinAsJava] ?: javaAsKotlin).setNullable(nullable)
@@ -32,9 +35,6 @@ class XClassName private constructor(
 
     override fun setNullableInternal(nullable: Boolean): XClassName =
         XClassName(packageName, simpleNames, nullable)
-
-    fun nested(name: String): XClassName =
-        of(packageName, simpleNames = (simpleNames + name).toTypedArray())
 
     companion object {
         private val K2J: Map<KPClassName, JPClassName> = buildMap {
@@ -119,9 +119,6 @@ class XClassName private constructor(
 
         fun of(packageName: String?, vararg simpleNames: String): XClassName =
             XClassName(packageName, simpleNames.toList())
-
-        inline fun <reified T : Any> of(): XClassName =
-            T::class.asXClassName()
     }
 }
 

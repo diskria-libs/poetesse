@@ -11,40 +11,34 @@ interface JavaFieldFactory
 fun JavaFieldFactory.field(
     name: String,
     type: XTypeName,
-    interop: Boolean = true,
     block: JavaFieldScope.() -> Unit = {}
-) = JavaFieldRef(name) { JavaFieldScope.of(name, type, interop).apply(block).build() }
+) = JavaFieldRef(name) { JavaFieldScope.of(name, type).apply(block).build() }
 
 fun JavaFieldFactory.field(
     type: XTypeName,
-    interop: Boolean = true,
     block: JavaFieldScope.() -> Unit = {}
-) = LazyDelegate { name -> field(name, type, interop, block) }
+) = LazyDelegate { name -> field(name, type, block) }
 
 fun JavaFieldFactory.field(
     name: String,
     type: KClass<out Any>,
     nullable: Boolean = false,
-    interop: Boolean = true,
     block: JavaFieldScope.() -> Unit = {}
-) = field(name, type.asXTypeName().setNullable(nullable), interop, block)
+) = field(name, type.asXTypeName().setNullable(nullable), block)
 
 fun JavaFieldFactory.field(
     type: KClass<out Any>,
     nullable: Boolean = false,
-    interop: Boolean = true,
     block: JavaFieldScope.() -> Unit = {}
-) = LazyDelegate { name -> field(name, type, nullable, interop, block) }
+) = LazyDelegate { name -> field(name, type, nullable, block) }
 
 inline fun <reified T : Any> JavaFieldFactory.field(
     name: String,
     nullable: Boolean = false,
-    interop: Boolean = true,
     noinline block: JavaFieldScope.() -> Unit = {}
-) = field(name, T::class, nullable, interop, block)
+) = field(name, T::class, nullable, block)
 
 inline fun <reified T : Any> JavaFieldFactory.field(
     nullable: Boolean = false,
-    interop: Boolean = true,
     noinline block: JavaFieldScope.() -> Unit = {}
-) = LazyDelegate { name -> field<T>(name, nullable, interop, block) }
+) = LazyDelegate { name -> field<T>(name, nullable, block) }

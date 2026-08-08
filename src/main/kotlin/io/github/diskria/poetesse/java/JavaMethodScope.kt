@@ -23,23 +23,39 @@ class JavaMethodScope private constructor(
         append = { specBuilder.addModifiers(*it) }
     )
 
+    fun abstract() {
+        modifiers(JPModifier.ABSTRACT)
+    }
+
     fun static() {
         modifiers(JPModifier.STATIC)
+    }
+
+    fun synchronized() {
+        modifiers(JPModifier.SYNCHRONIZED)
+    }
+
+    fun native() {
+        modifiers(JPModifier.NATIVE)
+    }
+
+    fun strictfp() {
+        modifiers(JPModifier.STRICTFP)
     }
 
     fun body(block: BodyScope.() -> Unit) {
         BodyScope().apply(block)
     }
 
-    fun returnType(type: XTypeName, interop: Boolean = true) {
-        specBuilder.returns(type.toJava(interop))
+    fun returnType(type: XTypeName) {
+        specBuilder.returns(type.interopToJava())
     }
 
-    fun returnType(type: KClass<out Any>, nullable: Boolean = false, interop: Boolean = true) =
-        returnType(type.asXTypeName().setNullable(nullable), interop)
+    fun returnType(type: KClass<out Any>, nullable: Boolean = false) =
+        returnType(type.asXTypeName().setNullable(nullable))
 
-    inline fun <reified T : Any> returnType(nullable: Boolean = false, interop: Boolean = true) =
-        returnType(T::class, nullable, interop)
+    inline fun <reified T : Any> returnType(nullable: Boolean = false) =
+        returnType(T::class, nullable)
 
     internal fun build(): JPMethod =
         specBuilder.build()

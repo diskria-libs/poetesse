@@ -12,15 +12,6 @@ class XParameterizedTypeName internal constructor(
     override val nullable: Boolean = false,
 ) : XTypeName() {
 
-    override val javaAsKotlin: KPParameterizedTypeName
-        get() = rawType.javaAsKotlin
-            .parameterizedBy(typeArguments.map { it.javaAsKotlin })
-            .setNullable(nullable)
-
-    override val kotlinAsJava: JPParameterizedTypeName
-        get() = rawType.kotlinAsJava
-            .parameterizedBy(typeArguments.map { it.ensureBoxed().kotlinAsJava })
-
     override fun interopToKotlin(): KPParameterizedTypeName =
         rawType.interopToKotlin()
             .parameterizedBy(typeArguments.map { it.interopToKotlin() })

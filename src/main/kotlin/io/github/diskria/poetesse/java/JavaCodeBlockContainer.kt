@@ -31,84 +31,72 @@ fun JavaCodeBlockContainer.variable(name: String, initializer: JavaCodeBuilder) 
 fun JavaCodeBlockContainer.fullVariable(
     name: String,
     type: XTypeName,
-    interop: Boolean = true,
     block: JavaVariableScope.() -> Unit
-) = fullVariable(name, { T(type, interop) }, block)
+) = fullVariable(name, { T(type) }, block)
 
 fun JavaCodeBlockContainer.variable(
     name: String,
     type: XTypeName,
-    interop: Boolean = true,
     initializer: JavaCodeBuilder
-) = fullVariable(name, type, interop) { initializer(initializer) }
+) = fullVariable(name, type) { initializer(initializer) }
 
 fun JavaCodeBlockContainer.fullVariable(
     type: XTypeName,
-    interop: Boolean = true,
     block: JavaVariableScope.() -> Unit
-) = EagerDelegate { name -> fullVariable(name, type, interop, block) }
+) = EagerDelegate { name -> fullVariable(name, type, block) }
 
 fun JavaCodeBlockContainer.variable(
     type: XTypeName,
-    interop: Boolean = true,
     initializer: JavaCodeBuilder
-) = fullVariable(type, interop) { initializer(initializer) }
+) = fullVariable(type) { initializer(initializer) }
 
 fun JavaCodeBlockContainer.fullVariable(
     name: String,
     type: KClass<out Any>,
     nullable: Boolean = false,
-    interop: Boolean = true,
     block: JavaVariableScope.() -> Unit
-) = fullVariable(name, type.asXTypeName().setNullable(nullable), interop, block)
+) = fullVariable(name, type.asXTypeName().setNullable(nullable), block)
 
 fun JavaCodeBlockContainer.variable(
     name: String,
     type: KClass<out Any>,
     nullable: Boolean = false,
-    interop: Boolean = true,
     initializer: JavaCodeBuilder
-) = fullVariable(name, type, nullable, interop) { initializer(initializer) }
+) = fullVariable(name, type, nullable) { initializer(initializer) }
 
 fun JavaCodeBlockContainer.fullVariable(
     type: KClass<out Any>,
     nullable: Boolean = false,
-    interop: Boolean = true,
     block: JavaVariableScope.() -> Unit
-) = EagerDelegate { name -> fullVariable(name, type, nullable, interop, block) }
+) = EagerDelegate { name -> fullVariable(name, type, nullable, block) }
 
 fun JavaCodeBlockContainer.variable(
     type: KClass<out Any>,
     nullable: Boolean = false,
-    interop: Boolean = true,
     initializer: JavaCodeBuilder
-) = fullVariable(type, nullable, interop) { initializer(initializer) }
+) = fullVariable(type, nullable) { initializer(initializer) }
 
 inline fun <reified T : Any> JavaCodeBlockContainer.fullVariable(
     name: String,
     nullable: Boolean = false,
-    interop: Boolean = true,
     noinline block: JavaVariableScope.() -> Unit
-) = fullVariable(name, T::class, nullable, interop, block)
+) = fullVariable(name, T::class, nullable, block)
 
 inline fun <reified T : Any> JavaCodeBlockContainer.variable(
     name: String,
     nullable: Boolean = false,
-    interop: Boolean = true,
     noinline initializer: JavaCodeBuilder
-) = fullVariable<T>(name, nullable, interop) { initializer(initializer) }
+) = fullVariable<T>(name, nullable) { initializer(initializer) }
 
 inline fun <reified T : Any> JavaCodeBlockContainer.fullVariable(
     nullable: Boolean = false,
-    interop: Boolean = true,
     noinline block: JavaVariableScope.() -> Unit
-) = EagerDelegate { name -> fullVariable<T>(name, nullable, interop, block) }
+) = EagerDelegate { name -> fullVariable<T>(name, nullable, block) }
 
 inline fun <reified T : Any> JavaCodeBlockContainer.variable(
     nullable: Boolean = false,
-    interop: Boolean = true,
     noinline initializer: JavaCodeBuilder,
-) = fullVariable<T>(nullable, interop) { initializer(initializer) }
+) = fullVariable<T>(nullable) { initializer(initializer) }
 
 fun JavaCodeBlockContainer.fullVariable(block: JavaVariableScope.() -> Unit) =
     EagerDelegate { name -> fullVariable(name, block) }

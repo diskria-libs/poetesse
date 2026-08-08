@@ -21,13 +21,13 @@ class JavaCodeScope internal constructor(
         return "$$mask"
     }
 
-    fun T(value: XTypeName, interop: Boolean = true) = argument(value.toJava(interop), 'T')
+    fun T(value: XTypeName) = argument(value.interopToJava(), 'T')
 
-    fun T(value: KClass<out Any>, nullable: Boolean = false, interop: Boolean = true) =
-        T(value.asXTypeName().setNullable(nullable), interop)
+    fun T(value: KClass<out Any>, nullable: Boolean = false) =
+        T(value.asXTypeName().setNullable(nullable))
 
-    inline fun <reified T : Any> T(nullable: Boolean = false, interop: Boolean = true) =
-        T(T::class, nullable, interop)
+    inline fun <reified T : Any> T(nullable: Boolean = false) =
+        T(T::class, nullable)
 
     fun S(value: CharSequence) = argument(value, 'S')
 
@@ -43,14 +43,14 @@ class JavaCodeScope internal constructor(
 
     inner class ExpressionScope {
 
-        fun classRef(value: XTypeName, interop: Boolean = true): String =
-            "${T(value, interop)}.class"
+        fun classRef(value: XTypeName): String =
+            "${T(value)}.class"
 
-        fun classRef(type: KClass<out Any>, interop: Boolean = true): String =
-            classRef(type.asXTypeName(), interop)
+        fun classRef(type: KClass<out Any>): String =
+            classRef(type.asXTypeName())
 
-        inline fun <reified T : Any> classRef(interop: Boolean = true): String =
-            classRef(T::class, interop)
+        inline fun <reified T : Any> classRef(): String =
+            classRef(T::class)
 
         inline fun <reified E : Enum<E>> enumEntry(value: E): String =
             "${T<E>()}.${L(value.name)}"

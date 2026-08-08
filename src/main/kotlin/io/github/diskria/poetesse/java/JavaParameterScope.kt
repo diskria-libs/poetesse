@@ -20,7 +20,7 @@ class JavaParameterScope private constructor(
         specBuilder.build()
 
     internal companion object {
-        fun of(name: String, type: XTypeName, interop: Boolean): JavaParameterScope =
-            JavaParameterScope(JPParameter.builder(type.toJava(interop), name))
+        fun of(name: String, type: XTypeName): JavaParameterScope =
+            JavaParameterScope(JPParameter.builder(type.interopToJava(), name))
     }
 }
