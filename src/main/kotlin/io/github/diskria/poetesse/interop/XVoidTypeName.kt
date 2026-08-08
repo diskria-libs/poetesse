@@ -30,21 +30,21 @@ class XVoidTypeName private constructor(override val nullable: Boolean = false) 
 }
 
 fun KPTypeName.asXVoidTypeNameOrNull(): XVoidTypeName? =
-    if (withoutAnnotations().setNullable(false) == KPUnit) XVoidTypeName.get(isNullable)
+    if (setNullable(false).withoutAnnotations() == KPUnit) XVoidTypeName.get(isNullable)
     else null
 
 fun KPTypeName.asXVoidTypeName(): XVoidTypeName =
     requireNotNull(asXVoidTypeNameOrNull()) { "$this is not a void type" }
 
 fun JPTypeName.asXVoidTypeNameOrNull(): XVoidTypeName? =
-    if (isVoid) XVoidTypeName.get()
+    if (setBoxed(false).withoutAnnotations() == JPVoid) XVoidTypeName.get(isBoxedVoid)
     else null
 
 fun JPTypeName.asXVoidTypeName(): XVoidTypeName =
     requireNotNull(asXVoidTypeNameOrNull()) { "$this is not a void type" }
 
-fun KClass<out Any>.asXVoidTypeNameOrNull(): XVoidTypeName? =
-    asClassName().asXVoidTypeNameOrNull()
+fun KClass<out Any>.asXVoidTypeNameOrNull(nullable: Boolean = false): XVoidTypeName? =
+    asClassName().setNullable(nullable).asXVoidTypeNameOrNull()
 
-fun KClass<out Any>.asXVoidTypeName(): XVoidTypeName =
-    asClassName().asXVoidTypeName()
+fun KClass<out Any>.asXVoidTypeName(nullable: Boolean = false): XVoidTypeName =
+    asClassName().setNullable(nullable).asXVoidTypeName()

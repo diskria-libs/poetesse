@@ -2,7 +2,7 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.LazyDelegate
 import io.github.diskria.poetesse.interop.XTypeName
-import io.github.diskria.poetesse.interop.asXTypeName
+import io.github.diskria.poetesse.interop.xType
 import io.github.diskria.poetesse.interop.setNullable
 import kotlin.reflect.KClass
 
@@ -24,7 +24,7 @@ fun JavaParameterFactory.parameter(
     type: KClass<out Any>,
     nullable: Boolean = false,
     block: JavaParameterScope.() -> Unit = {}
-) = parameter(name, type.asXTypeName().setNullable(nullable), block)
+) = parameter(name, type.xType().setNullable(nullable), block)
 
 fun JavaParameterFactory.parameter(
     type: KClass<out Any>,

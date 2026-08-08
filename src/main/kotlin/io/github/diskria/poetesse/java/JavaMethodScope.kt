@@ -2,7 +2,7 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.PoetesseJava
 import io.github.diskria.poetesse.interop.XTypeName
-import io.github.diskria.poetesse.interop.asXTypeName
+import io.github.diskria.poetesse.interop.xType
 import io.github.diskria.poetesse.interop.setNullable
 import kotlin.reflect.KClass
 
@@ -52,7 +52,7 @@ class JavaMethodScope private constructor(
     }
 
     fun returnType(type: KClass<out Any>, nullable: Boolean = false) =
-        returnType(type.asXTypeName().setNullable(nullable))
+        returnType(type.xType().setNullable(nullable))
 
     inline fun <reified T : Any> returnType(nullable: Boolean = false) =
         returnType(T::class, nullable)

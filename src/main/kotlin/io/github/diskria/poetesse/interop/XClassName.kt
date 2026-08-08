@@ -128,5 +128,5 @@ fun KPClassName.asXClassName(): XClassName =
 fun JPClassName.asXClassName(): XClassName =
     XClassName.of(packageName(), *simpleNames().toTypedArray())
 
-fun KClass<out Any>.asXClassName(): XClassName =
-    asClassName().asXClassName()
+fun KClass<out Any>.asXClassName(nullable: Boolean = false): XClassName =
+    asClassName().setNullable(nullable).asXClassName()

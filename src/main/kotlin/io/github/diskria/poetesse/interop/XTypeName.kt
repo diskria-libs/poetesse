@@ -32,16 +32,19 @@ fun KPTypeName.asXTypeName(): XTypeName = when (this) {
 }
 
 fun JPTypeName.asXTypeName(): XTypeName = when (this) {
-    is JPClassName -> asXClassName()
+    is JPClassName -> asXVoidTypeNameOrNull() ?: asXPrimitiveTypeNameOrNull() ?: asXClassName()
     is JPArrayTypeName -> asXArrayTypeName()
     is JPParameterizedTypeName -> asXFunctionalTypeNameOrNull() ?: asXParameterizedTypeName()
     is JPTypeVariableName -> asXTypeVariableName()
     is JPWildcardTypeName -> asXWildcardTypeName()
-    else -> asXVoidTypeNameOrNull() ?: asXPrimitiveTypeName()
+    is JPTypeName -> asXVoidTypeNameOrNull() ?: asXPrimitiveTypeName()
 }
 
-fun KClass<out Any>.asXTypeName(): XTypeName =
-    asXVoidTypeNameOrNull() ?: asXPrimitiveTypeNameOrNull() ?: asXClassName()
+fun KClass<out Any>.xType(nullable: Boolean = false): XTypeName =
+    asXVoidTypeNameOrNull(nullable) ?: asXPrimitiveTypeNameOrNull(nullable) ?: asXClassName(nullable)
+
+inline fun <reified T : Any> xType(): XTypeName =
+    T::class.xType()
 
 fun KPTypeName.interopToJavaPoet(): JPTypeName =
     asXTypeName().interopToJava()

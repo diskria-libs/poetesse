@@ -2,7 +2,7 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.PoetesseJava
 import io.github.diskria.poetesse.interop.XTypeName
-import io.github.diskria.poetesse.interop.asXTypeName
+import io.github.diskria.poetesse.interop.xType
 import io.github.diskria.poetesse.interop.setNullable
 import kotlin.reflect.KClass
 
@@ -24,7 +24,7 @@ class JavaCodeScope internal constructor(
     fun T(value: XTypeName) = argument(value.interopToJava(), 'T')
 
     fun T(value: KClass<out Any>, nullable: Boolean = false) =
-        T(value.asXTypeName().setNullable(nullable))
+        T(value.xType().setNullable(nullable))
 
     inline fun <reified T : Any> T(nullable: Boolean = false) =
         T(T::class, nullable)
@@ -47,7 +47,7 @@ class JavaCodeScope internal constructor(
             "${T(value)}.class"
 
         fun classRef(type: KClass<out Any>): String =
-            classRef(type.asXTypeName())
+            classRef(type.xType())
 
         inline fun <reified T : Any> classRef(): String =
             classRef(T::class)

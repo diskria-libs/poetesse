@@ -27,7 +27,7 @@ fun JavaParameterContainer.parameter(
     type: KClass<out Any>,
     nullable: Boolean = false,
     block: JavaParameterScope.() -> Unit = {}
-) = parameter(name, type.asXTypeName().setNullable(nullable), block)
+) = parameter(name, type.xType().setNullable(nullable), block)
 
 fun JavaParameterContainer.parameter(
     type: KClass<out Any>,

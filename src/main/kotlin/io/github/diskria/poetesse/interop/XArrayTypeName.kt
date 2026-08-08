@@ -25,14 +25,6 @@ class XArrayTypeName internal constructor(
 
     override fun setNullableInternal(nullable: Boolean): XArrayTypeName =
         XArrayTypeName(componentType, nullable)
-
-    companion object {
-        fun of(type: KClass<out Any>): XArrayTypeName =
-            type.asXTypeName().wrapToArray()
-
-        inline fun <reified T : Any> of(): XArrayTypeName =
-            of(T::class)
-    }
 }
 
 fun KPTypeName.asXArrayTypeNameOrNull(): XArrayTypeName? = when (this) {
@@ -56,5 +48,5 @@ fun KPTypeName.asXArrayTypeNameOrNull(): XArrayTypeName? = when (this) {
 fun JPArrayTypeName.asXArrayTypeName(): XArrayTypeName =
     XArrayTypeName(componentType().asXTypeName())
 
-fun XTypeName.wrapToArray(): XArrayTypeName =
+fun XTypeName.array(): XArrayTypeName =
     XArrayTypeName(this)

@@ -1,7 +1,6 @@
 package io.github.diskria.poetesse.interop
 
 import com.squareup.kotlinpoet.asClassName
-import io.github.diskria.poetesse.extensions.isBoxedVoidOrPrimitive
 import io.github.diskria.poetesse.extensions.setBoxed
 import io.github.diskria.poetesse.extensions.setNullable
 import io.github.diskria.poetesse.extensions.withoutAnnotations
@@ -27,10 +26,10 @@ class XPrimitiveTypeName internal constructor(
         XPrimitiveTypeName(kind, nullable)
 
     fun box(): XPrimitiveTypeName =
-        setNullable(true)
+        setNullableInternal(true)
 
     fun unbox(): XPrimitiveTypeName =
-        setNullable(false)
+        setNullableInternal(false)
 
     companion object {
         internal val K2KIND: Map<KPClassName, XPrimitiveKind> =
@@ -38,15 +37,12 @@ class XPrimitiveTypeName internal constructor(
 
         internal val J2KIND: Map<JPTypeName, XPrimitiveKind> =
             XPrimitiveKind.entries.associateBy { it.java }
-
-        inline fun <reified T : Any> of(): XPrimitiveTypeName =
-            T::class.asXPrimitiveTypeName()
     }
 }
 
 fun JPTypeName.asXPrimitiveTypeNameOrNull(): XPrimitiveTypeName? {
     val kind = J2KIND[withoutAnnotations().setBoxed(false)] ?: return null
-    return XPrimitiveTypeName(kind, isBoxedVoidOrPrimitive)
+    return XPrimitiveTypeName(kind, isBoxedPrimitive)
 }
 
 fun JPTypeName.asXPrimitiveTypeName(): XPrimitiveTypeName =
@@ -60,11 +56,11 @@ fun KPTypeName.asXPrimitiveTypeNameOrNull(): XPrimitiveTypeName? {
 fun KPTypeName.asXPrimitiveTypeName(): XPrimitiveTypeName =
     requireNotNull(asXPrimitiveTypeNameOrNull()) { "$this is not a primitive type" }
 
-fun KClass<out Any>.asXPrimitiveTypeNameOrNull(): XPrimitiveTypeName? =
-    asClassName().asXPrimitiveTypeNameOrNull()
+fun KClass<out Any>.asXPrimitiveTypeNameOrNull(nullable: Boolean = false): XPrimitiveTypeName? =
+    asClassName().setNullable(nullable).asXPrimitiveTypeNameOrNull()
 
-fun KClass<out Any>.asXPrimitiveTypeName(): XPrimitiveTypeName =
-    asClassName().asXPrimitiveTypeName()
+fun KClass<out Any>.asXPrimitiveTypeName(nullable: Boolean = false): XPrimitiveTypeName =
+    asClassName().setNullable(nullable).asXPrimitiveTypeName()
 
 fun XTypeName.ensureBoxed(): XTypeName =
     if (this is XPrimitiveTypeName) box()
