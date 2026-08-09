@@ -3,7 +3,6 @@ package io.github.diskria.poetesse.java
 import io.github.diskria.poetesse.PoetesseJava
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.xType
-import io.github.diskria.poetesse.interop.setNullable
 import kotlin.reflect.KClass
 
 @PoetesseJava
@@ -11,7 +10,7 @@ class JavaMethodScope private constructor(
     private val specBuilder: JPMethodBuilder
 ) : JavaParameterContainer,
     JavaAnnotationContainer,
-    JavaFinalWithVisibilityModifierContainer {
+    JavaModifierContainer.WithVisibility {
 
     internal val parameterContainer = JavaParameterContainerInternal.of(
         append = { specBuilder.addParameter(it) }
@@ -51,11 +50,14 @@ class JavaMethodScope private constructor(
         specBuilder.returns(type.interopToJava())
     }
 
-    fun returnType(type: KClass<out Any>, nullable: Boolean = false) =
-        returnType(type.xType().setNullable(nullable))
+    fun returnType(type: KClass<*>, nullable: Boolean = false) =
+        returnType(type.xType(nullable = nullable))
 
-    inline fun <reified T : Any> returnType(nullable: Boolean = false) =
+    inline fun <reified T> returnType(nullable: Boolean = true) =
         returnType(T::class, nullable)
+
+    inline fun <reified T : Any> returnType() =
+        returnType<T>(nullable = false)
 
     internal fun build(): JPMethod =
         specBuilder.build()

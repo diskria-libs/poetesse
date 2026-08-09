@@ -7,7 +7,7 @@ import io.github.diskria.poetesse.interop.XTypeName
 class JavaParameterScope private constructor(
     private val specBuilder: JPParameterBuilder
 ) : JavaAnnotationContainer,
-    JavaFinalOnlyModifierContainer {
+    JavaModifierContainer {
 
     internal val annotationContainer = JavaAnnotationContainerInternal.of(
         append = { specBuilder.addAnnotation(it) },
@@ -15,6 +15,10 @@ class JavaParameterScope private constructor(
     internal val modifierContainer = JavaModifierContainerInternal.of(
         append = { specBuilder.addModifiers(*it) }
     )
+
+    fun final() {
+        modifiers(JPModifier.FINAL)
+    }
 
     internal fun build(): JPParameter =
         specBuilder.build()

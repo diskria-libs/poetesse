@@ -2,13 +2,16 @@ package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.interop.XClassName
 
-sealed interface KotlinTypeContainer {
+sealed interface KotlinTypeContainer : KotlinTypeFactory {
 
-    fun type(kind: KPTypeKind, name: String, block: KotlinTypeScope.() -> Unit = {}): XClassName = with(internal) {
-        val className = nestedClassName(name)
-        holderBuilder.addType(KotlinTypeScope.of(kind, name, className).apply(block).build())
+    operator fun KotlinTypeRef.unaryPlus(): XClassName {
+        val className = internal.nestedClassName(name)
+        internal.append(build(className))
         return className
     }
+
+    fun type(kind: KPTypeKind, name: String, block: KotlinTypeScope.() -> Unit = {}): XClassName =
+        +factory.type(kind, name, block)
 
     fun class_(name: String, block: KotlinTypeScope.() -> Unit = {}): XClassName =
         type(KPTypeKind.CLASS, name, block)
@@ -52,20 +55,22 @@ sealed interface KotlinTypeContainer {
 
 internal interface KotlinTypeContainerInternal {
 
-    val holderBuilder: KPTypeHolderBuilder
-
+    fun append(type: KPType)
     fun nestedClassName(name: String): XClassName
 
     companion object {
         fun of(
-            holderBuilder: KPTypeHolderBuilder,
+            append: (KPType) -> Unit,
             nestedClassName: (name: String) -> XClassName,
         ): KotlinTypeContainerInternal = object : KotlinTypeContainerInternal {
-            override val holderBuilder: KPTypeHolderBuilder = holderBuilder
+            override fun append(type: KPType) = append(type)
             override fun nestedClassName(name: String): XClassName = nestedClassName(name)
         }
     }
 }
+
+private val KotlinTypeContainer.factory: KotlinTypeFactory
+    get() = this as KotlinTypeFactory
 
 private val KotlinTypeContainer.internal: KotlinTypeContainerInternal
     get() = when (this) {

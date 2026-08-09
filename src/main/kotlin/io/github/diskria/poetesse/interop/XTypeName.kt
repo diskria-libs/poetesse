@@ -7,17 +7,20 @@ import kotlin.reflect.KClass
 
 sealed class XTypeName {
 
-    abstract val nullable: Boolean
+    abstract val isNullable: Boolean
 
     abstract fun interopToKotlin(): KPTypeName
     abstract fun interopToJava(): JPTypeName
-    internal abstract fun setNullableInternal(nullable: Boolean): XTypeName
+    internal abstract fun setNullable(nullable: Boolean): XTypeName
 }
 
 @Suppress("UNCHECKED_CAST")
-fun <T : XTypeName> T.setNullable(nullable: Boolean): T =
-    if (nullable == this.nullable) this
-    else setNullableInternal(nullable) as T
+fun <T : XTypeName> T.nullable(nullable: Boolean = true): T =
+    if (nullable == isNullable) this
+    else setNullable(nullable) as T
+
+internal fun XTypeName.ensureBoxed(): XTypeName =
+    if (this is XPrimitiveTypeName) box() else this
 
 fun KPTypeName.asXTypeName(): XTypeName = when (this) {
     is ClassName -> {
@@ -40,11 +43,20 @@ fun JPTypeName.asXTypeName(): XTypeName = when (this) {
     is JPTypeName -> asXVoidTypeNameOrNull() ?: asXPrimitiveTypeName()
 }
 
-fun KClass<out Any>.xType(nullable: Boolean = false): XTypeName =
-    asXVoidTypeNameOrNull(nullable) ?: asXPrimitiveTypeNameOrNull(nullable) ?: asXClassName(nullable)
+fun KClass<*>.xType(nullable: Boolean = false): XTypeName {
+    require(java.typeParameters.isEmpty()) {
+        "xClass for generics is not possible.\n" +
+            "For example, for List<String> use:\n" +
+            "xClass<List<*>>().generic(xType<String>())"
+    }
+    return asXVoidTypeNameOrNull(nullable) ?: asXPrimitiveTypeNameOrNull(nullable) ?: xClass(nullable)
+}
+
+inline fun <reified T> xType(nullable: Boolean = true) =
+    T::class.xType(nullable)
 
 inline fun <reified T : Any> xType(): XTypeName =
-    T::class.xType()
+    xType<T>(nullable = false)
 
 fun KPTypeName.interopToJavaPoet(): JPTypeName =
     asXTypeName().interopToJava()

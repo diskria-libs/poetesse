@@ -7,7 +7,7 @@ class JavaConstructorScope private constructor(
     private val specBuilder: JPMethodBuilder
 ) : JavaParameterContainer,
     JavaAnnotationContainer,
-    JavaVisibilityOnlyModifierContainer {
+    JavaModifierContainer.WithVisibility {
 
     internal val parameterContainer = JavaParameterContainerInternal.of(
         append = { specBuilder.addParameter(it) }

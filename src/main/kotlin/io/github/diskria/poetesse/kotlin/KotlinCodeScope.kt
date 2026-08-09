@@ -1,36 +1,29 @@
-package io.github.diskria.poetesse.java
+package io.github.diskria.poetesse.kotlin
 
-import io.github.diskria.poetesse.PoetesseJava
+import io.github.diskria.poetesse.PoetesseKotlin
 import io.github.diskria.poetesse.interop.XTypeName
-import io.github.diskria.poetesse.interop.nullable
 import io.github.diskria.poetesse.interop.xType
 import kotlin.reflect.KClass
 
-typealias JavaCodeBuilder = JavaCodeScope.() -> String
+typealias KotlinCodeBuilder = KotlinCodeScope.() -> String
 
-@PoetesseJava
-class JavaCodeScope internal constructor(
-    private val block: JavaCodeBuilder,
+@PoetesseKotlin
+class KotlinCodeScope internal constructor(
+    private val block: KotlinCodeBuilder,
     private val arguments: MutableList<Any?> = mutableListOf(),
-) : JavaCodeFactory {
+) : KotlinCodeFactory {
 
     val expression: ExpressionScope by lazy { ExpressionScope() }
 
     fun argument(mask: Char, argument: Any?): String {
         arguments += argument
-        return "$$mask"
+        return "%$mask"
     }
 
-    fun T(value: XTypeName) = argument('T', value.interopToJava())
-
-    fun T(value: KClass<*>, nullable: Boolean = false) =
-        T(value.xType(nullable = nullable))
-
-    inline fun <reified T> T(nullable: Boolean = true) =
-        T(T::class, nullable)
-
-    inline fun <reified T : Any> T() =
-        T<T>(nullable = false)
+    fun T(value: XTypeName) = argument('T', value.interopToKotlin())
+    fun T(value: KClass<*>, nullable: Boolean = false) = T(value.xType(nullable = nullable))
+    inline fun <reified T> T(nullable: Boolean = true) = T(T::class, nullable)
+    inline fun <reified T : Any> T() = T<T>(nullable = false)
 
     fun S(value: CharSequence) = argument('S', value)
 
@@ -38,16 +31,16 @@ class JavaCodeScope internal constructor(
     fun L(value: Int) = argument('L', value)
     fun L(value: String) = argument('L', value)
 
-    fun L(value: JPAnnotation) = argument('L', value)
-    fun L(value: JavaAnnotationRef) = L(value.spec)
+    fun L(value: KPAnnotation) = argument('L', value)
+    fun L(value: KotlinAnnotationRef) = L(value.spec)
 
-    fun L(code: JavaCodeRef) = argument('L', code.codeBlock)
-    fun L(build: JavaCodeBuilder) = L(code(build))
+    fun L(code: KotlinCodeRef) = argument('L', code.codeBlock)
+    fun L(build: KotlinCodeBuilder) = L(code(build))
 
     inner class ExpressionScope {
 
         fun classLiteral(type: XTypeName): String =
-            "${T(type)}.class"
+            "${T(type)}::class"
 
         fun classLiteral(type: KClass<*>): String =
             classLiteral(type.xType())
@@ -59,17 +52,17 @@ class JavaCodeScope internal constructor(
             "${T<E>()}.${L(value.name)}"
 
         inline fun <reified E> arrayOf(values: Iterable<E>, crossinline transform: (E) -> String): String =
-            values.joinToString(prefix = "{", postfix = "}") { transform(it) }
+            values.joinToString(prefix = "[", postfix = "]") { transform(it) }
 
         fun concat(vararg elements: String): String =
             elements.joinToString(separator = " + ")
     }
 
-    internal fun build(): JPCodeBlock =
-        JPCodeBlock.of(block(), *arguments.toTypedArray())
+    internal fun build(): KPCodeBlock =
+        KPCodeBlock.of(block(), *arguments.toTypedArray())
 
     internal companion object {
-        fun of(block: JavaCodeBuilder): JavaCodeRef =
-            JavaCodeRef { JavaCodeScope(block).build() }
+        fun of(block: KotlinCodeBuilder): KotlinCodeRef =
+            KotlinCodeRef { KotlinCodeScope(block).build() }
     }
 }

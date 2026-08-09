@@ -11,7 +11,7 @@ class XFunctionalTypeName(
     val receiver: XTypeName? = null,
     val parameters: List<XParameter> = emptyList(),
     val returnType: XTypeName,
-    override val nullable: Boolean = false,
+    override val isNullable: Boolean = false,
 ) : XTypeName() {
 
     @OptIn(ExperimentalKotlinPoetApi::class)
@@ -21,7 +21,7 @@ class XFunctionalTypeName(
             receiver = receiver?.interopToKotlin(),
             parameters = parameters.map { it.interopToKotlin(fallbackName = "") },
             returnType = returnType.interopToKotlin(),
-        ).setNullable(nullable)
+        ).setNullable(isNullable)
 
     override fun interopToJava(): JPParameterizedTypeName {
         val allArguments = buildList {
@@ -40,7 +40,7 @@ class XFunctionalTypeName(
         return JPParameterizedTypeName.get(functionClass, *typeArguments)
     }
 
-    override fun setNullableInternal(nullable: Boolean): XTypeName =
+    override fun setNullable(nullable: Boolean): XTypeName =
         XFunctionalTypeName(contextParameters, receiver, parameters, returnType, nullable)
 }
 
@@ -51,7 +51,7 @@ fun KPFunctionalTypeName.asXFunctionalTypeName(): XFunctionalTypeName =
         receiver = receiver?.asXTypeName(),
         parameters = parameters.map { it.asXParameter() },
         returnType = returnType.asXTypeName(),
-        nullable = isNullable,
+        isNullable = isNullable,
     )
 
 fun JPParameterizedTypeName.asXFunctionalTypeNameOrNull(): XFunctionalTypeName? {

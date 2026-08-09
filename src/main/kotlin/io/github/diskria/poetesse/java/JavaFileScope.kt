@@ -3,7 +3,7 @@ package io.github.diskria.poetesse.java
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseJava
 import io.github.diskria.poetesse.interop.XClassName
-import io.github.diskria.poetesse.interop.setNullable
+import io.github.diskria.poetesse.interop.nullable
 
 @PoetesseJava
 class JavaFileScope private constructor(
@@ -15,7 +15,7 @@ class JavaFileScope private constructor(
 
     internal val typeContainer = JavaTypeContainerInternal.of(
         append = { types += it },
-        nestedClassName = { name -> XClassName.of(packageName, name).setNullable(false) },
+        nestedClassName = { name -> XClassName.of(packageName, name).nullable(false) },
     )
 
     internal fun build(settings: Poetesse.Settings): JavaFileRef {

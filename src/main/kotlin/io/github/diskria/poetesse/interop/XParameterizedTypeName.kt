@@ -9,27 +9,24 @@ import io.github.diskria.poetesse.kotlin.KPParameterizedTypeName
 class XParameterizedTypeName internal constructor(
     private val rawType: XClassName,
     private val typeArguments: List<XTypeName>,
-    override val nullable: Boolean = false,
+    override val isNullable: Boolean = false,
 ) : XTypeName() {
 
     override fun interopToKotlin(): KPParameterizedTypeName =
-        rawType.interopToKotlin()
-            .parameterizedBy(typeArguments.map { it.interopToKotlin() })
-            .setNullable(nullable)
+        rawType.interopToKotlin().parameterizedBy(typeArguments.map { it.interopToKotlin() }).setNullable(isNullable)
 
     override fun interopToJava(): JPParameterizedTypeName =
-        rawType.interopToJava()
-            .parameterizedBy(typeArguments.map { it.ensureBoxed().interopToJava() })
+        rawType.interopToJava().parameterizedBy(typeArguments.map { it.ensureBoxed().interopToJava() })
 
-    override fun setNullableInternal(nullable: Boolean): XParameterizedTypeName =
+    override fun setNullable(nullable: Boolean): XParameterizedTypeName =
         XParameterizedTypeName(rawType, typeArguments, nullable)
 }
 
-fun XClassName.parameterizedBy(typeArguments: Iterable<XTypeName>): XParameterizedTypeName =
+fun XClassName.generic(typeArguments: Iterable<XTypeName>): XParameterizedTypeName =
     XParameterizedTypeName(this, typeArguments.toList())
 
-fun XClassName.parameterizedBy(vararg typeArguments: XTypeName): XParameterizedTypeName =
-    parameterizedBy(typeArguments.asIterable())
+fun XClassName.generic(vararg typeArguments: XTypeName): XParameterizedTypeName =
+    generic(typeArguments.asIterable())
 
 fun KPParameterizedTypeName.asXParameterizedTypeName(): XParameterizedTypeName =
     XParameterizedTypeName(rawType.asXClassName(), typeArguments.map { it.asXTypeName() }, isNullable)

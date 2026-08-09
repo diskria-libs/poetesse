@@ -1,25 +1,36 @@
 package io.github.diskria.poetesse.kotlin
 
-sealed interface KotlinFunctionContainer {
+import io.github.diskria.poetesse.EagerDelegate
 
-    fun fun_(name: String, block: KotlinFunctionScope.() -> Unit = {}): String {
-        internal.holderBuilder.addFunction(KotlinFunctionScope.of(name).apply(block).build())
+sealed interface KotlinFunctionContainer : KotlinFunctionFactory {
+
+    operator fun KotlinFunctionRef.unaryPlus(): String {
+        internal.append(spec)
         return name
     }
+
+    fun function(name: String, block: KotlinFunctionScope.() -> Unit = {}): String =
+        +factory.function(name, block)
+
+    fun function(block: KotlinFunctionScope.() -> Unit = {}): EagerDelegate<String> =
+        EagerDelegate { name -> function(name, block) }
 }
 
 internal interface KotlinFunctionContainerInternal {
 
-    val holderBuilder: KPMemberHolderBuilder
+    fun append(function: KPFunction)
 
     companion object {
         fun of(
-            holderBuilder: KPMemberHolderBuilder,
+            append: (KPFunction) -> Unit,
         ): KotlinFunctionContainerInternal = object : KotlinFunctionContainerInternal {
-            override val holderBuilder: KPMemberHolderBuilder = holderBuilder
+            override fun append(function: KPFunction) = append(function)
         }
     }
 }
+
+private val KotlinFunctionContainer.factory: KotlinFunctionFactory
+    get() = this as KotlinFunctionFactory
 
 private val KotlinFunctionContainer.internal: KotlinFunctionContainerInternal
     get() = when (this) {

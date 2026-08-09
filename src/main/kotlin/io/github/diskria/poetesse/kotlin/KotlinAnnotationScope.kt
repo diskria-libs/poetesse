@@ -1,33 +1,33 @@
-package io.github.diskria.poetesse.java
+package io.github.diskria.poetesse.kotlin
 
-import io.github.diskria.poetesse.PoetesseJava
+import io.github.diskria.poetesse.PoetesseKotlin
 import io.github.diskria.poetesse.interop.XClassName
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.xClass
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 
-@PoetesseJava
-class JavaAnnotationScope<A : Annotation> internal constructor(
-    private val specBuilder: JPAnnotationBuilder
+@PoetesseKotlin
+class KotlinAnnotationScope<A : Annotation> internal constructor(
+    private val specBuilder: KPAnnotationBuilder
 ) {
     private typealias ArgumentProperty<A, V> = KProperty1<out A, V>
     private typealias ArrayArgumentProperty<A, E> = ArgumentProperty<A, Array<out E>>
 
-    fun argument(name: String, value: JPCodeBlock) {
+    fun argument(name: String, value: KPCodeBlock) {
         specBuilder.addMember(name, value)
     }
 
-    fun argument(name: String, value: JavaCodeRef) {
+    fun argument(name: String, value: KotlinCodeRef) {
         argument(name, value.codeBlock)
     }
 
-    fun argument(name: String, value: JavaCodeBuilder) {
-        argument(name, JavaCodeScope.of(value))
+    fun argument(name: String, value: KotlinCodeBuilder) {
+        argument(name, KotlinCodeScope.of(value))
     }
 
     @JvmName("propertyArgument")
-    fun argument(property: ArgumentProperty<A, *>, value: JavaCodeBuilder) {
+    fun argument(property: ArgumentProperty<A, *>, value: KotlinCodeBuilder) {
         argument(property.name, value)
     }
 
@@ -136,7 +136,7 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
     @JvmName("annotationArgument")
     inline fun <reified Embedded : Annotation> argument(
         property: ArgumentProperty<A, Embedded>,
-        annotation: JavaTypedAnnotationRef<Embedded>,
+        annotation: KotlinTypedAnnotationRef<Embedded>,
     ) {
         argument(property) { L(annotation) }
     }
@@ -144,15 +144,15 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
     @JvmName("annotationArgument")
     inline fun <reified Embedded : Annotation> argument(
         property: ArgumentProperty<A, Embedded>,
-        noinline block: JavaAnnotationScope<Embedded>.() -> Unit = {}
+        noinline block: KotlinAnnotationScope<Embedded>.() -> Unit = {}
     ) {
-        argument(property, JavaTypedAnnotationRef { of<Embedded>().apply(block).build() })
+        argument(property, KotlinTypedAnnotationRef { of<Embedded>().apply(block).build() })
     }
 
     @JvmName("annotationArrayArgument")
     inline fun <reified Embedded : Annotation> argument(
         property: ArrayArgumentProperty<A, Embedded>,
-        values: Iterable<JavaTypedAnnotationRef<Embedded>>
+        values: Iterable<KotlinTypedAnnotationRef<Embedded>>
     ) {
         argument(property.name) {
             expression.arrayOf(values) { L(it) }
@@ -162,24 +162,24 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
     @JvmName("annotationArrayArgument")
     inline fun <reified Embedded : Annotation> argument(
         property: ArrayArgumentProperty<A, Embedded>,
-        vararg values: JavaTypedAnnotationRef<Embedded>
+        vararg values: KotlinTypedAnnotationRef<Embedded>
     ) {
         argument(property, values.asIterable())
     }
 
     @PublishedApi
-    internal fun build(): JPAnnotation =
+    internal fun build(): KPAnnotation =
         specBuilder.build()
 
     @PublishedApi
     internal companion object {
-        fun <A : Annotation> of(className: XClassName): JavaAnnotationScope<A> =
-            JavaAnnotationScope(JPAnnotation.builder(className.interopToJava()))
+        fun <A : Annotation> of(className: XClassName): KotlinAnnotationScope<A> =
+            KotlinAnnotationScope(KPAnnotation.builder(className.interopToKotlin()))
 
-        fun <A : Annotation> of(type: KClass<out A>): JavaAnnotationScope<A> =
+        fun <A : Annotation> of(type: KClass<out A>): KotlinAnnotationScope<A> =
             of(type.xClass())
 
-        inline fun <reified A : Annotation> of(): JavaAnnotationScope<A> =
+        inline fun <reified A : Annotation> of(): KotlinAnnotationScope<A> =
             of(A::class)
     }
 }

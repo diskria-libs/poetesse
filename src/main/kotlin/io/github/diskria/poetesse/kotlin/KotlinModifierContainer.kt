@@ -6,55 +6,34 @@ sealed interface KotlinModifierContainer {
         internal.append(*modifiers)
     }
 
-    fun visibility(visibility: KotlinVisibility) {
-        modifiers(
-            when (visibility) {
-                KotlinVisibility.PUBLIC -> KPModifier.PUBLIC
-                KotlinVisibility.PROTECTED -> KPModifier.PROTECTED
-                KotlinVisibility.INTERNAL -> KPModifier.INTERNAL
-                KotlinVisibility.PRIVATE -> KPModifier.PRIVATE
-            }
-        )
-    }
+    sealed interface WithVisibility : KotlinModifierContainer {
 
-    fun public() {
-        visibility(KotlinVisibility.PUBLIC)
-    }
+        fun visibility(visibility: KotlinVisibility) {
+            modifiers(
+                when (visibility) {
+                    KotlinVisibility.PUBLIC -> KPModifier.PUBLIC
+                    KotlinVisibility.PROTECTED -> KPModifier.PROTECTED
+                    KotlinVisibility.INTERNAL -> KPModifier.INTERNAL
+                    KotlinVisibility.PRIVATE -> KPModifier.PRIVATE
+                }
+            )
+        }
 
-    fun protected() {
-        visibility(KotlinVisibility.PROTECTED)
-    }
+        fun public() {
+            visibility(KotlinVisibility.PUBLIC)
+        }
 
-    fun internal() {
-        visibility(KotlinVisibility.INTERNAL)
-    }
+        fun protected() {
+            visibility(KotlinVisibility.PROTECTED)
+        }
 
-    fun private() {
-        visibility(KotlinVisibility.PRIVATE)
-    }
+        fun internal() {
+            visibility(KotlinVisibility.INTERNAL)
+        }
 
-    fun expect() {
-        modifiers(KPModifier.EXPECT)
-    }
-
-    fun actual() {
-        modifiers(KPModifier.ACTUAL)
-    }
-
-    fun final() {
-        modifiers(KPModifier.FINAL)
-    }
-
-    fun open() {
-        modifiers(KPModifier.OPEN)
-    }
-
-    fun abstract() {
-        modifiers(KPModifier.ABSTRACT)
-    }
-
-    fun external() {
-        modifiers(KPModifier.EXTERNAL)
+        fun private() {
+            visibility(KotlinVisibility.PRIVATE)
+        }
     }
 }
 
@@ -74,5 +53,8 @@ internal interface KotlinModifierContainerInternal {
 private val KotlinModifierContainer.internal: KotlinModifierContainerInternal
     get() = when (this) {
         is KotlinTypeScope -> modifierContainer
+        is KotlinConstructorScope -> modifierContainer
         is KotlinFunctionScope -> modifierContainer
+        is KotlinParameterScope -> modifierContainer
+        is KotlinVariableScope -> modifierContainer
     }

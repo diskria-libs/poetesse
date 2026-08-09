@@ -2,12 +2,9 @@ package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.PoetesseKotlin
 import io.github.diskria.poetesse.extensions.addStatement
-import io.github.diskria.poetesse.interop.XTypeName
-import io.github.diskria.poetesse.interop.xType
-import kotlin.reflect.KClass
 
 @PoetesseKotlin
-class KotlinFunctionScope private constructor(
+class KotlinConstructorScope private constructor(
     private val specBuilder: KPFunctionBuilder
 ) : KotlinParameterContainer,
     KotlinAnnotationContainer,
@@ -47,46 +44,9 @@ class KotlinFunctionScope private constructor(
         modifiers(KPModifier.EXTERNAL)
     }
 
-    fun override() {
-        modifiers(KPModifier.OVERRIDE)
-    }
-
-    fun tailrec() {
-        modifiers(KPModifier.TAILREC)
-    }
-
-    fun suspend() {
-        modifiers(KPModifier.SUSPEND)
-    }
-
-    fun inline() {
-        modifiers(KPModifier.INLINE)
-    }
-
-    fun infix() {
-        modifiers(KPModifier.INFIX)
-    }
-
-    fun operator() {
-        modifiers(KPModifier.OPERATOR)
-    }
-
     fun body(block: BodyScope.() -> Unit) {
         BodyScope().apply(block)
     }
-
-    fun returnType(type: XTypeName) {
-        specBuilder.returns(type.interopToKotlin())
-    }
-
-    fun returnType(type: KClass<*>, nullable: Boolean = false) =
-        returnType(type.xType(nullable = nullable))
-
-    inline fun <reified T> returnType(nullable: Boolean = true) =
-        returnType(T::class, nullable)
-
-    inline fun <reified T : Any> returnType() =
-        returnType<T>(nullable = false)
 
     internal fun build(): KPFunction =
         specBuilder.build()
@@ -98,7 +58,7 @@ class KotlinFunctionScope private constructor(
     }
 
     internal companion object {
-        fun of(name: String): KotlinFunctionScope =
-            KotlinFunctionScope(KPFunction.builder(name))
+        fun of(): KotlinConstructorScope =
+            KotlinConstructorScope(KPFunction.constructorBuilder())
     }
 }

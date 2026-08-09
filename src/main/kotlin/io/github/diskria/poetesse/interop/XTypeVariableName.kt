@@ -10,20 +10,20 @@ class XTypeVariableName internal constructor(
     val bounds: List<XTypeName>,
     val variance: KVariance = KVariance.INVARIANT,
     val isReified: Boolean = false,
-    override val nullable: Boolean = false,
+    override val isNullable: Boolean = false,
 ) : XTypeName() {
 
     override fun interopToKotlin(): KPTypeVariableName =
         KPTypeVariableName(name, bounds.map { it.interopToKotlin() }, variance.toKPModifier())
-            .copy(reified = isReified, nullable = nullable)
+            .copy(reified = isReified, nullable = isNullable)
 
     override fun interopToJava(): JPTypeVariableName {
         if (variance != KVariance.INVARIANT) error("Java type variables doesn't support variance")
         if (isReified) error("Java type variables doesn't support reified")
-        return JPTypeVariableName.get(name, *bounds.map { it.interopToJava() }.toTypedArray())
+        return JPTypeVariableName.get(name, *bounds.map { it.ensureBoxed().interopToJava() }.toTypedArray())
     }
 
-    override fun setNullableInternal(nullable: Boolean): XTypeName =
+    override fun setNullable(nullable: Boolean): XTypeName =
         XTypeVariableName(name, bounds, variance, isReified, nullable)
 }
 

@@ -12,13 +12,13 @@ import io.github.diskria.poetesse.kotlin.KPTypeName
 import io.github.diskria.poetesse.kotlin.KPUnit
 import kotlin.reflect.KClass
 
-class XVoidTypeName private constructor(override val nullable: Boolean = false) : XTypeName() {
+class XVoidTypeName private constructor(override val isNullable: Boolean = false) : XTypeName() {
 
-    override fun interopToKotlin(): KPTypeName = KPUnit.setNullable(nullable)
+    override fun interopToKotlin(): KPTypeName = KPUnit.setNullable(isNullable)
 
-    override fun interopToJava(): JPTypeName = if (nullable) JPBoxedVoid else JPVoid
+    override fun interopToJava(): JPTypeName = if (isNullable) JPBoxedVoid else JPVoid
 
-    override fun setNullableInternal(nullable: Boolean): XVoidTypeName = get(nullable)
+    override fun setNullable(nullable: Boolean): XVoidTypeName = get(nullable)
 
     internal companion object {
         private val NON_BOXED: XVoidTypeName = XVoidTypeName(false)
@@ -43,8 +43,8 @@ fun JPTypeName.asXVoidTypeNameOrNull(): XVoidTypeName? =
 fun JPTypeName.asXVoidTypeName(): XVoidTypeName =
     requireNotNull(asXVoidTypeNameOrNull()) { "$this is not a void type" }
 
-fun KClass<out Any>.asXVoidTypeNameOrNull(nullable: Boolean = false): XVoidTypeName? =
+fun KClass<*>.asXVoidTypeNameOrNull(nullable: Boolean = false): XVoidTypeName? =
     asClassName().setNullable(nullable).asXVoidTypeNameOrNull()
 
-fun KClass<out Any>.asXVoidTypeName(nullable: Boolean = false): XVoidTypeName =
+fun KClass<*>.asXVoidTypeName(nullable: Boolean = false): XVoidTypeName =
     asClassName().setNullable(nullable).asXVoidTypeName()

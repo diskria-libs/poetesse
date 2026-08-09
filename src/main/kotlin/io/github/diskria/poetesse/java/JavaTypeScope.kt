@@ -12,7 +12,7 @@ class JavaTypeScope private constructor(
     JavaConstructorContainer,
     JavaMethodContainer,
     JavaAnnotationContainer,
-    JavaFinalWithVisibilityModifierContainer {
+    JavaModifierContainer.WithVisibility {
 
     internal val typeContainer = JavaTypeContainerInternal.of(
         append = { specBuilder.addType(it) },

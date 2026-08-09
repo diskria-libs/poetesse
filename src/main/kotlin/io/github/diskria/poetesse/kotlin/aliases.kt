@@ -13,8 +13,6 @@ typealias KPTypeKind = TypeSpec.Kind
 typealias KPTypeAliasBuilder = TypeAliasSpec.Builder
 typealias KPTypeAlias = TypeAliasSpec
 
-typealias KPMemberHolderBuilder = MemberSpecHolder.Builder<*>
-
 typealias KPPropertyBuilder = PropertySpec.Builder
 typealias KPProperty = PropertySpec
 

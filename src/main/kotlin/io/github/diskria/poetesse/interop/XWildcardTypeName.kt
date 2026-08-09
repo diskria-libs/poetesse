@@ -10,7 +10,7 @@ import io.github.diskria.poetesse.kotlin.KPWildcardTypeName
 class XWildcardTypeName(
     val inType: XTypeName? = null,
     val outType: XTypeName? = null,
-    override val nullable: Boolean = false,
+    override val isNullable: Boolean = false,
 ) : XTypeName() {
 
     override fun interopToKotlin(): KPWildcardTypeName = when {
@@ -25,15 +25,15 @@ class XWildcardTypeName(
         }
 
         else -> KPStar
-    }.setNullable(nullable)
+    }.setNullable(isNullable)
 
     override fun interopToJava(): JPWildcardTypeName = when {
-        inType != null -> JPWildcardTypeName.supertypeOf(inType.interopToJava())
-        outType != null -> JPWildcardTypeName.subtypeOf(outType.interopToJava())
+        inType != null -> JPWildcardTypeName.supertypeOf(inType.ensureBoxed().interopToJava())
+        outType != null -> JPWildcardTypeName.subtypeOf(outType.ensureBoxed().interopToJava())
         else -> JPWildcardTypeName.subtypeOf(JPObject)
     }
 
-    override fun setNullableInternal(nullable: Boolean): XWildcardTypeName =
+    override fun setNullable(nullable: Boolean): XWildcardTypeName =
         XWildcardTypeName(inType, outType, nullable)
 }
 
@@ -44,7 +44,7 @@ fun KPWildcardTypeName.asXWildcardTypeName(): XWildcardTypeName {
     return XWildcardTypeName(
         inType = inTypes.firstOrNull()?.asXTypeName(),
         outType = outTypes.firstOrNull()?.asXTypeName(),
-        nullable = isNullable
+        isNullable = isNullable
     )
 }
 
@@ -57,3 +57,6 @@ fun JPWildcardTypeName.asXWildcardTypeName(): XWildcardTypeName {
         outType = if (lowerBounds().isNotEmpty()) null else upperBounds().firstOrNull()?.asXTypeName()
     )
 }
+
+fun XTypeName.consumer(): XWildcardTypeName = XWildcardTypeName(inType = this)
+fun XTypeName.producer(): XWildcardTypeName = XWildcardTypeName(outType = this)

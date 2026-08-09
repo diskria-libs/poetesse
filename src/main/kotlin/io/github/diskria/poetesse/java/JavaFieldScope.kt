@@ -7,7 +7,7 @@ import io.github.diskria.poetesse.interop.XTypeName
 class JavaFieldScope private constructor(
     private val specBuilder: JPFieldBuilder
 ) : JavaAnnotationContainer,
-    JavaFinalWithVisibilityModifierContainer {
+    JavaModifierContainer.WithVisibility {
 
     internal val annotationContainer = JavaAnnotationContainerInternal.of(
         append = { specBuilder.addAnnotation(it) },

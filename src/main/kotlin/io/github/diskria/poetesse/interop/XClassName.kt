@@ -11,29 +11,29 @@ import kotlin.reflect.KClass
 class XClassName private constructor(
     val packageName: String?,
     val simpleNames: List<String>,
-    override val nullable: Boolean = false,
+    override val isNullable: Boolean = false,
 ) : XTypeName() {
 
     val simpleName: String = simpleNames.last()
     val nestedName: String = simpleNames.joinToString(".")
     val qualifiedName: String = listOfNotNull(packageName, nestedName).joinToString(".")
 
-    private val javaAsKotlin: KPClassName =
-        KPClassName(packageName.orEmpty(), simpleNames).setNullable(nullable)
+    private val rawKotlin: KPClassName =
+        KPClassName(packageName.orEmpty(), simpleNames).setNullable(isNullable)
 
-    private val kotlinAsJava: JPClassName =
+    private val rawJava: JPClassName =
         JPClassName.get(packageName.orEmpty(), simpleNames.first(), *simpleNames.drop(1).toTypedArray())
 
     fun nested(name: String): XClassName =
         of(packageName, simpleNames = (simpleNames + name).toTypedArray())
 
     override fun interopToKotlin(): KPClassName =
-        (J2K[kotlinAsJava] ?: javaAsKotlin).setNullable(nullable)
+        (J2K[rawJava] ?: rawKotlin).setNullable(isNullable)
 
     override fun interopToJava(): JPClassName =
-        K2J[javaAsKotlin.setNullable(false)] ?: kotlinAsJava
+        K2J[rawKotlin.setNullable(false)] ?: rawJava
 
-    override fun setNullableInternal(nullable: Boolean): XClassName =
+    override fun setNullable(nullable: Boolean): XClassName =
         XClassName(packageName, simpleNames, nullable)
 
     companion object {
@@ -117,16 +117,32 @@ class XClassName private constructor(
         private val J2K: Map<JPClassName, KPClassName> =
             K2J.entries.associate { (k, j) -> j to k }
 
-        fun of(packageName: String?, vararg simpleNames: String): XClassName =
-            XClassName(packageName, simpleNames.toList())
+        fun of(packageName: String?, simpleNames: Iterable<String>, nullable: Boolean = false): XClassName =
+            XClassName(packageName, simpleNames.toList(), nullable)
+
+        fun of(packageName: String?, vararg simpleNames: String, nullable: Boolean = false): XClassName =
+            of(packageName, simpleNames.asIterable(), nullable)
     }
 }
 
 fun KPClassName.asXClassName(): XClassName =
-    XClassName.of(packageName.takeIf { it.isNotEmpty() }, *simpleNames.toTypedArray())
+    XClassName.of(packageName.takeIf { it.isNotEmpty() }, simpleNames, isNullable)
 
 fun JPClassName.asXClassName(): XClassName =
     XClassName.of(packageName(), *simpleNames().toTypedArray())
 
-fun KClass<out Any>.asXClassName(nullable: Boolean = false): XClassName =
-    asClassName().setNullable(nullable).asXClassName()
+fun KClass<*>.xClass(nullable: Boolean = false): XClassName {
+    require(this != Array::class && !java.isArray) {
+        "xClass for arrays is not possible.\n" +
+            "For example, for `Array<Int>` use:\n" +
+            "xType<Int>().array()"
+    }
+    return asClassName().setNullable(nullable).asXClassName()
+}
+
+inline fun <reified T> xClass(nullable: Boolean = true) =
+    T::class.xClass(nullable)
+
+inline fun <reified T : Any> xClass() =
+    xClass<T>(nullable = false)
+

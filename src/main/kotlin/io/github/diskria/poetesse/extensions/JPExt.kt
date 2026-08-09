@@ -8,8 +8,11 @@ val JPTypeName.isVoid: Boolean
 val JPTypeName.isBoxedVoid: Boolean
     get() = withoutAnnotations() == JPBoxedVoid
 
-fun JPTypeName.setBoxed(boxed: Boolean): JPTypeName =
-    if (boxed) box() else unbox()
+fun JPTypeName.setBoxed(boxed: Boolean): JPTypeName {
+    val isBoxed = isBoxedVoid || isBoxedPrimitive
+    if (isBoxed == boxed) return this
+    return if (boxed) box() else unbox()
+}
 
 fun JPTypeName.wrapIntoArrayTypeName(): JPArrayTypeName =
     JPArrayTypeName.of(this)
