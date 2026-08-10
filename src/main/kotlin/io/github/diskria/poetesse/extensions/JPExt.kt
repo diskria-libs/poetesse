@@ -14,7 +14,7 @@ fun JPTypeName.setBoxed(boxed: Boolean): JPTypeName {
     return if (boxed) box() else unbox()
 }
 
-fun JPTypeName.wrapIntoArrayTypeName(): JPArrayTypeName =
+fun JPTypeName.wrapToArray(): JPArrayTypeName =
     JPArrayTypeName.of(this)
 
 fun JPClassName.parameterizedBy(vararg typeArguments: JPTypeName): JPParameterizedTypeName =

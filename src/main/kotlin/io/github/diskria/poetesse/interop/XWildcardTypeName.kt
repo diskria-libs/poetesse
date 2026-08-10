@@ -1,62 +1,62 @@
 package io.github.diskria.poetesse.interop
 
+import io.github.diskria.poetesse.Poetesse
+import io.github.diskria.poetesse.PoetesseScope
 import io.github.diskria.poetesse.extensions.setNullable
+import io.github.diskria.poetesse.extensions.withoutAnnotations
 import io.github.diskria.poetesse.java.JPObject
 import io.github.diskria.poetesse.java.JPWildcardTypeName
 import io.github.diskria.poetesse.kotlin.KPAny
 import io.github.diskria.poetesse.kotlin.KPStar
 import io.github.diskria.poetesse.kotlin.KPWildcardTypeName
 
-class XWildcardTypeName(
-    val inType: XTypeName? = null,
-    val outType: XTypeName? = null,
-    override val isNullable: Boolean = false,
-) : XTypeName() {
+class XWildcardTypeName internal constructor(
+    override val settings: Poetesse.Settings,
+    val inType: XTypeName<*, *>?,
+    val outType: XTypeName<*, *>?,
+    override val isNullable: Boolean,
+) : XTypeName<KPWildcardTypeName, JPWildcardTypeName>() {
 
-    override fun interopToKotlin(): KPWildcardTypeName = when {
+    override fun interopToKotlinInternal(): KPWildcardTypeName = when {
         inType != null -> KPWildcardTypeName.consumerOf(inType.interopToKotlin())
         outType != null -> {
-            val kotlinBound = outType.interopToKotlin()
-            if (kotlinBound == KPAny.copy(nullable = true)) {
-                KPStar
-            } else {
-                KPWildcardTypeName.producerOf(kotlinBound)
-            }
+            val kpBound = outType.interopToKotlin()
+            if (kpBound.withoutAnnotations() == KPAny.setNullable(true)) KPStar
+            else KPWildcardTypeName.producerOf(kpBound)
         }
 
         else -> KPStar
-    }.setNullable(isNullable)
+    }
 
-    override fun interopToJava(): JPWildcardTypeName = when {
-        inType != null -> JPWildcardTypeName.supertypeOf(inType.ensureBoxed().interopToJava())
-        outType != null -> JPWildcardTypeName.subtypeOf(outType.ensureBoxed().interopToJava())
+    override fun interopToJavaInternal(): JPWildcardTypeName = when {
+        inType != null -> JPWildcardTypeName.supertypeOf(inType.box().interopToJava())
+        outType != null -> JPWildcardTypeName.subtypeOf(outType.box().interopToJava())
         else -> JPWildcardTypeName.subtypeOf(JPObject)
     }
-
-    override fun setNullable(nullable: Boolean): XWildcardTypeName =
-        XWildcardTypeName(inType, outType, nullable)
 }
 
-fun KPWildcardTypeName.asXWildcardTypeName(): XWildcardTypeName {
-    if (inTypes.size > 1 || outTypes.size > 1) {
-        error("Unsupported wildcard with multiple bounds")
-    }
-    return XWildcardTypeName(
-        inType = inTypes.firstOrNull()?.asXTypeName(),
-        outType = outTypes.firstOrNull()?.asXTypeName(),
-        isNullable = isNullable
+@PublishedApi
+context(scope: PoetesseScope)
+internal fun KPWildcardTypeName.asXWildcardTypeName(): XWildcardTypeName =
+    XWildcardTypeName(
+        settings = scope.settings,
+        inType = inTypes.firstOrNull()?.toXType(),
+        outType = outTypes.firstOrNull()?.toXType(),
+        isNullable = isNullable,
     )
-}
 
-fun JPWildcardTypeName.asXWildcardTypeName(): XWildcardTypeName {
-    if (lowerBounds().size > 1 || upperBounds().size > 1) {
-        error("Unsupported wildcard with multiple bounds")
-    }
-    return XWildcardTypeName(
-        inType = lowerBounds().firstOrNull()?.asXTypeName(),
-        outType = if (lowerBounds().isNotEmpty()) null else upperBounds().firstOrNull()?.asXTypeName()
+@PublishedApi
+context(scope: PoetesseScope)
+internal fun JPWildcardTypeName.asXWildcardTypeName(nullable: Boolean = false): XWildcardTypeName =
+    XWildcardTypeName(
+        settings = scope.settings,
+        inType = lowerBounds().firstOrNull()?.toXType(),
+        outType = if (lowerBounds().isNotEmpty()) null else upperBounds().firstOrNull()?.toXType(),
+        isNullable = nullable,
     )
-}
 
-fun XTypeName.consumer(): XWildcardTypeName = XWildcardTypeName(inType = this)
-fun XTypeName.producer(): XWildcardTypeName = XWildcardTypeName(outType = this)
+fun XTypeName<*, *>.consumer(nullable: Boolean = false): XWildcardTypeName =
+    XWildcardTypeName(settings, inType = this, outType = null, isNullable = nullable)
+
+fun XTypeName<*, *>.producer(nullable: Boolean = false): XWildcardTypeName =
+    XWildcardTypeName(settings, outType = this, inType = null, isNullable = nullable)

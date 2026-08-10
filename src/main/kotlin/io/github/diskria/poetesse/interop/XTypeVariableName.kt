@@ -1,48 +1,53 @@
 package io.github.diskria.poetesse.interop
 
+import io.github.diskria.poetesse.Poetesse
+import io.github.diskria.poetesse.PoetesseScope
 import io.github.diskria.poetesse.java.JPTypeVariableName
 import io.github.diskria.poetesse.kotlin.KPModifier
 import io.github.diskria.poetesse.kotlin.KPTypeVariableName
-import kotlin.reflect.KVariance
 
 class XTypeVariableName internal constructor(
+    override val settings: Poetesse.Settings,
     val name: String,
-    val bounds: List<XTypeName>,
-    val variance: KVariance = KVariance.INVARIANT,
-    val isReified: Boolean = false,
-    override val isNullable: Boolean = false,
-) : XTypeName() {
+    val bounds: List<XTypeName<*, *>>,
+    val variance: XVariance?,
+    val isReified: Boolean,
+    override val isNullable: Boolean,
+) : XTypeName<KPTypeVariableName, JPTypeVariableName>() {
 
-    override fun interopToKotlin(): KPTypeVariableName =
-        KPTypeVariableName(name, bounds.map { it.interopToKotlin() }, variance.toKPModifier())
-            .copy(reified = isReified, nullable = isNullable)
+    override fun interopToKotlinInternal(): KPTypeVariableName =
+        KPTypeVariableName(
+            name,
+            bounds.map { it.interopToKotlin() },
+            variance?.toKPModifier()
+        ).copy(reified = isReified)
 
-    override fun interopToJava(): JPTypeVariableName {
-        if (variance != KVariance.INVARIANT) error("Java type variables doesn't support variance")
+    override fun interopToJavaInternal(): JPTypeVariableName {
+        if (variance != null) error("Java type variables doesn't support variance")
         if (isReified) error("Java type variables doesn't support reified")
-        return JPTypeVariableName.get(name, *bounds.map { it.ensureBoxed().interopToJava() }.toTypedArray())
+        return JPTypeVariableName.get(name, *bounds.map { it.box().interopToJava() }.toTypedArray())
     }
-
-    override fun setNullable(nullable: Boolean): XTypeName =
-        XTypeVariableName(name, bounds, variance, isReified, nullable)
 }
 
-fun KPTypeVariableName.asXTypeVariableName(): XTypeVariableName =
-    XTypeVariableName(name, bounds.map { it.asXTypeName() }, variance.toKVariance())
-
-fun JPTypeVariableName.asXTypeVariableName(): XTypeVariableName =
-    XTypeVariableName(name(), bounds().map { it.asXTypeName() })
-
-private fun KVariance.toKPModifier(): KPModifier? =
+private fun XVariance.toKPModifier(): KPModifier? =
     when (this) {
-        KVariance.INVARIANT -> null
-        KVariance.IN -> KPModifier.IN
-        KVariance.OUT -> KPModifier.OUT
+        XVariance.IN -> KPModifier.IN
+        XVariance.OUT -> KPModifier.OUT
     }
 
-private fun KPModifier?.toKVariance(): KVariance =
+private fun KPModifier?.toKVariance(): XVariance? =
     when (this) {
-        KPModifier.IN -> KVariance.IN
-        KPModifier.OUT -> KVariance.OUT
-        else -> KVariance.INVARIANT
+        KPModifier.IN -> XVariance.IN
+        KPModifier.OUT -> XVariance.OUT
+        else -> null
     }
+
+@PublishedApi
+context(scope: PoetesseScope)
+internal fun KPTypeVariableName.asXTypeVariableName(): XTypeVariableName =
+    XTypeVariableName(scope.settings, name, bounds.map { it.toXType() }, variance.toKVariance(), isReified, isNullable)
+
+@PublishedApi
+context(scope: PoetesseScope)
+internal fun JPTypeVariableName.asXTypeVariableName(nullable: Boolean = false): XTypeVariableName =
+    XTypeVariableName(scope.settings, name(), bounds().map { it.toXType() }, null, false, nullable)

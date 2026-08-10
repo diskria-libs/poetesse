@@ -1,9 +1,11 @@
 package io.github.diskria.poetesse.java
 
-interface JavaTypeFactory
+import io.github.diskria.poetesse.PoetesseScope
+
+interface JavaTypeFactory : PoetesseScope
 
 fun JavaTypeFactory.type(kind: JPTypeKind, name: String, block: JavaTypeScope.() -> Unit = {}): JavaTypeRef =
-    JavaTypeRef(name) { className -> JavaTypeScope.of(kind, name, className).apply(block).build() }
+    JavaTypeRef(name) { className -> JavaTypeScope.of(settings, kind, name, className).apply(block).build() }
 
 fun JavaTypeFactory.class_(name: String, block: JavaTypeScope.() -> Unit = {}): JavaTypeRef =
     type(JPTypeKind.CLASS, name, block)

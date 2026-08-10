@@ -1,57 +1,56 @@
 package io.github.diskria.poetesse.interop
 
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import com.squareup.kotlinpoet.asClassName
+import io.github.diskria.poetesse.Poetesse
+import io.github.diskria.poetesse.PoetesseScope
 import io.github.diskria.poetesse.extensions.setNullable
+import io.github.diskria.poetesse.extensions.withoutAnnotations
+import io.github.diskria.poetesse.interop.XArrayTypeName.Companion.kotlinPrimitiveArrays
 import io.github.diskria.poetesse.java.JPArrayTypeName
 import io.github.diskria.poetesse.kotlin.KPArray
 import io.github.diskria.poetesse.kotlin.KPClassName
 import io.github.diskria.poetesse.kotlin.KPParameterizedTypeName
 import io.github.diskria.poetesse.kotlin.KPTypeName
-import kotlin.reflect.KClass
 
 class XArrayTypeName internal constructor(
-    val componentType: XTypeName,
-    override val isNullable: Boolean = false,
-) : XTypeName() {
+    override val settings: Poetesse.Settings,
+    val componentType: XTypeName<*, *>,
+    override val isNullable: Boolean,
+) : XTypeName<KPTypeName, JPArrayTypeName>() {
 
-    override fun interopToKotlin(): KPTypeName =
-        if (componentType is XPrimitiveTypeName && !componentType.isNullable) {
-            componentType.kind.kotlinArrayClassName
+    override fun interopToKotlinInternal(): KPTypeName =
+        if (componentType is XPrimitiveTypeName && !componentType.isBoxed) {
+            componentType.kind.kotlinArray
         } else {
             KPArray.parameterizedBy(componentType.interopToKotlin())
-        }.setNullable(isNullable)
+        }
 
-    override fun interopToJava(): JPArrayTypeName =
+    override fun interopToJavaInternal(): JPArrayTypeName =
         JPArrayTypeName.of(componentType.interopToJava())
 
-    override fun setNullable(nullable: Boolean): XArrayTypeName =
-        XArrayTypeName(componentType, nullable)
+    internal companion object {
+        val kotlinPrimitiveArrays = XPrimitiveTypeName.Kind.entries.associate { it.kotlinArray to it.kotlin }
+    }
 }
 
-fun KPTypeName.asXArrayTypeNameOrNull(): XArrayTypeName? = when (this) {
-    is KPClassName -> {
-        XPrimitiveKind.entries.find { it.kotlinArrayClassName == this }
-            ?.java?.asXPrimitiveTypeName()
-            ?.let { XArrayTypeName(it, isNullable) }
-    }
-
-    is KPParameterizedTypeName -> {
-        if (rawType == KPArray) {
-            typeArguments.singleOrNull()?.asXTypeName()?.let { XArrayTypeName(it, isNullable) }
-        } else {
-            null
+@PublishedApi
+context(scope: PoetesseScope)
+internal fun KPTypeName.asXArrayTypeNameOrNull(): XArrayTypeName? {
+    val componentType = when (this) {
+        is KPClassName -> kotlinPrimitiveArrays[this]?.asX<XPrimitiveTypeName>()
+        is KPParameterizedTypeName if (rawType.setNullable(false).withoutAnnotations() == KPArray) -> {
+            typeArguments.firstOrNull()?.toXType()
         }
-    }
 
-    else -> null
+        else -> null
+    } ?: return null
+    return XArrayTypeName(scope.settings, componentType, isNullable)
 }
 
-fun KClass<*>.asXArrayTypeNameOrNull(nullable: Boolean = false): XArrayTypeName? =
-    asClassName().setNullable(nullable).asXArrayTypeNameOrNull()
+@PublishedApi
+context(scope: PoetesseScope)
+internal fun JPArrayTypeName.asXArrayTypeName(nullable: Boolean = false): XArrayTypeName =
+    XArrayTypeName(scope.settings, componentType().toXType(), nullable)
 
-fun JPArrayTypeName.asXArrayTypeName(): XArrayTypeName =
-    XArrayTypeName(componentType().asXTypeName())
-
-fun XTypeName.array(): XArrayTypeName =
-    XArrayTypeName(this)
+fun XTypeName<*, *>.array(nullable: Boolean = false): XArrayTypeName =
+    XArrayTypeName(settings, this, nullable)

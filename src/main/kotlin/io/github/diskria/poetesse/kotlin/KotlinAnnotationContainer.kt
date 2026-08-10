@@ -1,7 +1,7 @@
 package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.interop.XClassName
-import io.github.diskria.poetesse.interop.xClass
+import io.github.diskria.poetesse.xClass
 import kotlin.reflect.KClass
 
 sealed interface KotlinAnnotationContainer : KotlinAnnotationFactory {
@@ -22,7 +22,7 @@ fun <A : Annotation> KotlinAnnotationContainer.annotation(
     type: KClass<out A>,
     block: KotlinAnnotationScope<A>.() -> Unit = {}
 ) {
-    annotation(type.xClass(), block)
+    annotation(xClass(type), block)
 }
 
 inline fun <reified A : Annotation> KotlinAnnotationContainer.annotation(
@@ -50,7 +50,7 @@ private val KotlinAnnotationContainer.factory: KotlinAnnotationFactory
 private val KotlinAnnotationContainer.internal: KotlinAnnotationContainerInternal
     get() = when (this) {
         is KotlinTypeScope -> annotationContainer
-//        is KotlinFieldScope -> annotationContainer
+        is KotlinPropertyScope -> annotationContainer
         is KotlinConstructorScope -> annotationContainer
         is KotlinFunctionScope -> annotationContainer
         is KotlinParameterScope -> annotationContainer

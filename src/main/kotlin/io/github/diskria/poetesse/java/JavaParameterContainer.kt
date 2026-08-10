@@ -4,7 +4,7 @@ import io.github.diskria.poetesse.EagerDelegate
 import io.github.diskria.poetesse.interop.XParameter
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.asXParameter
-import io.github.diskria.poetesse.interop.xType
+import io.github.diskria.poetesse.xType
 import kotlin.reflect.KClass
 
 sealed interface JavaParameterContainer : JavaParameterFactory {
@@ -15,15 +15,15 @@ sealed interface JavaParameterContainer : JavaParameterFactory {
     }
 }
 
-fun JavaParameterContainer.parameter(name: String, type: XTypeName, block: JavaParameterScope.() -> Unit = {}) =
+fun JavaParameterContainer.parameter(name: String, type: XTypeName<*, *>, block: JavaParameterScope.() -> Unit = {}) =
     +factory.parameter(name, type, block)
 
-fun JavaParameterContainer.parameter(type: XTypeName, block: JavaParameterScope.() -> Unit = {}) =
+fun JavaParameterContainer.parameter(type: XTypeName<*, *>, block: JavaParameterScope.() -> Unit = {}) =
     EagerDelegate { name -> parameter(name, type, block) }
 
 fun JavaParameterContainer.parameter(
     name: String, type: KClass<*>, nullable: Boolean = false, block: JavaParameterScope.() -> Unit = {}
-) = parameter(name, type.xType(nullable = nullable), block)
+) = parameter(name, xType(type, nullable = nullable), block)
 
 fun JavaParameterContainer.parameter(
     type: KClass<*>, nullable: Boolean = false, block: JavaParameterScope.() -> Unit = {}

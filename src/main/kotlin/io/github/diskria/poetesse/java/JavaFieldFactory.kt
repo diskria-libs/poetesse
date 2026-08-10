@@ -1,22 +1,22 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.LazyDelegate
+import io.github.diskria.poetesse.PoetesseScope
 import io.github.diskria.poetesse.interop.XTypeName
-import io.github.diskria.poetesse.interop.nullable
-import io.github.diskria.poetesse.interop.xType
+import io.github.diskria.poetesse.xType
 import kotlin.reflect.KClass
 
-interface JavaFieldFactory
+interface JavaFieldFactory : PoetesseScope
 
-fun JavaFieldFactory.field(name: String, type: XTypeName, block: JavaFieldScope.() -> Unit = {}) =
-    JavaFieldRef(name) { JavaFieldScope.of(name, type).apply(block).build() }
+fun JavaFieldFactory.field(name: String, type: XTypeName<*, *>, block: JavaFieldScope.() -> Unit = {}) =
+    JavaFieldRef(name) { JavaFieldScope.of(settings, name, type).apply(block).build() }
 
-fun JavaFieldFactory.field(type: XTypeName, block: JavaFieldScope.() -> Unit = {}) =
+fun JavaFieldFactory.field(type: XTypeName<*, *>, block: JavaFieldScope.() -> Unit = {}) =
     LazyDelegate { name -> field(name, type, block) }
 
 fun JavaFieldFactory.field(
     name: String, type: KClass<*>, nullable: Boolean = false, block: JavaFieldScope.() -> Unit = {}
-) = field(name, type.xType(nullable = nullable), block)
+) = field(name, xType(type, nullable = nullable), block)
 
 fun JavaFieldFactory.field(type: KClass<*>, nullable: Boolean = false, block: JavaFieldScope.() -> Unit = {}) =
     LazyDelegate { name -> field(name, type, nullable, block) }

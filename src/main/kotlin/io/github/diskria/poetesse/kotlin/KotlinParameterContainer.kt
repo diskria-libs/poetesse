@@ -4,7 +4,7 @@ import io.github.diskria.poetesse.EagerDelegate
 import io.github.diskria.poetesse.interop.XParameter
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.asXParameter
-import io.github.diskria.poetesse.interop.xType
+import io.github.diskria.poetesse.xType
 import kotlin.reflect.KClass
 
 sealed interface KotlinParameterContainer : KotlinParameterFactory {
@@ -15,15 +15,18 @@ sealed interface KotlinParameterContainer : KotlinParameterFactory {
     }
 }
 
-fun KotlinParameterContainer.parameter(name: String, type: XTypeName, block: KotlinParameterScope.() -> Unit = {}) =
-    +factory.parameter(name, type, block)
+fun KotlinParameterContainer.parameter(
+    name: String,
+    type: XTypeName<*, *>,
+    block: KotlinParameterScope.() -> Unit = {}
+) = +factory.parameter(name, type, block)
 
-fun KotlinParameterContainer.parameter(type: XTypeName, block: KotlinParameterScope.() -> Unit = {}) =
+fun KotlinParameterContainer.parameter(type: XTypeName<*, *>, block: KotlinParameterScope.() -> Unit = {}) =
     EagerDelegate { name -> parameter(name, type, block) }
 
 fun KotlinParameterContainer.parameter(
     name: String, type: KClass<*>, nullable: Boolean = false, block: KotlinParameterScope.() -> Unit = {}
-) = parameter(name, type.xType(nullable = nullable), block)
+) = parameter(name, xType(type, nullable = nullable), block)
 
 fun KotlinParameterContainer.parameter(
     type: KClass<*>, nullable: Boolean = false, block: KotlinParameterScope.() -> Unit = {}

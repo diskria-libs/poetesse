@@ -1,29 +1,36 @@
 package io.github.diskria.poetesse.kotlin
 
+import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseKotlin
 import io.github.diskria.poetesse.interop.XClassName
 import io.github.diskria.poetesse.interop.XTypeName
-import io.github.diskria.poetesse.interop.xType
+import io.github.diskria.poetesse.interop.interopToKotlin
+import io.github.diskria.poetesse.xType
 import kotlin.reflect.KClass
 
 @PoetesseKotlin
 class KotlinTypeScope private constructor(
+    override val settings: Poetesse.Settings,
     val className: XClassName,
     private val specBuilder: KPTypeBuilder
-) : KotlinTypeContainer,
-    // properties
+) : KotlinTypeVariableContainer,
+    KotlinTypeContainer,
+    KotlinPropertyContainer,
     KotlinConstructorContainer,
     KotlinFunctionContainer,
     KotlinAnnotationContainer,
     KotlinModifierContainer.WithVisibility {
 
+    internal val typeVariableContainer = KotlinTypeVariableContainerInternal.of(
+        append = { specBuilder.addTypeVariable(it) }
+    )
     internal val typeContainer = KotlinTypeContainerInternal.of(
         append = { specBuilder.addType(it) },
         nestedClassName = { name -> className.nested(name) },
     )
-
-    // properties
-
+    internal val propertyContainer = KotlinPropertyContainerInternal.of(
+        append = { specBuilder.addProperty(it) }
+    )
     internal val constructorContainer = KotlinConstructorContainerInternal.of(
         append = { constructor, isPrimary ->
             if (isPrimary) specBuilder.primaryConstructor(constructor)
@@ -72,52 +79,53 @@ class KotlinTypeScope private constructor(
         modifiers(KPModifier.INNER)
     }
 
-    fun superclass(type: XTypeName, constructor: SuperclassConstructorScope.() -> Unit = {}) {
+    fun superclass(type: XTypeName<*, *>, constructor: SuperclassConstructorScope.() -> Unit = {}) {
         specBuilder.superclass(type.interopToKotlin())
-        SuperclassConstructorScope().constructor()
+        SuperclassConstructorScope(settings).constructor()
     }
 
     fun superclass(type: KClass<*>, constructor: SuperclassConstructorScope.() -> Unit = {}) {
-        superclass(type.xType(), constructor)
+        superclass(xType(type), constructor)
     }
 
     inline fun <reified T : Any> superclass(noinline constructor: SuperclassConstructorScope.() -> Unit = {}) {
         superclass(T::class, constructor)
     }
 
-    fun superinterface(type: XTypeName) {
+    fun superinterface(type: XTypeName<*, *>) {
         specBuilder.addSuperinterface(type.interopToKotlin())
     }
 
     fun superinterface(type: KClass<*>) {
-        superinterface(type.xType())
+        superinterface(xType(type))
     }
 
     inline fun <reified T : Any> superinterface() {
         superinterface(T::class)
     }
 
-    fun superinterfaces(types: Iterable<XTypeName>) {
+    fun superinterfaces(types: Iterable<XTypeName<*, *>>) {
         types.forEach { superinterface(it) }
     }
 
-    fun superinterfaces(vararg types: XTypeName) {
+    fun superinterfaces(vararg types: XTypeName<*, *>) {
         superinterfaces(types.asIterable())
     }
 
     internal fun build(): KPType =
         specBuilder.build()
 
-    inner class SuperclassConstructorScope : KotlinArgumentsContainer {
-
+    @PoetesseKotlin
+    inner class SuperclassConstructorScope(override val settings: Poetesse.Settings) : KotlinArgumentsContainer {
         internal val argumentsContainer = KotlinArgumentsContainerInternal.of(
-            append = { specBuilder.addSuperclassConstructorParameter(it) }
+            append = { this@KotlinTypeScope.specBuilder.addSuperclassConstructorParameter(it) }
         )
     }
 
     internal companion object {
-        fun of(kind: KPTypeKind, name: String, className: XClassName): KotlinTypeScope =
+        fun of(settings: Poetesse.Settings, kind: KPTypeKind, name: String, className: XClassName): KotlinTypeScope =
             KotlinTypeScope(
+                settings,
                 className,
                 when (kind) {
                     KPTypeKind.CLASS -> KPType.classBuilder(name)

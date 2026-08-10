@@ -1,19 +1,27 @@
 package io.github.diskria.poetesse.java
 
+import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseJava
 import io.github.diskria.poetesse.interop.XClassName
+import io.github.diskria.poetesse.interop.XTypeName
+import io.github.diskria.poetesse.interop.interopToJava
 
 @PoetesseJava
 class JavaTypeScope private constructor(
+    override val settings: Poetesse.Settings,
     val className: XClassName,
     private val specBuilder: JPTypeBuilder
-) : JavaTypeContainer,
+) : JavaTypeVariableContainer,
+    JavaTypeContainer,
     JavaFieldContainer,
     JavaConstructorContainer,
     JavaMethodContainer,
     JavaAnnotationContainer,
     JavaModifierContainer.WithVisibility {
 
+    internal val typeVariableContainer = JavaTypeVariableContainerInternal.of(
+        append = { specBuilder.addTypeVariable(it) }
+    )
     internal val typeContainer = JavaTypeContainerInternal.of(
         append = { specBuilder.addType(it) },
         nestedClassName = { name -> className.nested(name) },
@@ -42,8 +50,15 @@ class JavaTypeScope private constructor(
         modifiers(JPModifier.STATIC)
     }
 
-    fun sealed() {
+    fun sealed(permits: Iterable<XTypeName<*, *>>) {
         modifiers(JPModifier.SEALED)
+        permits.forEach {
+            specBuilder.addPermittedSubclass(it.interopToJava())
+        }
+    }
+
+    fun sealed(vararg permits: XTypeName<*, *>) {
+        sealed(permits.asIterable())
     }
 
     fun nonSealed() {
@@ -54,12 +69,21 @@ class JavaTypeScope private constructor(
         modifiers(JPModifier.STRICTFP)
     }
 
+    fun initializerBlock(block: JavaCodeBuilder) {
+        specBuilder.addInitializerBlock(JavaCodeScope.of(settings, block).codeBlock)
+    }
+
+    fun staticBlock(block: JavaCodeBuilder) {
+        specBuilder.addStaticBlock(JavaCodeScope.of(settings, block).codeBlock)
+    }
+
     internal fun build(): JPType =
         specBuilder.build()
 
     internal companion object {
-        fun of(kind: JPTypeKind, name: String, className: XClassName): JavaTypeScope =
+        fun of(settings: Poetesse.Settings, kind: JPTypeKind, name: String, className: XClassName): JavaTypeScope =
             JavaTypeScope(
+                settings,
                 className,
                 when (kind) {
                     JPTypeKind.CLASS -> JPType.classBuilder(name)

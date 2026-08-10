@@ -1,21 +1,22 @@
 package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.LazyDelegate
+import io.github.diskria.poetesse.PoetesseScope
 import io.github.diskria.poetesse.interop.XTypeName
-import io.github.diskria.poetesse.interop.xType
+import io.github.diskria.poetesse.xType
 import kotlin.reflect.KClass
 
-interface KotlinParameterFactory
+interface KotlinParameterFactory : PoetesseScope
 
-fun KotlinParameterFactory.parameter(name: String, type: XTypeName, block: KotlinParameterScope.() -> Unit) =
-    KotlinParameterRef(name) { KotlinParameterScope.of(name, type).apply(block).build() }
+fun KotlinParameterFactory.parameter(name: String, type: XTypeName<*, *>, block: KotlinParameterScope.() -> Unit) =
+    KotlinParameterRef(name) { KotlinParameterScope.of(settings, name, type).apply(block).build() }
 
-fun KotlinParameterFactory.parameter(type: XTypeName, block: KotlinParameterScope.() -> Unit = {}) =
+fun KotlinParameterFactory.parameter(type: XTypeName<*, *>, block: KotlinParameterScope.() -> Unit = {}) =
     LazyDelegate { name -> parameter(name, type, block) }
 
 fun KotlinParameterFactory.parameter(
     name: String, type: KClass<*>, nullable: Boolean = false, block: KotlinParameterScope.() -> Unit = {}
-) = parameter(name, type.xType(nullable = nullable), block)
+) = parameter(name, xType(type, nullable = nullable), block)
 
 fun KotlinParameterFactory.parameter(
     type: KClass<*>, nullable: Boolean = false, block: KotlinParameterScope.() -> Unit = {}

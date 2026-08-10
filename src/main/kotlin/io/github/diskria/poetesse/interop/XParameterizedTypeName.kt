@@ -1,35 +1,42 @@
 package io.github.diskria.poetesse.interop
 
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import io.github.diskria.poetesse.Poetesse
+import io.github.diskria.poetesse.PoetesseScope
 import io.github.diskria.poetesse.extensions.parameterizedBy
-import io.github.diskria.poetesse.extensions.setNullable
 import io.github.diskria.poetesse.java.JPParameterizedTypeName
 import io.github.diskria.poetesse.kotlin.KPParameterizedTypeName
 
 class XParameterizedTypeName internal constructor(
+    override val settings: Poetesse.Settings,
     private val rawType: XClassName,
-    private val typeArguments: List<XTypeName>,
-    override val isNullable: Boolean = false,
-) : XTypeName() {
+    private val typeArguments: List<XTypeName<*, *>>,
+    override val isNullable: Boolean,
+) : XTypeName<KPParameterizedTypeName, JPParameterizedTypeName>() {
 
-    override fun interopToKotlin(): KPParameterizedTypeName =
-        rawType.interopToKotlin().parameterizedBy(typeArguments.map { it.interopToKotlin() }).setNullable(isNullable)
+    override fun interopToKotlinInternal(): KPParameterizedTypeName =
+        rawType.interopToKotlin()
+            .parameterizedBy(typeArguments.map { it.interopToKotlin() })
 
-    override fun interopToJava(): JPParameterizedTypeName =
-        rawType.interopToJava().parameterizedBy(typeArguments.map { it.ensureBoxed().interopToJava() })
-
-    override fun setNullable(nullable: Boolean): XParameterizedTypeName =
-        XParameterizedTypeName(rawType, typeArguments, nullable)
+    override fun interopToJavaInternal(): JPParameterizedTypeName =
+        rawType.interopToJava(resolveNullability = false)
+            .parameterizedBy(typeArguments.map { it.box().interopToJava() })
 }
 
-fun XClassName.generic(typeArguments: Iterable<XTypeName>): XParameterizedTypeName =
-    XParameterizedTypeName(this, typeArguments.toList())
+@PublishedApi
+context(scope: PoetesseScope)
+internal fun KPParameterizedTypeName.asXParameterizedTypeName(): XParameterizedTypeName =
+    XParameterizedTypeName(scope.settings, rawType.asX<XClassName>(), typeArguments.map { it.toXType() }, isNullable)
 
-fun XClassName.generic(vararg typeArguments: XTypeName): XParameterizedTypeName =
-    generic(typeArguments.asIterable())
+@PublishedApi
+context(scope: PoetesseScope)
+internal fun JPParameterizedTypeName.asXParameterizedTypeName(nullable: Boolean = false): XParameterizedTypeName =
+    XParameterizedTypeName(scope.settings, rawType().asX<XClassName>(), typeArguments().map { it.toXType() }, nullable)
 
-fun KPParameterizedTypeName.asXParameterizedTypeName(): XParameterizedTypeName =
-    XParameterizedTypeName(rawType.asXClassName(), typeArguments.map { it.asXTypeName() }, isNullable)
+fun XClassName.generic(
+    typeArguments: Iterable<XTypeName<*, *>>,
+    nullable: Boolean = isNullable,
+): XParameterizedTypeName = XParameterizedTypeName(settings, this, typeArguments.toList(), nullable)
 
-fun JPParameterizedTypeName.asXParameterizedTypeName(): XParameterizedTypeName =
-    XParameterizedTypeName(rawType().asXClassName(), typeArguments().map { it.asXTypeName() }, false)
+fun XClassName.generic(vararg typeArguments: XTypeName<*, *>, nullable: Boolean = isNullable): XParameterizedTypeName =
+    generic(typeArguments.asIterable(), nullable)

@@ -1,9 +1,10 @@
 package io.github.diskria.poetesse.kotlin
 
+import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseKotlin
 
 @PoetesseKotlin
-class KotlinCodeBlockScope internal constructor() : KotlinCodeBlockContainer {
+class KotlinCodeBlockScope internal constructor(override val settings: Poetesse.Settings) : KotlinCodeBlockContainer {
 
     private val codeBlocks: MutableList<KPCodeBlock> = mutableListOf()
 

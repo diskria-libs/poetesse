@@ -2,11 +2,11 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseJava
-import io.github.diskria.poetesse.interop.XClassName
-import io.github.diskria.poetesse.interop.nullable
+import io.github.diskria.poetesse.xClass
 
 @PoetesseJava
 class JavaFileScope private constructor(
+    override val settings: Poetesse.Settings,
     private val packageName: String?,
     val fileName: String,
 ) : JavaTypeContainer {
@@ -15,7 +15,7 @@ class JavaFileScope private constructor(
 
     internal val typeContainer = JavaTypeContainerInternal.of(
         append = { types += it },
-        nestedClassName = { name -> XClassName.of(packageName, name).nullable(false) },
+        nestedClassName = { name -> xClass(packageName, name) },
     )
 
     internal fun build(settings: Poetesse.Settings): JavaFileRef {
@@ -33,7 +33,7 @@ class JavaFileScope private constructor(
     }
 
     internal companion object {
-        fun of(packageName: String?, fileName: String): JavaFileScope =
-            JavaFileScope(packageName, fileName)
+        fun of(settings: Poetesse.Settings, packageName: String?, fileName: String): JavaFileScope =
+            JavaFileScope(settings, packageName, fileName)
     }
 }

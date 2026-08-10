@@ -1,9 +1,11 @@
 package io.github.diskria.poetesse.java
 
+import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseJava
 
 @PoetesseJava
 class JavaConstructorScope private constructor(
+    override val settings: Poetesse.Settings,
     private val specBuilder: JPMethodBuilder
 ) : JavaParameterContainer,
     JavaAnnotationContainer,
@@ -20,20 +22,21 @@ class JavaConstructorScope private constructor(
     )
 
     fun body(block: BodyScope.() -> Unit) {
-        BodyScope().apply(block)
+        BodyScope(settings).apply(block)
     }
 
     internal fun build(): JPMethod =
         specBuilder.build()
 
-    inner class BodyScope : JavaCodeBlockContainer {
+    @PoetesseJava
+    inner class BodyScope(override val settings: Poetesse.Settings) : JavaCodeBlockContainer {
         internal val codeBlockContainer = JavaCodeBlockContainerInternal.of(
-            append = { specBuilder.addStatement(it) }
+            append = { this@JavaConstructorScope.specBuilder.addStatement(it) }
         )
     }
 
     internal companion object {
-        fun of(): JavaConstructorScope =
-            JavaConstructorScope(JPMethod.constructorBuilder())
+        fun of(settings: Poetesse.Settings): JavaConstructorScope =
+            JavaConstructorScope(settings, JPMethod.constructorBuilder())
     }
 }

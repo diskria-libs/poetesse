@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     alias(libs.plugins.projektor)
@@ -12,4 +13,8 @@ projekt {
     kotlinLibrary {
         jvmTarget = JvmTarget.JVM_17
     }
+}
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.compilerOptions {
+    freeCompilerArgs.set(listOf("-XXLanguage:+ContextParameters"))
 }

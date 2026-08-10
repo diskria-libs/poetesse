@@ -1,10 +1,13 @@
 package io.github.diskria.poetesse.java
 
+import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseJava
 import io.github.diskria.poetesse.interop.XTypeName
+import io.github.diskria.poetesse.interop.interopToJava
 
 @PoetesseJava
 class JavaParameterScope private constructor(
+    override val settings: Poetesse.Settings,
     private val specBuilder: JPParameterBuilder
 ) : JavaAnnotationContainer,
     JavaModifierContainer {
@@ -24,7 +27,7 @@ class JavaParameterScope private constructor(
         specBuilder.build()
 
     internal companion object {
-        fun of(name: String, type: XTypeName): JavaParameterScope =
-            JavaParameterScope(JPParameter.builder(type.interopToJava(), name))
+        fun of(settings: Poetesse.Settings, name: String, type: XTypeName<*, *>): JavaParameterScope =
+            JavaParameterScope(settings, JPParameter.builder(type.interopToJava(), name))
     }
 }

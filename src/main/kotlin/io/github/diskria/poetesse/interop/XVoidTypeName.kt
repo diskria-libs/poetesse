@@ -1,6 +1,7 @@
 package io.github.diskria.poetesse.interop
 
-import com.squareup.kotlinpoet.asClassName
+import io.github.diskria.poetesse.Poetesse
+import io.github.diskria.poetesse.PoetesseScope
 import io.github.diskria.poetesse.extensions.isBoxedVoid
 import io.github.diskria.poetesse.extensions.setBoxed
 import io.github.diskria.poetesse.extensions.setNullable
@@ -10,41 +11,30 @@ import io.github.diskria.poetesse.java.JPTypeName
 import io.github.diskria.poetesse.java.JPVoid
 import io.github.diskria.poetesse.kotlin.KPTypeName
 import io.github.diskria.poetesse.kotlin.KPUnit
-import kotlin.reflect.KClass
 
-class XVoidTypeName private constructor(override val isNullable: Boolean = false) : XTypeName() {
+class XVoidTypeName internal constructor(
+    override val settings: Poetesse.Settings,
+    override val isBoxed: Boolean,
+    override val isNullable: Boolean,
+) : XTypeName<KPTypeName, JPTypeName>() {
 
-    override fun interopToKotlin(): KPTypeName = KPUnit.setNullable(isNullable)
+    override fun interopToKotlinInternal(): KPTypeName = KPUnit
 
-    override fun interopToJava(): JPTypeName = if (isNullable) JPBoxedVoid else JPVoid
+    override fun interopToJavaInternal(): JPTypeName = if (isBoxed) JPBoxedVoid else JPVoid
 
-    override fun setNullable(nullable: Boolean): XVoidTypeName = get(nullable)
-
-    internal companion object {
-        private val NON_BOXED: XVoidTypeName = XVoidTypeName(false)
-        private val BOXED: XVoidTypeName = XVoidTypeName(true)
-
-        fun get(nullable: Boolean = false): XVoidTypeName =
-            if (nullable) BOXED else NON_BOXED
-    }
+    override fun boxInternal(): XVoidTypeName = XVoidTypeName(settings, true, isNullable)
 }
 
-fun KPTypeName.asXVoidTypeNameOrNull(): XVoidTypeName? =
-    if (setNullable(false).withoutAnnotations() == KPUnit) XVoidTypeName.get(isNullable)
-    else null
+@PublishedApi
+context(scope: PoetesseScope)
+internal fun KPTypeName.asXVoidTypeNameOrNull(boxed: Boolean = isNullable): XVoidTypeName? =
+    if (setNullable(false).withoutAnnotations() == KPUnit) {
+        XVoidTypeName(scope.settings, isNullable || boxed, isNullable)
+    } else null
 
-fun KPTypeName.asXVoidTypeName(): XVoidTypeName =
-    requireNotNull(asXVoidTypeNameOrNull()) { "$this is not a void type" }
-
-fun JPTypeName.asXVoidTypeNameOrNull(): XVoidTypeName? =
-    if (setBoxed(false).withoutAnnotations() == JPVoid) XVoidTypeName.get(isBoxedVoid)
-    else null
-
-fun JPTypeName.asXVoidTypeName(): XVoidTypeName =
-    requireNotNull(asXVoidTypeNameOrNull()) { "$this is not a void type" }
-
-fun KClass<*>.asXVoidTypeNameOrNull(nullable: Boolean = false): XVoidTypeName? =
-    asClassName().setNullable(nullable).asXVoidTypeNameOrNull()
-
-fun KClass<*>.asXVoidTypeName(nullable: Boolean = false): XVoidTypeName =
-    asClassName().setNullable(nullable).asXVoidTypeName()
+@PublishedApi
+context(scope: PoetesseScope)
+internal fun JPTypeName.asXVoidTypeNameOrNull(nullable: Boolean = false): XVoidTypeName? =
+    if (setBoxed(false).withoutAnnotations() == JPVoid) {
+        XVoidTypeName(scope.settings, nullable || isBoxedVoid, nullable)
+    } else null

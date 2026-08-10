@@ -1,18 +1,25 @@
 package io.github.diskria.poetesse.kotlin
 
+import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseKotlin
 import io.github.diskria.poetesse.extensions.addStatement
 import io.github.diskria.poetesse.interop.XTypeName
-import io.github.diskria.poetesse.interop.xType
+import io.github.diskria.poetesse.interop.interopToKotlin
+import io.github.diskria.poetesse.xType
 import kotlin.reflect.KClass
 
 @PoetesseKotlin
 class KotlinFunctionScope private constructor(
+    override val settings: Poetesse.Settings,
     private val specBuilder: KPFunctionBuilder
-) : KotlinParameterContainer,
+) : KotlinTypeVariableContainer,
+    KotlinParameterContainer,
     KotlinAnnotationContainer,
     KotlinModifierContainer.WithVisibility {
 
+    internal val typeVariableContainer = KotlinTypeVariableContainerInternal.of(
+        append = { specBuilder.addTypeVariable(it) }
+    )
     internal val parameterContainer = KotlinParameterContainerInternal.of(
         append = { specBuilder.addParameter(it) }
     )
@@ -72,33 +79,34 @@ class KotlinFunctionScope private constructor(
     }
 
     fun body(block: BodyScope.() -> Unit) {
-        BodyScope().apply(block)
+        BodyScope(settings).apply(block)
     }
 
-    fun returnType(type: XTypeName) {
+    fun returns(type: XTypeName<*, *>) {
         specBuilder.returns(type.interopToKotlin())
     }
 
-    fun returnType(type: KClass<*>, nullable: Boolean = false) =
-        returnType(type.xType(nullable = nullable))
+    fun returns(type: KClass<*>, nullable: Boolean = false) =
+        returns(xType(type, nullable = nullable))
 
-    inline fun <reified T> returnType(nullable: Boolean = true) =
-        returnType(T::class, nullable)
+    inline fun <reified T> returns(nullable: Boolean = true) =
+        returns(T::class, nullable)
 
-    inline fun <reified T : Any> returnType() =
-        returnType<T>(nullable = false)
+    inline fun <reified T : Any> returns() =
+        returns<T>(nullable = false)
 
     internal fun build(): KPFunction =
         specBuilder.build()
 
-    inner class BodyScope : KotlinCodeBlockContainer {
+    @PoetesseKotlin
+    inner class BodyScope(override val settings: Poetesse.Settings) : KotlinCodeBlockContainer {
         internal val codeBlockContainer = KotlinCodeBlockContainerInternal.of(
-            append = { specBuilder.addStatement(it) }
+            append = { this@KotlinFunctionScope.specBuilder.addStatement(it) }
         )
     }
 
     internal companion object {
-        fun of(name: String): KotlinFunctionScope =
-            KotlinFunctionScope(KPFunction.builder(name))
+        fun of(settings: Poetesse.Settings, name: String): KotlinFunctionScope =
+            KotlinFunctionScope(settings, KPFunction.builder(name))
     }
 }

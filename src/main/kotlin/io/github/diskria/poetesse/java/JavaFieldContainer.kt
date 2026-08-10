@@ -2,9 +2,7 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.EagerDelegate
 import io.github.diskria.poetesse.interop.XTypeName
-import io.github.diskria.poetesse.interop.nullable
-import io.github.diskria.poetesse.interop.xClass
-import io.github.diskria.poetesse.interop.xType
+import io.github.diskria.poetesse.xType
 import kotlin.reflect.KClass
 
 sealed interface JavaFieldContainer : JavaFieldFactory {
@@ -15,22 +13,22 @@ sealed interface JavaFieldContainer : JavaFieldFactory {
     }
 }
 
-fun JavaFieldContainer.field(name: String, type: XTypeName, block: JavaFieldScope.() -> Unit = {}) =
+fun JavaFieldContainer.field(name: String, type: XTypeName<*, *>, block: JavaFieldScope.() -> Unit = {}) =
     +factory.field(name, type, block)
 
-fun JavaFieldContainer.field(type: XTypeName, block: JavaFieldScope.() -> Unit = {}) =
+fun JavaFieldContainer.field(type: XTypeName<*, *>, block: JavaFieldScope.() -> Unit = {}) =
     EagerDelegate { name -> field(name, type, block) }
 
 fun JavaFieldContainer.field(
     name: String, type: KClass<*>, nullable: Boolean = false, block: JavaFieldScope.() -> Unit = {}
-) = field(name, type.xType(nullable = nullable), block)
+) = field(name, xType(type, nullable = nullable), block)
 
 fun JavaFieldContainer.field(type: KClass<*>, nullable: Boolean = false, block: JavaFieldScope.() -> Unit = {}) =
     EagerDelegate { name -> field(name, type, nullable, block) }
 
 inline fun <reified T> JavaFieldContainer.field(
     name: String, nullable: Boolean = true, noinline block: JavaFieldScope.() -> Unit = {}
-) = field(name, T::class.xClass(nullable = nullable), block)
+) = field(name, xType<T>(nullable = nullable), block)
 
 inline fun <reified T : Any> JavaFieldContainer.field(name: String, noinline block: JavaFieldScope.() -> Unit = {}) =
     field<T>(name, nullable = false, block)

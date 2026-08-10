@@ -1,17 +1,24 @@
 package io.github.diskria.poetesse.java
 
+import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseJava
 import io.github.diskria.poetesse.interop.XTypeName
-import io.github.diskria.poetesse.interop.xType
+import io.github.diskria.poetesse.interop.interopToJava
+import io.github.diskria.poetesse.xType
 import kotlin.reflect.KClass
 
 @PoetesseJava
 class JavaMethodScope private constructor(
+    override val settings: Poetesse.Settings,
     private val specBuilder: JPMethodBuilder
-) : JavaParameterContainer,
+) : JavaTypeVariableContainer,
+    JavaParameterContainer,
     JavaAnnotationContainer,
     JavaModifierContainer.WithVisibility {
 
+    internal val typeVariableContainer = JavaTypeVariableContainerInternal.of(
+        append = { specBuilder.addTypeVariable(it) }
+    )
     internal val parameterContainer = JavaParameterContainerInternal.of(
         append = { specBuilder.addParameter(it) }
     )
@@ -43,33 +50,34 @@ class JavaMethodScope private constructor(
     }
 
     fun body(block: BodyScope.() -> Unit) {
-        BodyScope().apply(block)
+        BodyScope(settings).apply(block)
     }
 
-    fun returnType(type: XTypeName) {
+    fun returns(type: XTypeName<*, *>) {
         specBuilder.returns(type.interopToJava())
     }
 
-    fun returnType(type: KClass<*>, nullable: Boolean = false) =
-        returnType(type.xType(nullable = nullable))
+    fun returns(type: KClass<*>, nullable: Boolean = false) =
+        returns(xType(type, nullable = nullable))
 
-    inline fun <reified T> returnType(nullable: Boolean = true) =
-        returnType(T::class, nullable)
+    inline fun <reified T> returns(nullable: Boolean = true) =
+        returns(T::class, nullable)
 
-    inline fun <reified T : Any> returnType() =
-        returnType<T>(nullable = false)
+    inline fun <reified T : Any> returns() =
+        returns<T>(nullable = false)
 
     internal fun build(): JPMethod =
         specBuilder.build()
 
-    inner class BodyScope : JavaCodeBlockContainer {
+    @PoetesseJava
+    inner class BodyScope(override val settings: Poetesse.Settings) : JavaCodeBlockContainer {
         internal val codeBlockContainer = JavaCodeBlockContainerInternal.of(
-            append = { specBuilder.addStatement(it) }
+            append = { this@JavaMethodScope.specBuilder.addStatement(it) }
         )
     }
 
     internal companion object {
-        fun of(name: String): JavaMethodScope =
-            JavaMethodScope(JPMethod.methodBuilder(name))
+        fun of(settings: Poetesse.Settings, name: String): JavaMethodScope =
+            JavaMethodScope(settings, JPMethod.methodBuilder(name))
     }
 }

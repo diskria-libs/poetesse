@@ -1,9 +1,11 @@
 package io.github.diskria.poetesse.kotlin
 
-interface KotlinTypeFactory
+import io.github.diskria.poetesse.PoetesseScope
+
+interface KotlinTypeFactory : PoetesseScope
 
 fun KotlinTypeFactory.type(kind: KPTypeKind, name: String, block: KotlinTypeScope.() -> Unit = {}): KotlinTypeRef =
-    KotlinTypeRef(name) { className -> KotlinTypeScope.of(kind, name, className).apply(block).build() }
+    KotlinTypeRef(name) { className -> KotlinTypeScope.of(settings, kind, name, className).apply(block).build() }
 
 fun KotlinTypeFactory.class_(name: String, block: KotlinTypeScope.() -> Unit = {}): KotlinTypeRef =
     type(KPTypeKind.CLASS, name, block)

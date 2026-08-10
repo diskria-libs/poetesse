@@ -1,6 +1,8 @@
 package io.github.diskria.poetesse.interop
 
 import com.squareup.kotlinpoet.asClassName
+import io.github.diskria.poetesse.Poetesse
+import io.github.diskria.poetesse.PoetesseScope
 import io.github.diskria.poetesse.extensions.asJPClassName
 import io.github.diskria.poetesse.extensions.asKPClassName
 import io.github.diskria.poetesse.extensions.setNullable
@@ -8,33 +10,31 @@ import io.github.diskria.poetesse.java.JPClassName
 import io.github.diskria.poetesse.kotlin.KPClassName
 import kotlin.reflect.KClass
 
-class XClassName private constructor(
+class XClassName internal constructor(
+    override val settings: Poetesse.Settings,
     val packageName: String?,
     val simpleNames: List<String>,
-    override val isNullable: Boolean = false,
-) : XTypeName() {
+    override val isNullable: Boolean,
+) : XTypeName<KPClassName, JPClassName>() {
 
     val simpleName: String = simpleNames.last()
     val nestedName: String = simpleNames.joinToString(".")
     val qualifiedName: String = listOfNotNull(packageName, nestedName).joinToString(".")
 
     private val rawKotlin: KPClassName =
-        KPClassName(packageName.orEmpty(), simpleNames).setNullable(isNullable)
+        KPClassName(packageName.orEmpty(), simpleNames)
 
     private val rawJava: JPClassName =
         JPClassName.get(packageName.orEmpty(), simpleNames.first(), *simpleNames.drop(1).toTypedArray())
 
-    fun nested(name: String): XClassName =
-        of(packageName, simpleNames = (simpleNames + name).toTypedArray())
+    internal fun nested(name: String): XClassName =
+        XClassName(settings, packageName, (simpleNames + name), false)
 
-    override fun interopToKotlin(): KPClassName =
-        (J2K[rawJava] ?: rawKotlin).setNullable(isNullable)
+    override fun interopToKotlinInternal(): KPClassName =
+        J2K[rawJava] ?: rawKotlin
 
-    override fun interopToJava(): JPClassName =
-        K2J[rawKotlin.setNullable(false)] ?: rawJava
-
-    override fun setNullable(nullable: Boolean): XClassName =
-        XClassName(packageName, simpleNames, nullable)
+    override fun interopToJavaInternal(): JPClassName =
+        K2J[rawKotlin] ?: rawJava
 
     companion object {
         private val K2J: Map<KPClassName, JPClassName> = buildMap {
@@ -110,39 +110,39 @@ class XClassName private constructor(
                     kotlin.coroutines.cancellation.CancellationException::class,
                 ),
             ).forEach { (packageName, typeAliases) ->
-                typeAliases.forEach { put(KPClassName(packageName, it.java.simpleName), it.asJPClassName()) }
+                typeAliases.forEach {
+                    val jp = it.asJPClassName()
+                    put(KPClassName(packageName, jp.simpleNames()), jp)
+                }
             }
         }
 
         private val J2K: Map<JPClassName, KPClassName> =
             K2J.entries.associate { (k, j) -> j to k }
-
-        fun of(packageName: String?, simpleNames: Iterable<String>, nullable: Boolean = false): XClassName =
-            XClassName(packageName, simpleNames.toList(), nullable)
-
-        fun of(packageName: String?, vararg simpleNames: String, nullable: Boolean = false): XClassName =
-            of(packageName, simpleNames.asIterable(), nullable)
     }
 }
 
-fun KPClassName.asXClassName(): XClassName =
-    XClassName.of(packageName.takeIf { it.isNotEmpty() }, simpleNames, isNullable)
+@PublishedApi
+context(scope: PoetesseScope)
+internal fun KPClassName.asXClassName(): XClassName =
+    XClassName(scope.settings, packageName.takeIf { it.isNotEmpty() }, simpleNames, isNullable)
 
-fun JPClassName.asXClassName(): XClassName =
-    XClassName.of(packageName(), *simpleNames().toTypedArray())
+@PublishedApi
+context(scope: PoetesseScope)
+internal fun JPClassName.asXClassName(nullable: Boolean = false): XClassName =
+    XClassName(scope.settings, packageName(), simpleNames(), nullable)
 
-fun KClass<*>.xClass(nullable: Boolean = false): XClassName {
+@PublishedApi
+context(scope: PoetesseScope)
+internal fun KClass<*>.toXClass(nullable: Boolean = false): XClassName {
     require(this != Array::class && !java.isArray) {
-        "xClass for arrays is not possible.\n" +
-            "For example, for `Array<Int>` use:\n" +
-            "xType<Int>().array()"
+        val className = simpleName ?: this.toString()
+        buildString {
+            appendLine("Cannot create XClassName directly for array type '$className'.")
+            appendLine()
+            appendLine("To construct array types, use:")
+            appendLine("  For IntArray: xType<Int>().array()")
+        }
     }
-    return asClassName().setNullable(nullable).asXClassName()
+    return asClassName().setNullable(nullable).asX<XClassName>()
 }
-
-inline fun <reified T> xClass(nullable: Boolean = true) =
-    T::class.xClass(nullable)
-
-inline fun <reified T : Any> xClass() =
-    xClass<T>(nullable = false)
-

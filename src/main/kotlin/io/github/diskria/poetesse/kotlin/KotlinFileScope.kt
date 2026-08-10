@@ -2,20 +2,26 @@ package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseKotlin
-import io.github.diskria.poetesse.interop.XClassName
-import io.github.diskria.poetesse.interop.nullable
+import io.github.diskria.poetesse.PoetesseScope
+import io.github.diskria.poetesse.xClass
 
 @PoetesseKotlin
 class KotlinFileScope private constructor(
+    override val settings: Poetesse.Settings,
     private val packageName: String?,
     val fileName: String,
     private val specBuilder: KPFileBuilder,
-) : KotlinTypeContainer,
+) : PoetesseScope,
+    KotlinTypeContainer,
+    KotlinPropertyContainer,
     KotlinFunctionContainer {
 
     internal val typeContainer = KotlinTypeContainerInternal.of(
         append = { specBuilder.addType(it) },
-        nestedClassName = { name -> XClassName.of(packageName, name).nullable(false) },
+        nestedClassName = { name -> xClass(packageName, name) },
+    )
+    internal val propertyContainer = KotlinPropertyContainerInternal.of(
+        append = { specBuilder.addProperty(it) }
     )
     internal val functionContainer = KotlinFunctionContainerInternal.of(
         append = { specBuilder.addFunction(it) }
@@ -30,7 +36,7 @@ class KotlinFileScope private constructor(
     }
 
     internal companion object {
-        fun of(packageName: String?, fileName: String): KotlinFileScope =
-            KotlinFileScope(packageName, fileName, KPFile.builder(packageName.orEmpty(), fileName))
+        fun of(settings: Poetesse.Settings, packageName: String?, fileName: String): KotlinFileScope =
+            KotlinFileScope(settings, packageName, fileName, KPFile.builder(packageName.orEmpty(), fileName))
     }
 }

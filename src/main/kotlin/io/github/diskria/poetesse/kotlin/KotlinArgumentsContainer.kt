@@ -1,6 +1,8 @@
 package io.github.diskria.poetesse.kotlin
 
-sealed interface KotlinArgumentsContainer {
+import io.github.diskria.poetesse.PoetesseScope
+
+sealed interface KotlinArgumentsContainer : PoetesseScope {
 
     fun argument(codeBlock: KPCodeBlock) {
         internal.append(codeBlock)
@@ -12,7 +14,7 @@ sealed interface KotlinArgumentsContainer {
         } else {
             ""
         }
-        argument(KotlinCodeScope.of { prefix + L(value) }.codeBlock)
+        argument(KotlinCodeScope.of(settings) { prefix + L(value) }.codeBlock)
     }
 
     fun argument(name: String, value: KotlinCodeRef) {
@@ -20,7 +22,7 @@ sealed interface KotlinArgumentsContainer {
     }
 
     fun argument(name: String, nameAsComment: Boolean, value: KotlinCodeBuilder) {
-        argument(name, nameAsComment, KotlinCodeScope.of(value))
+        argument(name, nameAsComment, KotlinCodeScope.of(settings, value))
     }
 
     fun argument(name: String, value: KotlinCodeBuilder) {

@@ -1,16 +1,20 @@
 package io.github.diskria.poetesse.java
 
+import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseJava
+import io.github.diskria.poetesse.PoetesseScope
 import io.github.diskria.poetesse.interop.XClassName
 import io.github.diskria.poetesse.interop.XTypeName
-import io.github.diskria.poetesse.interop.xClass
+import io.github.diskria.poetesse.interop.interopToJava
+import io.github.diskria.poetesse.xClass
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 
 @PoetesseJava
 class JavaAnnotationScope<A : Annotation> internal constructor(
+    override val settings: Poetesse.Settings,
     private val specBuilder: JPAnnotationBuilder
-) {
+) : PoetesseScope {
     private typealias ArgumentProperty<A, V> = KProperty1<out A, V>
     private typealias ArrayArgumentProperty<A, E> = ArgumentProperty<A, Array<out E>>
 
@@ -23,7 +27,7 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
     }
 
     fun argument(name: String, value: JavaCodeBuilder) {
-        argument(name, JavaCodeScope.of(value))
+        argument(name, JavaCodeScope.of(settings, value))
     }
 
     @JvmName("propertyArgument")
@@ -99,20 +103,20 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
         argument(property, values.asIterable())
     }
 
-    @JvmName("classNameArgument")
-    fun argument(property: ArgumentProperty<A, KClass<*>>, value: XTypeName) {
+    @JvmName("xTypeArgument")
+    fun argument(property: ArgumentProperty<A, KClass<*>>, value: XTypeName<*, *>) {
         argument(property) { expression.classLiteral(value) }
     }
 
-    @JvmName("classNameArrayArgument")
-    fun argument(property: ArrayArgumentProperty<A, KClass<*>>, values: Iterable<XTypeName>) {
+    @JvmName("xTypeArrayArgument")
+    fun argument(property: ArrayArgumentProperty<A, KClass<*>>, values: Iterable<XTypeName<*, *>>) {
         argument(property) {
             expression.arrayOf(values) { expression.classLiteral(it) }
         }
     }
 
     @JvmName("classNameArrayArgument")
-    fun argument(property: ArrayArgumentProperty<A, KClass<*>>, vararg values: XTypeName) {
+    fun argument(property: ArrayArgumentProperty<A, KClass<*>>, vararg values: XTypeName<*, *>) {
         argument(property, values.asIterable())
     }
 
@@ -146,7 +150,9 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
         property: ArgumentProperty<A, Embedded>,
         noinline block: JavaAnnotationScope<Embedded>.() -> Unit = {}
     ) {
-        argument(property, JavaTypedAnnotationRef { of<Embedded>().apply(block).build() })
+        argument(property, JavaTypedAnnotationRef {
+            of<Embedded>(settings, xClass<Embedded>()).apply(block).build()
+        })
     }
 
     @JvmName("annotationArrayArgument")
@@ -173,13 +179,7 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
 
     @PublishedApi
     internal companion object {
-        fun <A : Annotation> of(className: XClassName): JavaAnnotationScope<A> =
-            JavaAnnotationScope(JPAnnotation.builder(className.interopToJava()))
-
-        fun <A : Annotation> of(type: KClass<out A>): JavaAnnotationScope<A> =
-            of(type.xClass())
-
-        inline fun <reified A : Annotation> of(): JavaAnnotationScope<A> =
-            of(A::class)
+        fun <A : Annotation> of(settings: Poetesse.Settings, className: XClassName): JavaAnnotationScope<A> =
+            JavaAnnotationScope(settings, JPAnnotation.builder(className.interopToJava()))
     }
 }

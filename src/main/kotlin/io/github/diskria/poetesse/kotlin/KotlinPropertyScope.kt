@@ -2,18 +2,19 @@ package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseKotlin
-import io.github.diskria.poetesse.extensions.addStatement
+import io.github.diskria.poetesse.interop.XTypeName
+import io.github.diskria.poetesse.interop.interopToKotlin
 
 @PoetesseKotlin
-class KotlinConstructorScope private constructor(
+class KotlinPropertyScope private constructor(
     override val settings: Poetesse.Settings,
-    private val specBuilder: KPFunctionBuilder
-) : KotlinParameterContainer,
+    private val specBuilder: KPPropertyBuilder
+) : KotlinTypeVariableContainer,
     KotlinAnnotationContainer,
     KotlinModifierContainer.WithVisibility {
 
-    internal val parameterContainer = KotlinParameterContainerInternal.of(
-        append = { specBuilder.addParameter(it) }
+    internal val typeVariableContainer = KotlinTypeVariableContainerInternal.of(
+        append = { specBuilder.addTypeVariable(it) }
     )
     internal val annotationContainer = KotlinAnnotationContainerInternal.of(
         append = { specBuilder.addAnnotation(it) },
@@ -42,26 +43,27 @@ class KotlinConstructorScope private constructor(
         modifiers(KPModifier.ABSTRACT)
     }
 
+    fun const() {
+        modifiers(KPModifier.CONST)
+    }
+
     fun external() {
         modifiers(KPModifier.EXTERNAL)
     }
 
-    fun body(block: BodyScope.() -> Unit) {
-        BodyScope(settings).apply(block)
+    fun override() {
+        modifiers(KPModifier.OVERRIDE)
     }
 
-    internal fun build(): KPFunction =
+    fun lateinit() {
+        modifiers(KPModifier.LATEINIT)
+    }
+
+    internal fun build(): KPProperty =
         specBuilder.build()
 
-    @PoetesseKotlin
-    inner class BodyScope(override val settings: Poetesse.Settings) : KotlinCodeBlockContainer {
-        internal val codeBlockContainer = KotlinCodeBlockContainerInternal.of(
-            append = { this@KotlinConstructorScope.specBuilder.addStatement(it) }
-        )
-    }
-
     internal companion object {
-        fun of(settings: Poetesse.Settings): KotlinConstructorScope =
-            KotlinConstructorScope(settings, KPFunction.constructorBuilder())
+        fun of(settings: Poetesse.Settings, name: String, type: XTypeName<*, *>): KotlinPropertyScope =
+            KotlinPropertyScope(settings, KPProperty.builder(name, type.interopToKotlin()))
     }
 }

@@ -3,5 +3,5 @@ package io.github.diskria.poetesse.kotlin
 interface KotlinCodeBlockFactory : KotlinCodeFactory {
 
     fun codeBlock(build: KotlinCodeBlockScope.() -> Unit): KotlinCodeBlockRef =
-        KotlinCodeBlockRef { KotlinCodeBlockScope().apply(build).build() }
+        KotlinCodeBlockRef { KotlinCodeBlockScope(settings).apply(build).build() }
 }

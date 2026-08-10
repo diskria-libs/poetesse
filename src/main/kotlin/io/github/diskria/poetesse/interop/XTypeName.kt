@@ -1,65 +1,129 @@
 package io.github.diskria.poetesse.interop
 
-import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.Dynamic
+import com.squareup.kotlinpoet.asClassName
+import io.github.diskria.poetesse.PoetesseScope
+import io.github.diskria.poetesse.extensions.setNullable
 import io.github.diskria.poetesse.java.*
-import io.github.diskria.poetesse.kotlin.KPTypeName
+import io.github.diskria.poetesse.kotlin.*
+import io.github.diskria.poetesse.xClass
 import kotlin.reflect.KClass
 
-sealed class XTypeName {
+sealed class XTypeName<K : KPTypeName, J : JPTypeName> : PoetesseScope {
 
-    abstract val isNullable: Boolean
+    internal open val isBoxed: Boolean = true
+    internal abstract val isNullable: Boolean
 
-    abstract fun interopToKotlin(): KPTypeName
-    abstract fun interopToJava(): JPTypeName
-    internal abstract fun setNullable(nullable: Boolean): XTypeName
+    internal open fun boxInternal(): XTypeName<K, J> = this
+
+    internal abstract fun interopToKotlinInternal(): K
+    internal abstract fun interopToJavaInternal(): J
 }
 
+fun <K : KPTypeName, X : XTypeName<K, *>> X.interopToKotlin(): K =
+    interopToKotlinInternal().setNullable(isNullable)
+
+fun <J : JPTypeName, X : XTypeName<*, J>> X.box(): XTypeName<*, J> =
+    if (isBoxed) this
+    else boxInternal()
+
 @Suppress("UNCHECKED_CAST")
-fun <T : XTypeName> T.nullable(nullable: Boolean = true): T =
-    if (nullable == isNullable) this
-    else setNullable(nullable) as T
+fun <J : JPTypeName, X : XTypeName<*, J>> X.interopToJava(resolveNullability: Boolean = true): J {
+    val jp = interopToJavaInternal()
+    if (resolveNullability && isBoxed) {
+        return settings.javaNullabilityResolver.setNullable(jp, isNullable)
+    }
+    return jp
+}
 
-internal fun XTypeName.ensureBoxed(): XTypeName =
-    if (this is XPrimitiveTypeName) box() else this
+@PublishedApi
+context(scope: PoetesseScope)
+internal inline fun <reified X : XTypeName<*, *>> KPTypeName.asXOrNull(boxed: Boolean = isNullable): X? =
+    when (X::class) {
+        XVoidTypeName::class -> asXVoidTypeNameOrNull(boxed)
+        XPrimitiveTypeName::class -> asXPrimitiveTypeNameOrNull(boxed)
+        XClassName::class if (this is KPClassName) -> asXClassName()
+        XArrayTypeName::class if (this is KPParameterizedTypeName) -> asXArrayTypeNameOrNull()
+        XFunctionalTypeName::class if (this is KPFunctionalTypeName) -> asXFunctionalTypeName()
+        XParameterizedTypeName::class if (this is KPParameterizedTypeName) -> asXParameterizedTypeName()
+        XTypeVariableName::class if (this is KPTypeVariableName) -> asXTypeVariableName()
+        XWildcardTypeName::class if (this is KPWildcardTypeName) -> asXWildcardTypeName()
+        else -> null
+    } as X?
 
-fun KPTypeName.asXTypeName(): XTypeName = when (this) {
-    is ClassName -> {
-        asXVoidTypeNameOrNull() ?: asXPrimitiveTypeNameOrNull() ?: asXArrayTypeNameOrNull() ?: asXClassName()
+context(scope: PoetesseScope)
+internal inline fun <reified X : XTypeName<*, *>> KPTypeName.asX(boxed: Boolean = isNullable): X =
+    requireNotNull(asXOrNull<X>(boxed)) {
+        "Cannot convert KPTypeName '${this::class.simpleName}' ($this) to X-interop '${X::class.simpleName}'"
     }
 
-    is ParameterizedTypeName -> asXArrayTypeNameOrNull() ?: asXParameterizedTypeName()
-    is TypeVariableName -> asXTypeVariableName()
-    is WildcardTypeName -> asXWildcardTypeName()
-    is LambdaTypeName -> asXFunctionalTypeName()
+context(scope: PoetesseScope)
+internal fun KPTypeName.toXType(boxed: Boolean = isNullable): XTypeName<*, *> = when (this) {
+    is KPClassName -> {
+        asXOrNull<XVoidTypeName>(boxed)
+            ?: asXOrNull<XPrimitiveTypeName>(boxed)
+            ?: asXOrNull<XArrayTypeName>()
+            ?: asX<XClassName>()
+    }
+
+    is KPParameterizedTypeName -> asXOrNull<XArrayTypeName>() ?: asX<XParameterizedTypeName>()
+    is KPTypeVariableName -> asX<XTypeVariableName>()
+    is KPWildcardTypeName -> asX<XWildcardTypeName>()
+    is KPFunctionalTypeName -> asX<XFunctionalTypeName>()
     Dynamic -> error("XTypeName is only supported on Kotlin/JVM (Kotlin/JS is unsupported)")
 }
 
-fun JPTypeName.asXTypeName(): XTypeName = when (this) {
-    is JPClassName -> asXVoidTypeNameOrNull() ?: asXPrimitiveTypeNameOrNull() ?: asXClassName()
-    is JPArrayTypeName -> asXArrayTypeName()
-    is JPParameterizedTypeName -> asXFunctionalTypeNameOrNull() ?: asXParameterizedTypeName()
-    is JPTypeVariableName -> asXTypeVariableName()
-    is JPWildcardTypeName -> asXWildcardTypeName()
-    is JPTypeName -> asXVoidTypeNameOrNull() ?: asXPrimitiveTypeName()
-}
-
-fun KClass<*>.xType(nullable: Boolean = false): XTypeName {
+@PublishedApi
+context(scope: PoetesseScope)
+internal fun KClass<*>.toXType(nullable: Boolean = false, boxed: Boolean = nullable): XTypeName<*, *> {
     require(java.typeParameters.isEmpty()) {
-        "xClass for generics is not possible.\n" +
-            "For example, for List<String> use:\n" +
-            "xClass<List<*>>().generic(xType<String>())"
+        val className = simpleName ?: this.toString()
+        buildString {
+            appendLine("Cannot create XTypeName directly from parameterized class '$className'.")
+            appendLine()
+            appendLine("To construct generic types, use:")
+            appendLine("  For List<String>: xClass<List<*>>().generic(xType<String>())")
+            appendLine()
+            appendLine("To construct lambda types, use:")
+            appendLine("  For (Int) -> String: xType<String>().lambda(xType<Int>())")
+        }
     }
-    return asXVoidTypeNameOrNull(nullable) ?: asXPrimitiveTypeNameOrNull(nullable) ?: xClass(nullable)
+    val kp = asClassName().setNullable(nullable)
+    return kp.asXOrNull<XVoidTypeName>(boxed) ?: kp.asXOrNull<XPrimitiveTypeName>(boxed) ?: scope.xClass(this, nullable)
 }
 
-inline fun <reified T> xType(nullable: Boolean = true) =
-    T::class.xType(nullable)
+@PublishedApi
+context(scope: PoetesseScope)
+internal inline fun <reified X : XTypeName<*, *>> JPTypeName.asXOrNull(nullable: Boolean = false): X? =
+    when (X::class) {
+        XVoidTypeName::class -> asXVoidTypeNameOrNull(nullable)
+        XPrimitiveTypeName::class -> asXPrimitiveTypeNameOrNull(nullable)
+        XClassName::class if (this is JPClassName) -> asXClassName(nullable)
+        XArrayTypeName::class if (this is JPArrayTypeName) -> asXArrayTypeName(nullable)
+        XFunctionalTypeName::class if (this is JPParameterizedTypeName) -> asXFunctionalTypeNameOrNull(nullable)
+        XParameterizedTypeName::class if (this is JPParameterizedTypeName) -> asXParameterizedTypeName(nullable)
+        XTypeVariableName::class if (this is JPTypeVariableName) -> asXTypeVariableName(nullable)
+        XWildcardTypeName::class if (this is JPWildcardTypeName) -> asXWildcardTypeName(nullable)
+        else -> null
+    } as X?
 
-inline fun <reified T : Any> xType(): XTypeName =
-    xType<T>(nullable = false)
+context(scope: PoetesseScope)
+internal inline fun <reified X : XTypeName<*, *>> JPTypeName.asX(nullable: Boolean = false): X =
+    requireNotNull(asXOrNull<X>(nullable)) {
+        "Cannot convert JPTypeName '${this::class.simpleName}' ($this) to X-interop '${X::class.simpleName}'"
+    }
 
-fun KPTypeName.interopToJavaPoet(): JPTypeName =
-    asXTypeName().interopToJava()
+context(scope: PoetesseScope)
+internal fun JPTypeName.toXType(nullable: Boolean = false): XTypeName<*, *> = when (this) {
+    is JPClassName -> {
+        asXOrNull<XVoidTypeName>(nullable)
+            ?: asXOrNull<XPrimitiveTypeName>(nullable)
+            ?: asX<XClassName>(nullable)
+    }
 
-fun JPTypeName.interopToKotlinPoet(): KPTypeName =
-    asXTypeName().interopToKotlin()
+    is JPArrayTypeName -> asX<XArrayTypeName>(nullable)
+    is JPParameterizedTypeName -> asXOrNull<XFunctionalTypeName>(nullable) ?: asX<XParameterizedTypeName>(nullable)
+    is JPTypeVariableName -> asX<XTypeVariableName>(nullable)
+    is JPWildcardTypeName -> asX<XWildcardTypeName>(nullable)
+    is JPTypeName -> asXOrNull<XVoidTypeName>(nullable) ?: asX<XPrimitiveTypeName>(nullable)
+}

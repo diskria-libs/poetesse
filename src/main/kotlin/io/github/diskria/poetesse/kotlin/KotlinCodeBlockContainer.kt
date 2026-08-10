@@ -2,7 +2,7 @@ package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.EagerDelegate
 import io.github.diskria.poetesse.interop.XTypeName
-import io.github.diskria.poetesse.interop.xType
+import io.github.diskria.poetesse.xType
 import kotlin.reflect.KClass
 
 sealed interface KotlinCodeBlockContainer : KotlinCodeBlockFactory {
@@ -22,9 +22,9 @@ sealed interface KotlinCodeBlockContainer : KotlinCodeBlockFactory {
 }
 
 fun KotlinCodeBlockContainer.variable(
-    name: String, type: XTypeName?, block: KotlinVariableScope.() -> Unit
+    name: String, type: XTypeName<*, *>?, block: KotlinVariableScope.() -> Unit
 ): String {
-    line(KotlinVariableScope(name, type).apply(block).build())
+    line(KotlinVariableScope(settings, name, type).apply(block).build())
     return name
 }
 
@@ -34,13 +34,13 @@ fun KotlinCodeBlockContainer.variable(name: String, block: KotlinVariableScope.(
 
 fun KotlinCodeBlockContainer.variable(
     name: String, type: KClass<*>, nullable: Boolean = false, block: KotlinVariableScope.() -> Unit
-) = variable(name, type.xType(nullable = nullable), block)
+) = variable(name, xType(type, nullable = nullable), block)
 
 fun KotlinCodeBlockContainer.variable(
     type: KClass<*>, nullable: Boolean = false, block: KotlinVariableScope.() -> Unit
 ) = EagerDelegate { name -> variable(name, type, nullable, block) }
 
-fun KotlinCodeBlockContainer.variable(type: XTypeName, block: KotlinVariableScope.() -> Unit) =
+fun KotlinCodeBlockContainer.variable(type: XTypeName<*, *>, block: KotlinVariableScope.() -> Unit) =
     EagerDelegate { name -> variable(name, type, block) }
 
 @JvmName("variableUntypedDelegate")

@@ -1,15 +1,17 @@
 package io.github.diskria.poetesse.java
 
+import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseJava
 import io.github.diskria.poetesse.interop.XTypeName
-import io.github.diskria.poetesse.interop.nullable
-import io.github.diskria.poetesse.interop.xType
+import io.github.diskria.poetesse.interop.interopToJava
+import io.github.diskria.poetesse.xType
 import kotlin.reflect.KClass
 
 typealias JavaCodeBuilder = JavaCodeScope.() -> String
 
 @PoetesseJava
 class JavaCodeScope internal constructor(
+    override val settings: Poetesse.Settings,
     private val block: JavaCodeBuilder,
     private val arguments: MutableList<Any?> = mutableListOf(),
 ) : JavaCodeFactory {
@@ -21,16 +23,17 @@ class JavaCodeScope internal constructor(
         return "$$mask"
     }
 
-    fun T(value: XTypeName) = argument('T', value.interopToJava())
+    fun T(value: XTypeName<*, *>, resolveNullability: Boolean = false) =
+        argument('T', value.interopToJava(resolveNullability = resolveNullability))
 
-    fun T(value: KClass<*>, nullable: Boolean = false) =
-        T(value.xType(nullable = nullable))
+    fun T(value: KClass<*>, nullable: Boolean = false, resolveNullability: Boolean = false) =
+        T(xType(value, nullable = nullable), resolveNullability)
 
-    inline fun <reified T> T(nullable: Boolean = true) =
-        T(T::class, nullable)
+    inline fun <reified T> T(nullable: Boolean = true, resolveNullability: Boolean = false) =
+        T(T::class, nullable, resolveNullability)
 
-    inline fun <reified T : Any> T() =
-        T<T>(nullable = false)
+    inline fun <reified T : Any> T(resolveNullability: Boolean = false) =
+        T<T>(nullable = false, resolveNullability = resolveNullability)
 
     fun S(value: CharSequence) = argument('S', value)
 
@@ -46,11 +49,11 @@ class JavaCodeScope internal constructor(
 
     inner class ExpressionScope {
 
-        fun classLiteral(type: XTypeName): String =
+        fun classLiteral(type: XTypeName<*, *>): String =
             "${T(type)}.class"
 
         fun classLiteral(type: KClass<*>): String =
-            classLiteral(type.xType())
+            classLiteral(xType(type))
 
         inline fun <reified T> classLiteral(): String =
             classLiteral(T::class)
@@ -69,7 +72,7 @@ class JavaCodeScope internal constructor(
         JPCodeBlock.of(block(), *arguments.toTypedArray())
 
     internal companion object {
-        fun of(block: JavaCodeBuilder): JavaCodeRef =
-            JavaCodeRef { JavaCodeScope(block).build() }
+        fun of(settings: Poetesse.Settings, block: JavaCodeBuilder): JavaCodeRef =
+            JavaCodeRef { JavaCodeScope(settings, block).build() }
     }
 }

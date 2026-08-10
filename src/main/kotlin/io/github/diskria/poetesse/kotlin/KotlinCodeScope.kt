@@ -1,14 +1,17 @@
 package io.github.diskria.poetesse.kotlin
 
+import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseKotlin
 import io.github.diskria.poetesse.interop.XTypeName
-import io.github.diskria.poetesse.interop.xType
+import io.github.diskria.poetesse.interop.interopToKotlin
+import io.github.diskria.poetesse.xType
 import kotlin.reflect.KClass
 
 typealias KotlinCodeBuilder = KotlinCodeScope.() -> String
 
 @PoetesseKotlin
 class KotlinCodeScope internal constructor(
+    override val settings: Poetesse.Settings,
     private val block: KotlinCodeBuilder,
     private val arguments: MutableList<Any?> = mutableListOf(),
 ) : KotlinCodeFactory {
@@ -20,8 +23,8 @@ class KotlinCodeScope internal constructor(
         return "%$mask"
     }
 
-    fun T(value: XTypeName) = argument('T', value.interopToKotlin())
-    fun T(value: KClass<*>, nullable: Boolean = false) = T(value.xType(nullable = nullable))
+    fun T(value: XTypeName<*, *>) = argument('T', value.interopToKotlin())
+    fun T(value: KClass<*>, nullable: Boolean = false) = T(xType(value, nullable = nullable))
     inline fun <reified T> T(nullable: Boolean = true) = T(T::class, nullable)
     inline fun <reified T : Any> T() = T<T>(nullable = false)
 
@@ -38,12 +41,11 @@ class KotlinCodeScope internal constructor(
     fun L(build: KotlinCodeBuilder) = L(code(build))
 
     inner class ExpressionScope {
-
-        fun classLiteral(type: XTypeName): String =
+        fun classLiteral(type: XTypeName<*, *>): String =
             "${T(type)}::class"
 
         fun classLiteral(type: KClass<*>): String =
-            classLiteral(type.xType())
+            classLiteral(xType(type))
 
         inline fun <reified T> classLiteral(): String =
             classLiteral(T::class)
@@ -62,7 +64,7 @@ class KotlinCodeScope internal constructor(
         KPCodeBlock.of(block(), *arguments.toTypedArray())
 
     internal companion object {
-        fun of(block: KotlinCodeBuilder): KotlinCodeRef =
-            KotlinCodeRef { KotlinCodeScope(block).build() }
+        fun of(settings: Poetesse.Settings, block: KotlinCodeBuilder): KotlinCodeRef =
+            KotlinCodeRef { KotlinCodeScope(settings, block).build() }
     }
 }

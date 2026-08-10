@@ -36,7 +36,6 @@ typealias KPParameterizedTypeName = ParameterizedTypeName
 typealias KPTypeVariableName = TypeVariableName
 typealias KPWildcardTypeName = WildcardTypeName
 typealias KPFunctionalTypeName = LambdaTypeName
-typealias KPDynamic = Dynamic
 
 val KPUnit: KPClassName = UNIT
 
