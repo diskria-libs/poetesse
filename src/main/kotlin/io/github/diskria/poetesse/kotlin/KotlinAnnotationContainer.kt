@@ -50,6 +50,7 @@ private val KotlinAnnotationContainer.factory: KotlinAnnotationFactory
 private val KotlinAnnotationContainer.internal: KotlinAnnotationContainerInternal
     get() = when (this) {
         is KotlinTypeScope -> annotationContainer
+        is KotlinTypeAliasScope -> annotationContainer
         is KotlinPropertyScope -> annotationContainer
         is KotlinConstructorScope -> annotationContainer
         is KotlinFunctionScope -> annotationContainer

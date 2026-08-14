@@ -53,6 +53,7 @@ internal interface KotlinModifierContainerInternal {
 private val KotlinModifierContainer.internal: KotlinModifierContainerInternal
     get() = when (this) {
         is KotlinTypeScope -> modifierContainer
+        is KotlinTypeAliasScope -> modifierContainer
         is KotlinPropertyScope -> modifierContainer
         is KotlinConstructorScope -> modifierContainer
         is KotlinFunctionScope -> modifierContainer

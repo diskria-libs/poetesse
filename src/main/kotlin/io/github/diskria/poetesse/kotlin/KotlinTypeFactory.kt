@@ -1,47 +1,73 @@
 package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.PoetesseScope
+import io.github.diskria.poetesse.interop.XClassName
+import io.github.diskria.poetesse.interop.XTypeName
 
 interface KotlinTypeFactory : PoetesseScope
 
-fun KotlinTypeFactory.type(kind: KPTypeKind, name: String, block: KotlinTypeScope.() -> Unit = {}): KotlinTypeRef =
-    KotlinTypeRef(name) { className -> KotlinTypeScope.of(settings, kind, name, className).apply(block).build() }
+fun KotlinTypeFactory.typeAlias(
+    name: String, type: XTypeName<*, *>, block: KotlinTypeAliasScope.() -> Unit
+): KotlinTypeAliasRef = KotlinTypeAliasRef(name) { KotlinTypeAliasScope.of(settings, name, type).apply(block).build() }
 
-fun KotlinTypeFactory.class_(name: String, block: KotlinTypeScope.() -> Unit = {}): KotlinTypeRef =
+fun KotlinTypeFactory.type(
+    kind: KPTypeKind, name: String, block: KotlinTypeScope.(className: XClassName) -> Unit = {}
+): KotlinTypeRef =
+    KotlinTypeRef(name) { className ->
+        KotlinTypeScope.of(settings, kind, name, className).apply { block(className) }.build()
+    }
+
+fun KotlinTypeFactory.class_(
+    name: String, block: KotlinTypeScope.(className: XClassName) -> Unit = {}
+): KotlinTypeRef =
     type(KPTypeKind.CLASS, name, block)
 
-fun KotlinTypeFactory.value_class_(name: String, block: KotlinTypeScope.() -> Unit = {}): KotlinTypeRef =
+fun KotlinTypeFactory.value_class_(
+    name: String, block: KotlinTypeScope.(className: XClassName) -> Unit = {}
+): KotlinTypeRef =
     class_(name) {
         modifiers(KPModifier.VALUE)
-        block()
+        block(it)
     }
 
-fun KotlinTypeFactory.enum_class_(name: String, block: KotlinTypeScope.() -> Unit = {}): KotlinTypeRef =
+fun KotlinTypeFactory.enum_class_(
+    name: String, block: KotlinTypeScope.(className: XClassName) -> Unit = {}
+): KotlinTypeRef =
     class_(name) {
         modifiers(KPModifier.ENUM)
-        block()
+        block(it)
     }
 
-fun KotlinTypeFactory.data_class_(name: String, block: KotlinTypeScope.() -> Unit = {}): KotlinTypeRef =
+fun KotlinTypeFactory.data_class_(
+    name: String, block: KotlinTypeScope.(className: XClassName) -> Unit = {}
+): KotlinTypeRef =
     class_(name) {
         modifiers(KPModifier.DATA)
-        block()
+        block(it)
     }
 
-fun KotlinTypeFactory.annotation_class_(name: String, block: KotlinTypeScope.() -> Unit = {}): KotlinTypeRef =
+fun KotlinTypeFactory.annotation_class_(
+    name: String, block: KotlinTypeScope.(className: XClassName) -> Unit = {}
+): KotlinTypeRef =
     class_(name) {
         modifiers(KPModifier.ANNOTATION)
-        block()
+        block(it)
     }
 
-fun KotlinTypeFactory.object_(name: String, block: KotlinTypeScope.() -> Unit = {}): KotlinTypeRef =
+fun KotlinTypeFactory.object_(
+    name: String, block: KotlinTypeScope.(className: XClassName) -> Unit = {}
+): KotlinTypeRef =
     type(KPTypeKind.OBJECT, name, block)
 
-fun KotlinTypeFactory.interface_(name: String, block: KotlinTypeScope.() -> Unit = {}): KotlinTypeRef =
+fun KotlinTypeFactory.interface_(
+    name: String, block: KotlinTypeScope.(className: XClassName) -> Unit = {}
+): KotlinTypeRef =
     type(KPTypeKind.INTERFACE, name, block)
 
-fun KotlinTypeFactory.fun_interface_(name: String, block: KotlinTypeScope.() -> Unit = {}): KotlinTypeRef =
+fun KotlinTypeFactory.fun_interface_(
+    name: String, block: KotlinTypeScope.(className: XClassName) -> Unit = {}
+): KotlinTypeRef =
     interface_(name) {
         modifiers(KPModifier.FUN)
-        block()
+        block(it)
     }

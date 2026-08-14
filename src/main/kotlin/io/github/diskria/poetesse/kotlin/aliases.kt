@@ -5,7 +5,6 @@ import com.squareup.kotlinpoet.*
 typealias KPFileBuilder = FileSpec.Builder
 typealias KPFile = FileSpec
 
-typealias KPTypeHolderBuilder = TypeSpecHolder.Builder<*>
 typealias KPTypeBuilder = TypeSpec.Builder
 typealias KPType = TypeSpec
 typealias KPTypeKind = TypeSpec.Kind

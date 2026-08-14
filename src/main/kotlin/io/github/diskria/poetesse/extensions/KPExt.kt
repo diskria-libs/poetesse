@@ -1,6 +1,7 @@
 package io.github.diskria.poetesse.extensions
 
 import io.github.diskria.poetesse.kotlin.KPCodeBlock
+import io.github.diskria.poetesse.kotlin.KPCodeBlockBuilder
 import io.github.diskria.poetesse.kotlin.KPFunctionBuilder
 import io.github.diskria.poetesse.kotlin.KPTypeName
 
@@ -18,4 +19,10 @@ fun KPFunctionBuilder.addStatement(codeBlock: KPCodeBlock) {
     addCode("«")
     addCode(codeBlock)
     addCode("\n»")
+}
+
+fun KPCodeBlockBuilder.addStatement(codeBlock: KPCodeBlock) {
+    add("«")
+    add(codeBlock)
+    add("\n»")
 }

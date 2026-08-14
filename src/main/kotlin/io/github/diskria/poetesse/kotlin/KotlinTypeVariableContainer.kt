@@ -52,6 +52,7 @@ internal interface KotlinTypeVariableContainerInternal {
 private val KotlinTypeVariableContainer.internal: KotlinTypeVariableContainerInternal
     get() = when (this) {
         is KotlinTypeScope -> typeVariableContainer
+        is KotlinTypeAliasScope -> typeVariableContainer
         is KotlinPropertyScope -> typeVariableContainer
         is KotlinFunctionScope -> typeVariableContainer
     }

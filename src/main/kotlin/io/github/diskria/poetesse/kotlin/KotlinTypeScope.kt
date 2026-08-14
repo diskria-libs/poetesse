@@ -11,7 +11,7 @@ import kotlin.reflect.KClass
 @PoetesseKotlin
 class KotlinTypeScope private constructor(
     override val settings: Poetesse.Settings,
-    val className: XClassName,
+    private val className: XClassName,
     private val specBuilder: KPTypeBuilder
 ) : KotlinTypeVariableContainer,
     KotlinTypeContainer,
@@ -25,7 +25,8 @@ class KotlinTypeScope private constructor(
         append = { specBuilder.addTypeVariable(it) }
     )
     internal val typeContainer = KotlinTypeContainerInternal.of(
-        append = { specBuilder.addType(it) },
+        appendType = { specBuilder.addType(it) },
+        appendTypeAlias = { specBuilder.addTypeAlias(it) },
         nestedClassName = { name -> className.nested(name) },
     )
     internal val propertyContainer = KotlinPropertyContainerInternal.of(
@@ -110,6 +111,10 @@ class KotlinTypeScope private constructor(
 
     fun superinterfaces(vararg types: XTypeName<*, *>) {
         superinterfaces(types.asIterable())
+    }
+
+    fun initializerBlock(block: KotlinCodeBlockBuilder) {
+        specBuilder.addInitializerBlock(KotlinCodeBlockScope.of(settings, block).build())
     }
 
     internal fun build(): KPType =

@@ -17,7 +17,8 @@ class KotlinFileScope private constructor(
     KotlinFunctionContainer {
 
     internal val typeContainer = KotlinTypeContainerInternal.of(
-        append = { specBuilder.addType(it) },
+        appendType = { specBuilder.addType(it) },
+        appendTypeAlias = { specBuilder.addTypeAlias(it) },
         nestedClassName = { name -> xClass(packageName, name) },
     )
     internal val propertyContainer = KotlinPropertyContainerInternal.of(

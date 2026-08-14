@@ -79,5 +79,6 @@ private val KotlinCodeBlockContainer.internal: KotlinCodeBlockContainerInternal
     get() = when (this) {
         is KotlinConstructorScope.BodyScope -> codeBlockContainer
         is KotlinFunctionScope.BodyScope -> codeBlockContainer
+        is KotlinEmbeddedCodeBlockScope -> codeBlockContainer
         is KotlinCodeBlockScope -> codeBlockContainer
     }

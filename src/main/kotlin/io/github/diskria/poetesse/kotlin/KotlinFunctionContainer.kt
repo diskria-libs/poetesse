@@ -22,7 +22,7 @@ internal interface KotlinFunctionContainerInternal {
 
     companion object {
         fun of(
-            append: (KPFunction) -> Unit,
+            append: (function: KPFunction) -> Unit,
         ): KotlinFunctionContainerInternal = object : KotlinFunctionContainerInternal {
             override fun append(function: KPFunction) = append(function)
         }

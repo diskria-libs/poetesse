@@ -9,7 +9,7 @@ import io.github.diskria.poetesse.interop.interopToJava
 @PoetesseJava
 class JavaTypeScope private constructor(
     override val settings: Poetesse.Settings,
-    val className: XClassName,
+    private val className: XClassName,
     private val specBuilder: JPTypeBuilder
 ) : JavaTypeVariableContainer,
     JavaTypeContainer,
@@ -69,12 +69,12 @@ class JavaTypeScope private constructor(
         modifiers(JPModifier.STRICTFP)
     }
 
-    fun initializerBlock(block: JavaCodeBuilder) {
-        specBuilder.addInitializerBlock(JavaCodeScope.of(settings, block).codeBlock)
+    fun initializerBlock(block: JavaCodeBlockBuilder) {
+        specBuilder.addInitializerBlock(JavaCodeBlockScope.of(settings, block).build())
     }
 
-    fun staticBlock(block: JavaCodeBuilder) {
-        specBuilder.addStaticBlock(JavaCodeScope.of(settings, block).codeBlock)
+    fun staticBlock(block: JavaCodeBlockBuilder) {
+        specBuilder.addStaticBlock(JavaCodeBlockScope.of(settings, block).build())
     }
 
     internal fun build(): JPType =
