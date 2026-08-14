@@ -81,12 +81,12 @@ class KotlinPropertyScope private constructor(
         getter = KotlinPropertyGetterScope.of(settings).apply(block).specBuilder
     }
 
-    fun setter(block: KotlinPropertySetterScope.() -> Unit = {}) {
+    fun fullSetter(block: KotlinPropertySetterScope.() -> Unit = {}) {
         setter = KotlinPropertySetterScope.of(settings).apply(block).specBuilder
     }
 
-    fun setter(parameterName: String, block: KotlinPropertySetterScope.(String) -> Unit = {}) {
-        setter {
+    fun setter(parameterName: String = "value", block: KotlinPropertySetterScope.(String) -> Unit = {}) {
+        fullSetter {
             parameter(parameterName, this@KotlinPropertyScope.type)
             block(parameterName)
         }

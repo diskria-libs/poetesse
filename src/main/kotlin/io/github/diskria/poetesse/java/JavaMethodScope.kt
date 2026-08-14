@@ -14,7 +14,8 @@ class JavaMethodScope private constructor(
 ) : JavaTypeVariableContainer,
     JavaParameterContainer,
     JavaAnnotationContainer,
-    JavaModifierContainer.WithVisibility {
+    JavaModifierContainer.WithVisibility,
+    JavaBodyContainer {
 
     internal val typeVariableContainer = JavaTypeVariableContainerInternal.of(
         append = { specBuilder.addTypeVariable(it) }
@@ -27,6 +28,9 @@ class JavaMethodScope private constructor(
     )
     internal val modifierContainer = JavaModifierContainerInternal.of(
         append = { specBuilder.addModifiers(*it) }
+    )
+    internal val bodyContainer = JavaBodyContainerInternal.of(
+        append = { specBuilder.addStatement(it) }
     )
 
     fun abstract() {
@@ -49,10 +53,6 @@ class JavaMethodScope private constructor(
         modifiers(JPModifier.STRICTFP)
     }
 
-    fun body(block: BodyScope.() -> Unit) {
-        BodyScope(settings).apply(block)
-    }
-
     fun returns(type: XTypeName<*, *>) {
         specBuilder.returns(type.interopToJava())
     }
@@ -68,13 +68,6 @@ class JavaMethodScope private constructor(
 
     internal fun build(): JPMethod =
         specBuilder.build()
-
-    @PoetesseJava
-    inner class BodyScope(override val settings: Poetesse.Settings) : JavaCodeBlockContainer {
-        internal val codeBlockContainer = JavaCodeBlockContainerInternal.of(
-            append = { this@JavaMethodScope.specBuilder.addStatement(it) }
-        )
-    }
 
     internal companion object {
         fun of(settings: Poetesse.Settings, name: String): JavaMethodScope =

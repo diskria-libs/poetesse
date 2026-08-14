@@ -77,10 +77,7 @@ internal interface KotlinCodeBlockContainerInternal {
 
 private val KotlinCodeBlockContainer.internal: KotlinCodeBlockContainerInternal
     get() = when (this) {
-        is KotlinPropertyGetterScope.BodyScope -> codeBlockContainer
-        is KotlinPropertySetterScope.BodyScope -> codeBlockContainer
-        is KotlinConstructorScope.BodyScope -> codeBlockContainer
-        is KotlinFunctionScope.BodyScope -> codeBlockContainer
+        is KotlinBodyScope -> codeBlockContainer
         is KotlinEmbeddableCodeBlockScope -> codeBlockContainer
         is KotlinCodeBlockScope -> codeBlockContainer
     }

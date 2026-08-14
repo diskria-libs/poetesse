@@ -10,7 +10,8 @@ class KotlinConstructorScope private constructor(
     private val specBuilder: KPFunctionBuilder
 ) : KotlinParameterContainer,
     KotlinAnnotationContainer,
-    KotlinModifierContainer.WithVisibility {
+    KotlinModifierContainer.WithVisibility,
+    KotlinBodyContainer {
 
     internal val parameterContainer = KotlinParameterContainerInternal.of(
         append = { specBuilder.addParameter(it) }
@@ -21,6 +22,9 @@ class KotlinConstructorScope private constructor(
     internal val modifierContainer = KotlinModifierContainerInternal.of(
         append = { specBuilder.addModifiers(*it) }
     )
+    internal val bodyContainer = KotlinBodyContainerInternal.of(
+        append = { specBuilder.addStatement(it) },
+    )
 
     fun expect() {
         modifiers(KPModifier.EXPECT)
@@ -30,23 +34,8 @@ class KotlinConstructorScope private constructor(
         modifiers(KPModifier.ACTUAL)
     }
 
-    fun body(block: BodyScope.() -> Unit) {
-        BodyScope(settings).apply(block)
-    }
-
-    fun expression(block: KotlinCodeBuilder) {
-        body { line { "return ${L(block)}" } }
-    }
-
     internal fun build(): KPFunction =
         specBuilder.build()
-
-    @PoetesseKotlin
-    inner class BodyScope(override val settings: Poetesse.Settings) : KotlinCodeBlockContainer {
-        internal val codeBlockContainer = KotlinCodeBlockContainerInternal.of(
-            append = { this@KotlinConstructorScope.specBuilder.addStatement(it) }
-        )
-    }
 
     internal companion object {
         fun of(settings: Poetesse.Settings): KotlinConstructorScope =

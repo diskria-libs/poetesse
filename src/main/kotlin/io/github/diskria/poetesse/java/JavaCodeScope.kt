@@ -44,7 +44,8 @@ class JavaCodeScope internal constructor(
     fun L(value: JPAnnotation) = argument('L', value)
     fun L(value: JavaAnnotationRef) = L(value.spec)
 
-    fun L(code: JavaCodeRef) = argument('L', code.codeBlock)
+    fun L(codeBlock: JPCodeBlock) = argument('L', codeBlock)
+    fun L(code: JavaCodeRef) = L(code.codeBlock)
     fun L(build: JavaCodeBuilder) = L(code(build))
 
     inner class ExpressionScope {

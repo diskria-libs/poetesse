@@ -9,7 +9,8 @@ class JavaConstructorScope private constructor(
     private val specBuilder: JPMethodBuilder
 ) : JavaParameterContainer,
     JavaAnnotationContainer,
-    JavaModifierContainer.WithVisibility {
+    JavaModifierContainer.WithVisibility,
+    JavaBodyContainer {
 
     internal val parameterContainer = JavaParameterContainerInternal.of(
         append = { specBuilder.addParameter(it) }
@@ -20,20 +21,12 @@ class JavaConstructorScope private constructor(
     internal val modifierContainer = JavaModifierContainerInternal.of(
         append = { specBuilder.addModifiers(*it) }
     )
-
-    fun body(block: BodyScope.() -> Unit) {
-        BodyScope(settings).apply(block)
-    }
+    internal val bodyContainer = JavaBodyContainerInternal.of(
+        append = { specBuilder.addStatement(it) }
+    )
 
     internal fun build(): JPMethod =
         specBuilder.build()
-
-    @PoetesseJava
-    inner class BodyScope(override val settings: Poetesse.Settings) : JavaCodeBlockContainer {
-        internal val codeBlockContainer = JavaCodeBlockContainerInternal.of(
-            append = { this@JavaConstructorScope.specBuilder.addStatement(it) }
-        )
-    }
 
     internal companion object {
         fun of(settings: Poetesse.Settings): JavaConstructorScope =

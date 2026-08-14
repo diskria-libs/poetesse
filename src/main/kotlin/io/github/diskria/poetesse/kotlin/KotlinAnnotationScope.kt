@@ -20,35 +20,31 @@ class KotlinAnnotationScope<A : Annotation> internal constructor(
     private typealias ArgumentProperty<A, V> = KProperty1<out A, V>
     private typealias ArrayArgumentProperty<A, E> = ArgumentProperty<A, Array<out E>>
 
-    fun argument(name: String? = null, value: KPCodeBlock) {
-        val format = buildString {
-            name?.let { append("$it = ") }
-            append("%L")
-        }
-        specBuilder.addMember(format, value)
+    fun member(name: String? = null, value: KPCodeBlock) {
+        specBuilder.addMember(KotlinCodeScope.of(settings) {
+            buildString {
+                name?.let { append("$it = ") }
+                append(L(value))
+            }
+        }.codeBlock)
     }
 
-    fun argument(name: String? = null, value: KotlinCodeRef) {
-        argument(name, value.codeBlock)
+    fun argument(name: String, value: KotlinCodeRef) {
+        member(name, value.codeBlock)
     }
 
-    fun argument(name: String? = null, value: KotlinCodeBuilder) {
+    fun argument(name: String, value: KotlinCodeBuilder) {
         argument(name, KotlinCodeScope.of(settings, value))
-    }
-
-    @JvmName("propertyArgument")
-    fun argument(property: ArgumentProperty<A, *>, value: KotlinCodeBuilder) {
-        argument(property.name, value)
     }
 
     @JvmName("stringArgument")
     fun argument(property: ArgumentProperty<A, String>, value: String) {
-        argument(property) { S(value) }
+        argument(property.name) { S(value) }
     }
 
     @JvmName("stringArrayArgument")
     fun argument(property: ArrayArgumentProperty<A, String>, values: Iterable<String>) {
-        argument(property) {
+        argument(property.name) {
             expression.arrayOf(values) { S(it) }
         }
     }
@@ -60,12 +56,12 @@ class KotlinAnnotationScope<A : Annotation> internal constructor(
 
     @JvmName("booleanArgument")
     fun argument(property: ArgumentProperty<A, Boolean>, value: Boolean) {
-        argument(property) { L(value) }
+        argument(property.name) { L(value) }
     }
 
     @JvmName("booleanArrayArgument")
     fun argument(property: ArgumentProperty<A, BooleanArray>, values: Iterable<Boolean>) {
-        argument(property) {
+        argument(property.name) {
             expression.arrayOf(values) { L(it) }
         }
     }
@@ -77,12 +73,12 @@ class KotlinAnnotationScope<A : Annotation> internal constructor(
 
     @JvmName("intArgument")
     fun argument(property: ArgumentProperty<A, Int>, value: Int) {
-        argument(property) { L(value) }
+        argument(property.name) { L(value) }
     }
 
     @JvmName("intArrayArgument")
     fun argument(property: ArgumentProperty<A, IntArray>, values: Iterable<Int>) {
-        argument(property) {
+        argument(property.name) {
             expression.arrayOf(values) { L(it) }
         }
     }
@@ -94,12 +90,12 @@ class KotlinAnnotationScope<A : Annotation> internal constructor(
 
     @JvmName("classArgument")
     fun argument(property: ArgumentProperty<A, KClass<*>>, value: KClass<*>) {
-        argument(property) { expression.classLiteral(value) }
+        argument(property.name) { expression.classLiteral(value) }
     }
 
     @JvmName("classArrayArgument")
     fun argument(property: ArrayArgumentProperty<A, KClass<*>>, values: Iterable<KClass<*>>) {
-        argument(property) {
+        argument(property.name) {
             expression.arrayOf(values) { expression.classLiteral(it) }
         }
     }
@@ -111,12 +107,12 @@ class KotlinAnnotationScope<A : Annotation> internal constructor(
 
     @JvmName("xTypeArgument")
     fun argument(property: ArgumentProperty<A, KClass<*>>, value: XTypeName<*, *>) {
-        argument(property) { expression.classLiteral(value) }
+        argument(property.name) { expression.classLiteral(value) }
     }
 
     @JvmName("xTypeArrayArgument")
     fun argument(property: ArrayArgumentProperty<A, KClass<*>>, values: Iterable<XTypeName<*, *>>) {
-        argument(property) {
+        argument(property.name) {
             expression.arrayOf(values) { expression.classLiteral(it) }
         }
     }
@@ -128,12 +124,12 @@ class KotlinAnnotationScope<A : Annotation> internal constructor(
 
     @JvmName("enumArgument")
     inline fun <reified E : Enum<E>> argument(property: ArgumentProperty<A, E>, value: E) {
-        argument(property) { expression.enumEntry(value) }
+        argument(property.name) { expression.enumEntry(value) }
     }
 
     @JvmName("enumArrayArgument")
     inline fun <reified E : Enum<E>> argument(property: ArrayArgumentProperty<A, E>, values: Iterable<E>) {
-        argument(property) {
+        argument(property.name) {
             expression.arrayOf(values) { expression.enumEntry(it) }
         }
     }
@@ -148,7 +144,7 @@ class KotlinAnnotationScope<A : Annotation> internal constructor(
         property: ArgumentProperty<A, Nested>,
         annotation: KotlinTypedAnnotationRef<Nested>,
     ) {
-        argument(property) { L(annotation) }
+        argument(property.name) { L(annotation) }
     }
 
     @JvmName("annotationArgument")

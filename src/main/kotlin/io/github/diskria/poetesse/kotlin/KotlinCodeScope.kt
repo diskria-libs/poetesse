@@ -37,7 +37,8 @@ class KotlinCodeScope internal constructor(
     fun L(value: KPAnnotation) = argument('L', value)
     fun L(value: KotlinAnnotationRef) = L(value.spec)
 
-    fun L(code: KotlinCodeRef) = argument('L', code.codeBlock)
+    fun L(codeBlock: KPCodeBlock) = argument('L', codeBlock)
+    fun L(code: KotlinCodeRef) = L(code.codeBlock)
     fun L(build: KotlinCodeBuilder) = L(code(build))
 
     inner class ExpressionScope {
