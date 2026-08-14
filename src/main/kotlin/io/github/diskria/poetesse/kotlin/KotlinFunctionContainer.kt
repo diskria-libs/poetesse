@@ -9,10 +9,10 @@ sealed interface KotlinFunctionContainer : KotlinFunctionFactory {
         return name
     }
 
-    fun function(name: String, block: KotlinFunctionScope.() -> Unit = {}): String =
+    fun function(name: String, block: KotlinFunctionScope.Block = {}) =
         +factory.function(name, block)
 
-    fun function(block: KotlinFunctionScope.() -> Unit = {}): EagerDelegate<String> =
+    fun function(block: KotlinFunctionScope.Block = {}) =
         EagerDelegate { name -> function(name, block) }
 }
 

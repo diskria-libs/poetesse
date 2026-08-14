@@ -9,36 +9,38 @@ import io.github.diskria.poetesse.kotlin.*
 import io.github.diskria.poetesse.xClass
 import kotlin.reflect.KClass
 
-sealed class XTypeName<K : KPTypeName, J : JPTypeName> : PoetesseScope {
+typealias XTypeName = XTypedTypeName<*, *>
+
+sealed class XTypedTypeName<K : KPTypeName, J : JPTypeName> : PoetesseScope {
 
     internal open val isBoxed: Boolean = true
     internal abstract val isNullable: Boolean
 
-    internal open fun boxInternal(): XTypeName<K, J> = this
+    internal open fun boxInternal(): XTypedTypeName<K, J> = this
 
     internal abstract fun interopToKotlinInternal(): K
     internal abstract fun interopToJavaInternal(): J
 }
 
-fun <K : KPTypeName, X : XTypeName<K, *>> X.interopToKotlin(): K =
+fun <K : KPTypeName, X : XTypedTypeName<K, *>> X.interopToKotlin(): K =
     interopToKotlinInternal().setNullable(isNullable)
 
-fun <J : JPTypeName, X : XTypeName<*, J>> X.box(): XTypeName<*, J> =
+fun <J : JPTypeName, X : XTypedTypeName<*, J>> X.box(): XTypedTypeName<*, J> =
     if (isBoxed) this
     else boxInternal()
 
 @Suppress("UNCHECKED_CAST")
-fun <J : JPTypeName, X : XTypeName<*, J>> X.interopToJava(resolveNullability: Boolean = true): J {
+fun <J : JPTypeName, X : XTypedTypeName<*, J>> X.interopToJava(resolveNullability: Boolean = true): J {
     val jp = interopToJavaInternal()
     if (resolveNullability && isBoxed) {
-        return settings.javaNullabilityResolver.setNullable(jp, isNullable)
+        return settings.javaNullabilityResolver.setNullable(jp, isNullable) as J
     }
     return jp
 }
 
 @PublishedApi
 context(scope: PoetesseScope)
-internal inline fun <reified X : XTypeName<*, *>> KPTypeName.asXOrNull(boxed: Boolean = isNullable): X? =
+internal inline fun <reified X : XTypeName> KPTypeName.asXOrNull(boxed: Boolean = isNullable): X? =
     when (X::class) {
         XVoidTypeName::class -> asXVoidTypeNameOrNull(boxed)
         XPrimitiveTypeName::class -> asXPrimitiveTypeNameOrNull(boxed)
@@ -52,13 +54,13 @@ internal inline fun <reified X : XTypeName<*, *>> KPTypeName.asXOrNull(boxed: Bo
     } as X?
 
 context(scope: PoetesseScope)
-internal inline fun <reified X : XTypeName<*, *>> KPTypeName.asX(boxed: Boolean = isNullable): X =
+internal inline fun <reified X : XTypeName> KPTypeName.asX(boxed: Boolean = isNullable): X =
     requireNotNull(asXOrNull<X>(boxed)) {
         "Cannot convert KPTypeName '${this::class.simpleName}' ($this) to X-interop '${X::class.simpleName}'"
     }
 
 context(scope: PoetesseScope)
-internal fun KPTypeName.toXType(boxed: Boolean = isNullable): XTypeName<*, *> = when (this) {
+internal fun KPTypeName.toXType(boxed: Boolean = isNullable): XTypeName = when (this) {
     is KPClassName -> {
         asXOrNull<XVoidTypeName>(boxed)
             ?: asXOrNull<XPrimitiveTypeName>(boxed)
@@ -75,7 +77,7 @@ internal fun KPTypeName.toXType(boxed: Boolean = isNullable): XTypeName<*, *> = 
 
 @PublishedApi
 context(scope: PoetesseScope)
-internal fun KClass<*>.toXType(nullable: Boolean = false, boxed: Boolean = nullable): XTypeName<*, *> {
+internal fun KClass<*>.toXType(nullable: Boolean = false, boxed: Boolean = nullable): XTypeName {
     require(java.typeParameters.isEmpty()) {
         val className = simpleName ?: this.toString()
         buildString {
@@ -94,7 +96,7 @@ internal fun KClass<*>.toXType(nullable: Boolean = false, boxed: Boolean = nulla
 
 @PublishedApi
 context(scope: PoetesseScope)
-internal inline fun <reified X : XTypeName<*, *>> JPTypeName.asXOrNull(nullable: Boolean = false): X? =
+internal inline fun <reified X : XTypeName> JPTypeName.asXOrNull(nullable: Boolean = false): X? =
     when (X::class) {
         XVoidTypeName::class -> asXVoidTypeNameOrNull(nullable)
         XPrimitiveTypeName::class -> asXPrimitiveTypeNameOrNull(nullable)
@@ -108,13 +110,13 @@ internal inline fun <reified X : XTypeName<*, *>> JPTypeName.asXOrNull(nullable:
     } as X?
 
 context(scope: PoetesseScope)
-internal inline fun <reified X : XTypeName<*, *>> JPTypeName.asX(nullable: Boolean = false): X =
+internal inline fun <reified X : XTypeName> JPTypeName.asX(nullable: Boolean = false): X =
     requireNotNull(asXOrNull<X>(nullable)) {
         "Cannot convert JPTypeName '${this::class.simpleName}' ($this) to X-interop '${X::class.simpleName}'"
     }
 
 context(scope: PoetesseScope)
-internal fun JPTypeName.toXType(nullable: Boolean = false): XTypeName<*, *> = when (this) {
+internal fun JPTypeName.toXType(nullable: Boolean = false): XTypeName = when (this) {
     is JPClassName -> {
         asXOrNull<XVoidTypeName>(nullable)
             ?: asXOrNull<XPrimitiveTypeName>(nullable)

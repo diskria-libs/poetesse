@@ -3,12 +3,12 @@ package io.github.diskria.poetesse.kotlin
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.extensions.addStatement
 
-typealias KotlinCodeBlockBuilder = KotlinCodeBlockScope.() -> Unit
-
 class KotlinCodeBlockScope internal constructor(
     override val settings: Poetesse.Settings,
     private val builder: KPCodeBlockBuilder = KPCodeBlock.builder(),
 ) : KotlinCodeBlockContainer {
+
+    internal typealias Block = KotlinCodeBlockScope.() -> Unit
 
     internal val codeBlockContainer = KotlinCodeBlockContainerInternal.of(
         append = { builder.addStatement(it) }
@@ -18,17 +18,16 @@ class KotlinCodeBlockScope internal constructor(
         builder.build()
 
     internal companion object {
-        fun of(settings: Poetesse.Settings, block: KotlinCodeBlockBuilder): KotlinCodeBlockScope =
-            KotlinCodeBlockScope(settings).apply(block)
+        fun of(settings: Poetesse.Settings, block: Block) = KotlinCodeBlockScope(settings).apply(block)
     }
 }
-
-typealias KotlinEmbeddableCodeBlockBuilder = KotlinEmbeddableCodeBlockScope.() -> Unit
 
 class KotlinEmbeddableCodeBlockScope internal constructor(
     override val settings: Poetesse.Settings,
     internal val statements: MutableList<KPCodeBlock> = mutableListOf()
 ) : KotlinCodeBlockContainer {
+
+    internal typealias Block = KotlinEmbeddableCodeBlockScope.() -> Unit
 
     internal val codeBlockContainer = KotlinCodeBlockContainerInternal.of(
         append = { statements += it }

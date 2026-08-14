@@ -9,11 +9,11 @@ import io.github.diskria.poetesse.kotlin.KPTypeVariableName
 class XTypeVariableName internal constructor(
     override val settings: Poetesse.Settings,
     val name: String,
-    val bounds: List<XTypeName<*, *>>,
+    val bounds: List<XTypeName>,
     val variance: XVariance?,
     val isReified: Boolean,
     override val isNullable: Boolean,
-) : XTypeName<KPTypeVariableName, JPTypeVariableName>() {
+) : XTypedTypeName<KPTypeVariableName, JPTypeVariableName>() {
 
     override fun interopToKotlinInternal(): KPTypeVariableName =
         KPTypeVariableName(
@@ -51,3 +51,8 @@ internal fun KPTypeVariableName.asXTypeVariableName(): XTypeVariableName =
 context(scope: PoetesseScope)
 internal fun JPTypeVariableName.asXTypeVariableName(nullable: Boolean = false): XTypeVariableName =
     XTypeVariableName(scope.settings, name(), bounds().map { it.toXType() }, null, false, nullable)
+
+enum class XVariance {
+    IN,
+    OUT,
+}

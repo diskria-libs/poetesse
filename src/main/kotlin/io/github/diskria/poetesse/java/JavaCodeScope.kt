@@ -21,7 +21,7 @@ class JavaCodeScope internal constructor(
         return "$$mask"
     }
 
-    fun T(value: XTypeName<*, *>, resolveNullability: Boolean = false) =
+    fun T(value: XTypeName, resolveNullability: Boolean = false) =
         argument('T', value.interopToJava(resolveNullability = resolveNullability))
 
     fun T(value: KClass<*>, nullable: Boolean = false, resolveNullability: Boolean = false) =
@@ -48,7 +48,7 @@ class JavaCodeScope internal constructor(
 
     inner class ExpressionScope {
 
-        fun classLiteral(type: XTypeName<*, *>): String =
+        fun classLiteral(type: XTypeName): String =
             "${T(type)}.class"
 
         fun classLiteral(type: KClass<*>): String =
@@ -71,7 +71,8 @@ class JavaCodeScope internal constructor(
         JPCodeBlock.of(block(), *arguments.toTypedArray())
 
     internal companion object {
-        fun of(settings: Poetesse.Settings, block: JavaCodeBuilder): JavaCodeRef =
-            JavaCodeRef { JavaCodeScope(settings, block).build() }
+        fun of(settings: Poetesse.Settings, block: JavaCodeBuilder) = JavaCodeRef {
+            JavaCodeScope(settings, block).build()
+        }
     }
 }

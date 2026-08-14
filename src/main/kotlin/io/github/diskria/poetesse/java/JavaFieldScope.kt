@@ -11,6 +11,8 @@ class JavaFieldScope private constructor(
     JavaAnnotationContainer,
     JavaModifierContainer.WithVisibility {
 
+    internal typealias Block = JavaFieldScope.() -> Unit
+
     internal val annotationContainer = JavaAnnotationContainerInternal.of(
         append = { specBuilder.addAnnotation(it) },
     )
@@ -26,7 +28,7 @@ class JavaFieldScope private constructor(
         specBuilder.build()
 
     internal companion object {
-        fun of(settings: Poetesse.Settings, name: String, type: XTypeName<*, *>): JavaFieldScope =
+        fun of(settings: Poetesse.Settings, name: String, type: XTypeName) =
             JavaFieldScope(settings, JPField.builder(type.interopToJava(), name))
     }
 }

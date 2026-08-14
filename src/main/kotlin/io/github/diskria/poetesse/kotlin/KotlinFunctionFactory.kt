@@ -4,8 +4,8 @@ import io.github.diskria.poetesse.LazyDelegate
 
 interface KotlinFunctionFactory : PoetesseKotlinScope
 
-fun KotlinFunctionFactory.function(name: String, block: KotlinFunctionScope.() -> Unit = {}): KotlinFunctionRef =
+fun KotlinFunctionFactory.function(name: String, block: KotlinFunctionScope.Block = {}) =
     KotlinFunctionRef(name) { KotlinFunctionScope.of(settings, name).apply(block).build() }
 
-fun KotlinFunctionFactory.function(block: KotlinFunctionScope.() -> Unit = {}): LazyDelegate<KotlinFunctionRef> =
+fun KotlinFunctionFactory.function(block: KotlinFunctionScope.Block = {}) =
     LazyDelegate { name -> function(name, block) }

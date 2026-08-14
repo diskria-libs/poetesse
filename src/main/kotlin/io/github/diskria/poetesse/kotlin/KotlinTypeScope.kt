@@ -20,6 +20,8 @@ class KotlinTypeScope private constructor(
     KotlinAnnotationContainer,
     KotlinModifierContainer.WithVisibility {
 
+    internal typealias Block = KotlinTypeScope.(className: XClassName) -> Unit
+
     internal val typeVariableContainer = KotlinTypeVariableContainerInternal.of(
         append = { specBuilder.addTypeVariable(it) }
     )
@@ -79,20 +81,20 @@ class KotlinTypeScope private constructor(
         modifiers(KPModifier.INNER)
     }
 
-    fun superclass(type: XTypeName<*, *>, constructor: SuperclassConstructorScope.() -> Unit = {}) {
+    fun superclass(type: XTypeName, constructor: SuperclassConstructorScope.Block = {}) {
         specBuilder.superclass(type.interopToKotlin())
         SuperclassConstructorScope(settings).constructor()
     }
 
-    fun superclass(type: KClass<*>, constructor: SuperclassConstructorScope.() -> Unit = {}) {
+    fun superclass(type: KClass<*>, constructor: SuperclassConstructorScope.Block = {}) {
         superclass(xType(type), constructor)
     }
 
-    inline fun <reified T : Any> superclass(noinline constructor: SuperclassConstructorScope.() -> Unit = {}) {
+    inline fun <reified T : Any> superclass(noinline constructor: SuperclassConstructorScope.Block = {}) {
         superclass(T::class, constructor)
     }
 
-    fun superinterface(type: XTypeName<*, *>) {
+    fun superinterface(type: XTypeName) {
         specBuilder.addSuperinterface(type.interopToKotlin())
     }
 
@@ -104,15 +106,15 @@ class KotlinTypeScope private constructor(
         superinterface(T::class)
     }
 
-    fun superinterfaces(types: Iterable<XTypeName<*, *>>) {
+    fun superinterfaces(types: Iterable<XTypeName>) {
         types.forEach { superinterface(it) }
     }
 
-    fun superinterfaces(vararg types: XTypeName<*, *>) {
+    fun superinterfaces(vararg types: XTypeName) {
         superinterfaces(types.asIterable())
     }
 
-    fun initializerBlock(block: KotlinCodeBlockBuilder) {
+    fun initializerBlock(block: KotlinCodeBlockScope.Block = {}) {
         specBuilder.addInitializerBlock(KotlinCodeBlockScope.of(settings, block).build())
     }
 
@@ -120,13 +122,16 @@ class KotlinTypeScope private constructor(
         specBuilder.build()
 
     inner class SuperclassConstructorScope(override val settings: Poetesse.Settings) : KotlinArgumentsContainer {
+
+        internal typealias Block = SuperclassConstructorScope.() -> Unit
+
         internal val argumentsContainer = KotlinArgumentsContainerInternal.of(
             append = { this@KotlinTypeScope.specBuilder.addSuperclassConstructorParameter(it) }
         )
     }
 
     internal companion object {
-        fun of(settings: Poetesse.Settings, kind: KPTypeKind, name: String, className: XClassName): KotlinTypeScope =
+        fun of(settings: Poetesse.Settings, kind: KPTypeKind, name: String, className: XClassName) =
             KotlinTypeScope(
                 settings,
                 className,

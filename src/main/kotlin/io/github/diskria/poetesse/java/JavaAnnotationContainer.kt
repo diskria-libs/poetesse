@@ -8,17 +8,14 @@ sealed interface JavaAnnotationContainer : JavaAnnotationFactory {
 }
 
 fun <A : Annotation> JavaAnnotationContainer.annotation(
-    className: XClassName,
-    block: JavaAnnotationScope<A>.() -> Unit = {}
+    className: XClassName, block: JavaAnnotationScope.Block<A> = {}
 ) = +factory.annotation(className, block)
 
-fun <A : Annotation> JavaAnnotationContainer.annotation(
-    type: KClass<out A>,
-    block: JavaAnnotationScope<A>.() -> Unit = {}
-) = +factory.annotation(type, block)
+fun <A : Annotation> JavaAnnotationContainer.annotation(type: KClass<out A>, block: JavaAnnotationScope.Block<A> = {}) =
+    +factory.annotation(type, block)
 
 inline fun <reified A : Annotation> JavaAnnotationContainer.annotation(
-    noinline block: JavaAnnotationScope<A>.() -> Unit = {}
+    noinline block: JavaAnnotationScope.Block<A> = {}
 ) = +factory.annotation<A>(block)
 
 internal interface JavaAnnotationContainerInternal {

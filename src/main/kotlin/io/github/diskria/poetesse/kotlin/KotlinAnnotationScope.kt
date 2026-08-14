@@ -14,6 +14,8 @@ class KotlinAnnotationScope<A : Annotation> internal constructor(
     private val specBuilder: KPAnnotationBuilder,
 ) : PoetesseKotlinScope {
 
+    internal typealias Block<A> = KotlinAnnotationScope<A>.() -> Unit
+
     private typealias ArgumentProperty<A, V> = KProperty1<out A, V>
     private typealias ArrayArgumentProperty<A, E> = ArgumentProperty<A, Array<out E>>
 
@@ -103,19 +105,19 @@ class KotlinAnnotationScope<A : Annotation> internal constructor(
     }
 
     @JvmName("xTypeArgument")
-    fun argument(property: ArgumentProperty<A, KClass<*>>, value: XTypeName<*, *>) {
+    fun argument(property: ArgumentProperty<A, KClass<*>>, value: XTypeName) {
         argument(property.name) { expression.classLiteral(value) }
     }
 
     @JvmName("xTypeArrayArgument")
-    fun argument(property: ArrayArgumentProperty<A, KClass<*>>, values: Iterable<XTypeName<*, *>>) {
+    fun argument(property: ArrayArgumentProperty<A, KClass<*>>, values: Iterable<XTypeName>) {
         argument(property.name) {
             expression.arrayOf(values) { expression.classLiteral(it) }
         }
     }
 
     @JvmName("classNameArrayArgument")
-    fun argument(property: ArrayArgumentProperty<A, KClass<*>>, vararg values: XTypeName<*, *>) {
+    fun argument(property: ArrayArgumentProperty<A, KClass<*>>, vararg values: XTypeName) {
         argument(property, values.asIterable())
     }
 
@@ -147,7 +149,7 @@ class KotlinAnnotationScope<A : Annotation> internal constructor(
     @JvmName("annotationArgument")
     inline fun <reified Nested : Annotation> argument(
         property: ArgumentProperty<A, Nested>,
-        noinline block: KotlinAnnotationScope<Nested>.() -> Unit = {}
+        noinline block: Block<Nested> = {}
     ) {
         argument(property, KotlinTypedAnnotationRef {
             of<Nested>(settings, xClass<Nested>()).apply(block).build()
@@ -182,10 +184,9 @@ class KotlinAnnotationScope<A : Annotation> internal constructor(
             settings: Poetesse.Settings,
             className: XClassName,
             useSiteTarget: UseSite? = null,
-        ): KotlinAnnotationScope<A> =
-            KotlinAnnotationScope(
-                settings, KPAnnotation.builder(className.interopToKotlin()).useSiteTarget(useSiteTarget)
-            )
+        ) = KotlinAnnotationScope<A>(
+            settings, KPAnnotation.builder(className.interopToKotlin()).useSiteTarget(useSiteTarget)
+        )
     }
 }
 

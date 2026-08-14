@@ -9,6 +9,8 @@ class JavaFileScope private constructor(
     val fileName: String,
 ) : JavaTypeContainer {
 
+    internal typealias Block = JavaFileScope.() -> Unit
+
     private val types: MutableList<JPType> = mutableListOf()
 
     internal val typeContainer = JavaTypeContainerInternal.of(
@@ -31,7 +33,7 @@ class JavaFileScope private constructor(
     }
 
     internal companion object {
-        fun of(settings: Poetesse.Settings, packageName: String?, fileName: String): JavaFileScope =
+        fun of(settings: Poetesse.Settings, packageName: String?, fileName: String) =
             JavaFileScope(settings, packageName, fileName)
     }
 }

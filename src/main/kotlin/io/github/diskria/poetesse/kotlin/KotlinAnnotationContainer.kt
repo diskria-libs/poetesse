@@ -11,20 +11,15 @@ sealed interface KotlinAnnotationContainer : KotlinAnnotationFactory {
 }
 
 fun <A : Annotation> KotlinAnnotationContainer.annotation(
-    className: XClassName,
-    target: UseSite? = null,
-    block: KotlinAnnotationScope<A>.() -> Unit = {}
+    className: XClassName, target: UseSite? = null, block: KotlinAnnotationScope.Block<A> = {}
 ) = +factory.annotation(className, target, block)
 
 fun <A : Annotation> KotlinAnnotationContainer.annotation(
-    type: KClass<out A>,
-    target: UseSite? = null,
-    block: KotlinAnnotationScope<A>.() -> Unit = {}
+    type: KClass<out A>, target: UseSite? = null, block: KotlinAnnotationScope.Block<A> = {}
 ) = +factory.annotation(type, target, block)
 
 inline fun <reified A : Annotation> KotlinAnnotationContainer.annotation(
-    target: UseSite? = null,
-    noinline block: KotlinAnnotationScope<A>.() -> Unit = {}
+    target: UseSite? = null, noinline block: KotlinAnnotationScope.Block<A> = {}
 ) = +factory.annotation<A>(target, block)
 
 internal interface KotlinAnnotationContainerInternal {

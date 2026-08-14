@@ -12,10 +12,10 @@ import io.github.diskria.poetesse.kotlin.KPWildcardTypeName
 
 class XWildcardTypeName internal constructor(
     override val settings: Poetesse.Settings,
-    val inType: XTypeName<*, *>?,
-    val outType: XTypeName<*, *>?,
+    val inType: XTypeName?,
+    val outType: XTypeName?,
     override val isNullable: Boolean,
-) : XTypeName<KPWildcardTypeName, JPWildcardTypeName>() {
+) : XTypedTypeName<KPWildcardTypeName, JPWildcardTypeName>() {
 
     override fun interopToKotlinInternal(): KPWildcardTypeName = when {
         inType != null -> KPWildcardTypeName.consumerOf(inType.interopToKotlin())
@@ -55,8 +55,8 @@ internal fun JPWildcardTypeName.asXWildcardTypeName(nullable: Boolean = false): 
         isNullable = nullable,
     )
 
-fun XTypeName<*, *>.consumer(nullable: Boolean = false): XWildcardTypeName =
+fun XTypeName.consumer(nullable: Boolean = false): XWildcardTypeName =
     XWildcardTypeName(settings, inType = this, outType = null, isNullable = nullable)
 
-fun XTypeName<*, *>.producer(nullable: Boolean = false): XWildcardTypeName =
+fun XTypeName.producer(nullable: Boolean = false): XWildcardTypeName =
     XWildcardTypeName(settings, outType = this, inType = null, isNullable = nullable)

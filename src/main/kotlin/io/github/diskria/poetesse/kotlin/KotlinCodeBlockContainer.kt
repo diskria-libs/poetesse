@@ -21,45 +21,43 @@ sealed interface KotlinCodeBlockContainer : KotlinCodeBlockFactory {
     }
 }
 
-fun KotlinCodeBlockContainer.variable(
-    name: String, type: XTypeName<*, *>?, block: KotlinVariableScope.() -> Unit
-): String {
+fun KotlinCodeBlockContainer.variable(name: String, type: XTypeName?, block: KotlinVariableScope.Block = {}): String {
     line(KotlinVariableScope(settings, name, type).apply(block).build())
     return name
 }
 
 @JvmName("variableUntyped")
-fun KotlinCodeBlockContainer.variable(name: String, block: KotlinVariableScope.() -> Unit) =
+fun KotlinCodeBlockContainer.variable(name: String, block: KotlinVariableScope.Block = {}) =
     variable(name, type = null, block)
 
 fun KotlinCodeBlockContainer.variable(
-    name: String, type: KClass<*>, nullable: Boolean = false, block: KotlinVariableScope.() -> Unit
+    name: String, type: KClass<*>, nullable: Boolean = false, block: KotlinVariableScope.Block = {}
 ) = variable(name, xType(type, nullable = nullable), block)
 
 fun KotlinCodeBlockContainer.variable(
-    type: KClass<*>, nullable: Boolean = false, block: KotlinVariableScope.() -> Unit
+    type: KClass<*>, nullable: Boolean = false, block: KotlinVariableScope.Block = {}
 ) = EagerDelegate { name -> variable(name, type, nullable, block) }
 
-fun KotlinCodeBlockContainer.variable(type: XTypeName<*, *>, block: KotlinVariableScope.() -> Unit) =
+fun KotlinCodeBlockContainer.variable(type: XTypeName, block: KotlinVariableScope.Block = {}) =
     EagerDelegate { name -> variable(name, type, block) }
 
 @JvmName("variableUntypedDelegate")
-fun KotlinCodeBlockContainer.variable(block: KotlinVariableScope.() -> Unit) =
+fun KotlinCodeBlockContainer.variable(block: KotlinVariableScope.Block = {}) =
     EagerDelegate { name -> variable(name, type = null, block) }
 
 inline fun <reified T> KotlinCodeBlockContainer.variable(
-    name: String, nullable: Boolean = true, noinline block: KotlinVariableScope.() -> Unit
+    name: String, nullable: Boolean = true, noinline block: KotlinVariableScope.Block = {}
 ) = variable(name, T::class, nullable, block)
 
 inline fun <reified T : Any> KotlinCodeBlockContainer.variable(
-    name: String, noinline block: KotlinVariableScope.() -> Unit
+    name: String, noinline block: KotlinVariableScope.Block = {}
 ) = variable<T>(name, nullable = false, block)
 
 inline fun <reified T> KotlinCodeBlockContainer.variable(
-    nullable: Boolean = true, noinline block: KotlinVariableScope.() -> Unit
+    nullable: Boolean = true, noinline block: KotlinVariableScope.Block = {}
 ) = EagerDelegate { name -> variable<T>(name, nullable, block) }
 
-inline fun <reified T : Any> KotlinCodeBlockContainer.variable(noinline block: KotlinVariableScope.() -> Unit) =
+inline fun <reified T : Any> KotlinCodeBlockContainer.variable(noinline block: KotlinVariableScope.Block = {}) =
     variable<T>(nullable = false, block)
 
 internal interface KotlinCodeBlockContainerInternal {

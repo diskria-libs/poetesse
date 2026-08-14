@@ -9,12 +9,12 @@ import io.github.diskria.poetesse.kotlin.KPFunctionalTypeName
 
 class XFunctionalTypeName internal constructor(
     override val settings: Poetesse.Settings,
-    val contextParameters: List<XTypeName<*, *>>,
-    val receiver: XTypeName<*, *>?,
+    val contextParameters: List<XTypeName>,
+    val receiver: XTypeName?,
     val parameters: List<XParameter>,
-    val returnType: XTypeName<*, *>,
+    val returnType: XTypeName,
     override val isNullable: Boolean,
-) : XTypeName<KPFunctionalTypeName, JPParameterizedTypeName>() {
+) : XTypedTypeName<KPFunctionalTypeName, JPParameterizedTypeName>() {
 
     @OptIn(ExperimentalKotlinPoetApi::class)
     override fun interopToKotlinInternal(): KPFunctionalTypeName =
@@ -78,10 +78,10 @@ internal fun JPParameterizedTypeName.asXFunctionalTypeNameOrNull(nullable: Boole
     )
 }
 
-fun XTypeName<*, *>.lambda(
+fun XTypeName.lambda(
     parameters: Iterable<XParameter> = emptyList(),
-    receiver: XTypeName<*, *>? = null,
-    contextParameters: Iterable<XTypeName<*, *>> = emptyList(),
+    receiver: XTypeName? = null,
+    contextParameters: Iterable<XTypeName> = emptyList(),
     nullable: Boolean = false,
 ): XFunctionalTypeName = XFunctionalTypeName(
     settings = settings,
@@ -93,18 +93,18 @@ fun XTypeName<*, *>.lambda(
 )
 
 @JvmName("lambdaWithParameterTypes")
-fun XTypeName<*, *>.lambda(
-    parameters: Iterable<XTypeName<*, *>> = emptyList(),
-    receiver: XTypeName<*, *>? = null,
-    contextParameters: Iterable<XTypeName<*, *>> = emptyList(),
+fun XTypeName.lambda(
+    parameters: Iterable<XTypeName> = emptyList(),
+    receiver: XTypeName? = null,
+    contextParameters: Iterable<XTypeName> = emptyList(),
     nullable: Boolean = false,
 ): XFunctionalTypeName = lambda(parameters.map { XParameter(type = it) }, receiver, contextParameters, nullable)
 
-fun XTypeName<*, *>.lambda(
-    receiver: XTypeName<*, *>? = null,
-    contextParameters: Iterable<XTypeName<*, *>> = emptyList(),
+fun XTypeName.lambda(
+    receiver: XTypeName? = null,
+    contextParameters: Iterable<XTypeName> = emptyList(),
     nullable: Boolean = false,
-): XFunctionalTypeName = lambda(emptyList<XTypeName<*, *>>(), receiver, contextParameters, nullable)
+): XFunctionalTypeName = lambda(emptyList<XTypeName>(), receiver, contextParameters, nullable)
 
-fun XTypeName<*, *>.lambda(vararg parameters: XTypeName<*, *>, nullable: Boolean = false): XFunctionalTypeName =
+fun XTypeName.lambda(vararg parameters: XTypeName, nullable: Boolean = false): XFunctionalTypeName =
     lambda(parameters = parameters.asIterable(), nullable = nullable)

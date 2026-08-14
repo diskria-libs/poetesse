@@ -21,7 +21,7 @@ class KotlinCodeScope internal constructor(
         return "%$mask"
     }
 
-    fun T(value: XTypeName<*, *>) = argument('T', value.interopToKotlin())
+    fun T(value: XTypeName) = argument('T', value.interopToKotlin())
     fun T(value: KClass<*>, nullable: Boolean = false) = T(xType(value, nullable = nullable))
     inline fun <reified T> T(nullable: Boolean = true) = T(T::class, nullable)
     inline fun <reified T : Any> T() = T<T>(nullable = false)
@@ -40,7 +40,7 @@ class KotlinCodeScope internal constructor(
     fun L(build: KotlinCodeBuilder) = L(code(build))
 
     inner class ExpressionScope {
-        fun classLiteral(type: XTypeName<*, *>): String =
+        fun classLiteral(type: XTypeName): String =
             "${T(type)}::class"
 
         fun classLiteral(type: KClass<*>): String =
@@ -63,7 +63,8 @@ class KotlinCodeScope internal constructor(
         KPCodeBlock.of(block(), *arguments.toTypedArray())
 
     internal companion object {
-        fun of(settings: Poetesse.Settings, block: KotlinCodeBuilder): KotlinCodeRef =
-            KotlinCodeRef { KotlinCodeScope(settings, block).build() }
+        fun of(settings: Poetesse.Settings, block: KotlinCodeBuilder) = KotlinCodeRef {
+            KotlinCodeScope(settings, block).build()
+        }
     }
 }

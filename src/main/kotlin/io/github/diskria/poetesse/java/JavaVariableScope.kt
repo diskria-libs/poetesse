@@ -7,10 +7,12 @@ import io.github.diskria.poetesse.interop.XTypeName
 class JavaVariableScope internal constructor(
     override val settings: Poetesse.Settings,
     val name: String,
-    private val type: XTypeName<*, *>?,
+    private val type: XTypeName?,
 ) : PoetesseJavaScope,
     JavaAnnotationContainer,
     JavaModifierContainer {
+
+    internal typealias Block = JavaVariableScope.() -> Unit
 
     private val modifiers: MutableList<JPModifier> = mutableListOf()
     private val annotations: MutableList<JPAnnotation> = mutableListOf()

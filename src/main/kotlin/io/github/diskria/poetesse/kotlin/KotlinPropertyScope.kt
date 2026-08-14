@@ -6,12 +6,14 @@ import io.github.diskria.poetesse.interop.interopToKotlin
 
 class KotlinPropertyScope private constructor(
     override val settings: Poetesse.Settings,
-    private val type: XTypeName<*, *>,
+    private val type: XTypeName,
     private val specBuilder: KPPropertyBuilder,
 ) : PoetesseKotlinScope,
     KotlinTypeVariableContainer,
     KotlinAnnotationContainer,
     KotlinModifierContainer.WithVisibility {
+
+    internal typealias Block = KotlinPropertyScope.() -> Unit
 
     internal val typeVariableContainer = KotlinTypeVariableContainerInternal.of(
         append = { specBuilder.addTypeVariable(it) }
@@ -76,11 +78,11 @@ class KotlinPropertyScope private constructor(
         accessorModifiers += KPModifier.INLINE
     }
 
-    fun getter(block: KotlinPropertyGetterScope.() -> Unit = {}) {
+    fun getter(block: KotlinPropertyGetterScope.Block = {}) {
         getter = KotlinPropertyGetterScope.of(settings).apply(block).specBuilder
     }
 
-    fun fullSetter(block: KotlinPropertySetterScope.() -> Unit = {}) {
+    fun fullSetter(block: KotlinPropertySetterScope.Block = {}) {
         setter = KotlinPropertySetterScope.of(settings).apply(block).specBuilder
     }
 
@@ -101,7 +103,7 @@ class KotlinPropertyScope private constructor(
         }.build()
 
     internal companion object {
-        fun of(settings: Poetesse.Settings, name: String, type: XTypeName<*, *>) =
+        fun of(settings: Poetesse.Settings, name: String, type: XTypeName) =
             KotlinPropertyScope(settings, type, KPProperty.builder(name, type.interopToKotlin()))
     }
 }

@@ -4,7 +4,7 @@ import io.github.diskria.poetesse.Poetesse
 
 sealed interface KotlinBodyContainer : PoetesseKotlinScope
 
-fun KotlinBodyContainer.body(block: KotlinBodyScope.() -> Unit) {
+fun KotlinBodyContainer.body(block: KotlinBodyScope.Block = {}) {
     KotlinBodyScope(settings, internal::append).apply(block)
 }
 
@@ -29,13 +29,16 @@ class KotlinBodyScope(
     override val settings: Poetesse.Settings,
     append: (statement: KPCodeBlock) -> Unit,
 ) : KotlinCodeBlockContainer {
+
+    internal typealias Block = KotlinBodyScope.() -> Unit
+
     internal val codeBlockContainer = KotlinCodeBlockContainerInternal.of(append)
 }
 
 private val KotlinBodyContainer.internal: KotlinBodyContainerInternal
     get() = when (this) {
-        is KotlinPropertyGetterScope -> bodyContainer
-        is KotlinPropertySetterScope -> bodyContainer
-        is KotlinConstructorScope -> bodyContainer
-        is KotlinFunctionScope -> bodyContainer
+        is KotlinPropertyGetterScope -> statementContainer
+        is KotlinPropertySetterScope -> statementContainer
+        is KotlinConstructorScope -> statementContainer
+        is KotlinFunctionScope -> statementContainer
     }

@@ -9,10 +9,10 @@ sealed interface JavaMethodContainer : JavaMethodFactory {
         return name
     }
 
-    fun method(name: String, block: JavaMethodScope.() -> Unit = {}): String =
+    fun method(name: String, block: JavaMethodScope.Block = {}) =
         +factory.method(name, block)
 
-    fun method(block: JavaMethodScope.() -> Unit = {}): EagerDelegate<String> =
+    fun method(block: JavaMethodScope.Block = {}) =
         EagerDelegate { name -> method(name, block) }
 }
 

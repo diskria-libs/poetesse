@@ -15,18 +15,16 @@ sealed interface JavaTypeVariableContainer : PoetesseJavaScope {
 }
 
 fun JavaTypeVariableContainer.typeVariable(
-    name: String,
-    bounds: Iterable<XTypeName<*, *>> = emptyList(),
-    nullable: Boolean = false
+    name: String, bounds: Iterable<XTypeName> = emptyList(), nullable: Boolean = false
 ) = +XTypeVariableName(settings, name, bounds.toList(), null, false, nullable)
 
-fun JavaTypeVariableContainer.typeVariable(name: String, vararg bounds: XTypeName<*, *>, nullable: Boolean = false) =
+fun JavaTypeVariableContainer.typeVariable(name: String, vararg bounds: XTypeName, nullable: Boolean = false) =
     typeVariable(name, bounds.asIterable(), nullable)
 
-fun JavaTypeVariableContainer.typeVariable(bounds: Iterable<XTypeName<*, *>> = emptyList(), nullable: Boolean = false) =
+fun JavaTypeVariableContainer.typeVariable(bounds: Iterable<XTypeName> = emptyList(), nullable: Boolean = false) =
     EagerDelegate { name -> typeVariable(name.capitalized(), bounds, nullable) }
 
-fun JavaTypeVariableContainer.typeVariable(vararg bounds: XTypeName<*, *>, nullable: Boolean = false) =
+fun JavaTypeVariableContainer.typeVariable(vararg bounds: XTypeName, nullable: Boolean = false) =
     EagerDelegate { name -> typeVariable(name.capitalized(), bounds.asIterable(), nullable) }
 
 internal interface JavaTypeVariableContainerInternal {

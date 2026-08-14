@@ -16,27 +16,22 @@ sealed interface KotlinTypeVariableContainer : PoetesseKotlinScope {
 }
 
 fun KotlinTypeVariableContainer.typeVariable(
-    name: String, bounds: Iterable<XTypeName<*, *>> = emptyList(),
-    variance: XVariance? = null, reified: Boolean = false,
+    name: String, bounds: Iterable<XTypeName> = emptyList(), variance: XVariance? = null, reified: Boolean = false,
     nullable: Boolean = false,
 ) = +XTypeVariableName(settings, name, bounds.toList(), variance, reified, nullable)
 
 fun KotlinTypeVariableContainer.typeVariable(
-    name: String, vararg bounds: XTypeName<*, *>,
-    variance: XVariance? = null, reified: Boolean = false,
+    name: String, vararg bounds: XTypeName, variance: XVariance? = null, reified: Boolean = false,
     nullable: Boolean = false,
 ) = typeVariable(name, bounds.asIterable(), variance, reified, nullable)
 
 fun KotlinTypeVariableContainer.typeVariable(
-    bounds: Iterable<XTypeName<*, *>> = emptyList(),
-    variance: XVariance? = null, reified: Boolean = false,
+    bounds: Iterable<XTypeName> = emptyList(), variance: XVariance? = null, reified: Boolean = false,
     nullable: Boolean = false,
 ) = EagerDelegate { name -> typeVariable(name.capitalized(), bounds, variance, reified, nullable) }
 
 fun KotlinTypeVariableContainer.typeVariable(
-    vararg bounds: XTypeName<*, *>,
-    variance: XVariance? = null, reified: Boolean = false,
-    nullable: Boolean = false,
+    vararg bounds: XTypeName, variance: XVariance? = null, reified: Boolean = false, nullable: Boolean = false,
 ) = EagerDelegate { name -> typeVariable(name.capitalized(), bounds.asIterable(), variance, reified, nullable) }
 
 internal interface KotlinTypeVariableContainerInternal {

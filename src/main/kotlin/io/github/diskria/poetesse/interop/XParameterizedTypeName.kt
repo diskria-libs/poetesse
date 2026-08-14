@@ -10,9 +10,9 @@ import io.github.diskria.poetesse.kotlin.KPParameterizedTypeName
 class XParameterizedTypeName internal constructor(
     override val settings: Poetesse.Settings,
     private val rawType: XClassName,
-    private val typeArguments: List<XTypeName<*, *>>,
+    private val typeArguments: List<XTypeName>,
     override val isNullable: Boolean,
-) : XTypeName<KPParameterizedTypeName, JPParameterizedTypeName>() {
+) : XTypedTypeName<KPParameterizedTypeName, JPParameterizedTypeName>() {
 
     override fun interopToKotlinInternal(): KPParameterizedTypeName =
         rawType.interopToKotlin()
@@ -34,9 +34,9 @@ internal fun JPParameterizedTypeName.asXParameterizedTypeName(nullable: Boolean 
     XParameterizedTypeName(scope.settings, rawType().asX<XClassName>(), typeArguments().map { it.toXType() }, nullable)
 
 fun XClassName.generic(
-    typeArguments: Iterable<XTypeName<*, *>>,
+    typeArguments: Iterable<XTypeName>,
     nullable: Boolean = isNullable,
 ): XParameterizedTypeName = XParameterizedTypeName(settings, this, typeArguments.toList(), nullable)
 
-fun XClassName.generic(vararg typeArguments: XTypeName<*, *>, nullable: Boolean = isNullable): XParameterizedTypeName =
+fun XClassName.generic(vararg typeArguments: XTypeName, nullable: Boolean = isNullable): XParameterizedTypeName =
     generic(typeArguments.asIterable(), nullable)

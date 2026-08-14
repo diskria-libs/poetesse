@@ -11,13 +11,15 @@ class KotlinPropertyGetterScope private constructor(
     KotlinModifierContainer.WithVisibility,
     KotlinBodyContainer {
 
+    internal typealias Block = KotlinPropertyGetterScope.() -> Unit
+
     internal val annotationContainer = KotlinAnnotationContainerInternal.of(
         append = { specBuilder.addAnnotation(it) },
     )
     internal val modifierContainer = KotlinModifierContainerInternal.of(
         append = { specBuilder.addModifiers(*it) }
     )
-    internal val bodyContainer = KotlinBodyContainerInternal.of(
+    internal val statementContainer = KotlinBodyContainerInternal.of(
         append = { specBuilder.addStatement(it) },
     )
 
@@ -37,7 +39,6 @@ class KotlinPropertyGetterScope private constructor(
         specBuilder.build()
 
     internal companion object {
-        fun of(settings: Poetesse.Settings): KotlinPropertyGetterScope =
-            KotlinPropertyGetterScope(settings, KPFunction.getterBuilder())
+        fun of(settings: Poetesse.Settings) = KotlinPropertyGetterScope(settings, KPFunction.getterBuilder())
     }
 }

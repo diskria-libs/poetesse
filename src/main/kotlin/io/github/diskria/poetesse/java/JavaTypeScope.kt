@@ -18,6 +18,8 @@ class JavaTypeScope private constructor(
     JavaAnnotationContainer,
     JavaModifierContainer.WithVisibility {
 
+    internal typealias Block = JavaTypeScope.(className: XClassName) -> Unit
+
     internal val typeVariableContainer = JavaTypeVariableContainerInternal.of(
         append = { specBuilder.addTypeVariable(it) }
     )
@@ -49,14 +51,14 @@ class JavaTypeScope private constructor(
         modifiers(JPModifier.STATIC)
     }
 
-    fun sealed(permits: Iterable<XTypeName<*, *>>) {
+    fun sealed(permits: Iterable<XTypeName>) {
         modifiers(JPModifier.SEALED)
         permits.forEach {
             specBuilder.addPermittedSubclass(it.interopToJava())
         }
     }
 
-    fun sealed(vararg permits: XTypeName<*, *>) {
+    fun sealed(vararg permits: XTypeName) {
         sealed(permits.asIterable())
     }
 
@@ -68,11 +70,11 @@ class JavaTypeScope private constructor(
         modifiers(JPModifier.STRICTFP)
     }
 
-    fun initializerBlock(block: JavaCodeBlockBuilder) {
+    fun initializerBlock(block: JavaCodeBlockScope.Block = {}) {
         specBuilder.addInitializerBlock(JavaCodeBlockScope.of(settings, block).build())
     }
 
-    fun staticBlock(block: JavaCodeBlockBuilder) {
+    fun staticBlock(block: JavaCodeBlockScope.Block = {}) {
         specBuilder.addStaticBlock(JavaCodeBlockScope.of(settings, block).build())
     }
 
@@ -80,7 +82,7 @@ class JavaTypeScope private constructor(
         specBuilder.build()
 
     internal companion object {
-        fun of(settings: Poetesse.Settings, kind: JPTypeKind, name: String, className: XClassName): JavaTypeScope =
+        fun of(settings: Poetesse.Settings, kind: JPTypeKind, name: String, className: XClassName) =
             JavaTypeScope(
                 settings,
                 className,

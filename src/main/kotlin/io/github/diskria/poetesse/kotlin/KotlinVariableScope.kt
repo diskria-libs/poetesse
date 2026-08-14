@@ -7,10 +7,12 @@ import io.github.diskria.poetesse.interop.XTypeName
 class KotlinVariableScope internal constructor(
     override val settings: Poetesse.Settings,
     val name: String,
-    private val type: XTypeName<*, *>?,
+    private val type: XTypeName?,
 ) : PoetesseKotlinScope,
     KotlinAnnotationContainer,
     KotlinModifierContainer {
+
+    internal typealias Block = KotlinVariableScope.() -> Unit
 
     private var isMutable: Boolean = false
     private val modifiers: MutableList<KPModifier> = mutableListOf()

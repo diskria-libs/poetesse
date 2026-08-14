@@ -59,3 +59,10 @@ private val JavaModifierContainer.internal: JavaModifierContainerInternal
         is JavaParameterScope -> modifierContainer
         is JavaVariableScope -> modifierContainer
     }
+
+enum class JavaVisibility {
+    PUBLIC,
+    PROTECTED,
+    PACKAGE_PRIVATE,
+    PRIVATE,
+}

@@ -6,7 +6,7 @@ sealed interface KotlinConstructorContainer : KotlinConstructorFactory {
         internal.append(spec, isPrimary)
     }
 
-    fun constructor(primary: Boolean = false, block: KotlinConstructorScope.() -> Unit = {}) =
+    fun constructor(primary: Boolean = false, block: KotlinConstructorScope.Block = {}) =
         +factory.constructor(primary, block)
 }
 

@@ -11,6 +11,8 @@ class JavaParameterScope private constructor(
     JavaAnnotationContainer,
     JavaModifierContainer {
 
+    internal typealias Block = JavaParameterScope.() -> Unit
+
     internal val annotationContainer = JavaAnnotationContainerInternal.of(
         append = { specBuilder.addAnnotation(it) },
     )
@@ -26,7 +28,7 @@ class JavaParameterScope private constructor(
         specBuilder.build()
 
     internal companion object {
-        fun of(settings: Poetesse.Settings, name: String, type: XTypeName<*, *>): JavaParameterScope =
+        fun of(settings: Poetesse.Settings, name: String, type: XTypeName) =
             JavaParameterScope(settings, JPParameter.builder(type.interopToJava(), name))
     }
 }

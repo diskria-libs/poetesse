@@ -7,31 +7,31 @@ import kotlin.reflect.KClass
 
 interface KotlinParameterFactory : PoetesseKotlinScope
 
-fun KotlinParameterFactory.parameter(name: String, type: XTypeName<*, *>, block: KotlinParameterScope.() -> Unit) =
+fun KotlinParameterFactory.parameter(name: String, type: XTypeName, block: KotlinParameterScope.Block = {}) =
     KotlinParameterRef(name) { KotlinParameterScope.of(settings, name, type).apply(block).build() }
 
-fun KotlinParameterFactory.parameter(type: XTypeName<*, *>, block: KotlinParameterScope.() -> Unit = {}) =
+fun KotlinParameterFactory.parameter(type: XTypeName, block: KotlinParameterScope.Block = {}) =
     LazyDelegate { name -> parameter(name, type, block) }
 
 fun KotlinParameterFactory.parameter(
-    name: String, type: KClass<*>, nullable: Boolean = false, block: KotlinParameterScope.() -> Unit = {}
+    name: String, type: KClass<*>, nullable: Boolean = false, block: KotlinParameterScope.Block = {}
 ) = parameter(name, xType(type, nullable = nullable), block)
 
 fun KotlinParameterFactory.parameter(
-    type: KClass<*>, nullable: Boolean = false, block: KotlinParameterScope.() -> Unit = {}
+    type: KClass<*>, nullable: Boolean = false, block: KotlinParameterScope.Block = {}
 ) = LazyDelegate { name -> parameter(name, type, nullable, block) }
 
 inline fun <reified T> KotlinParameterFactory.parameter(
-    name: String, nullable: Boolean = true, noinline block: KotlinParameterScope.() -> Unit = {}
+    name: String, nullable: Boolean = true, noinline block: KotlinParameterScope.Block = {}
 ) = parameter(name, T::class, nullable, block)
 
 inline fun <reified T : Any> KotlinParameterFactory.parameter(
-    name: String, noinline block: KotlinParameterScope.() -> Unit = {}
+    name: String, noinline block: KotlinParameterScope.Block = {}
 ) = parameter<T>(name, nullable = false, block)
 
 inline fun <reified T> KotlinParameterFactory.parameter(
-    nullable: Boolean = true, noinline block: KotlinParameterScope.() -> Unit = {}
+    nullable: Boolean = true, noinline block: KotlinParameterScope.Block = {}
 ) = LazyDelegate { name -> parameter<T>(name, nullable, block) }
 
-inline fun <reified T : Any> KotlinParameterFactory.parameter(noinline block: KotlinParameterScope.() -> Unit = {}) =
+inline fun <reified T : Any> KotlinParameterFactory.parameter(noinline block: KotlinParameterScope.Block = {}) =
     parameter<T>(nullable = false, block)

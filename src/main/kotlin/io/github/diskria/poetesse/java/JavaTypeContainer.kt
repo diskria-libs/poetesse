@@ -10,22 +10,22 @@ sealed interface JavaTypeContainer : JavaTypeFactory {
         return className
     }
 
-    fun type(kind: JPTypeKind, name: String, block: JavaTypeScope.(className: XClassName) -> Unit = {}): XClassName =
+    fun type(kind: JPTypeKind, name: String, block: JavaTypeScope.Block = {}) =
         +factory.type(kind, name, block)
 
-    fun class_(name: String, block: JavaTypeScope.(className: XClassName) -> Unit = {}): XClassName =
+    fun class_(name: String, block: JavaTypeScope.Block = {}) =
         +factory.class_(name, block)
 
-    fun record_(name: String, block: JavaTypeScope.(className: XClassName) -> Unit = {}): XClassName =
+    fun record_(name: String, block: JavaTypeScope.Block = {}) =
         +factory.record_(name, block)
 
-    fun interface_(name: String, block: JavaTypeScope.(className: XClassName) -> Unit = {}): XClassName =
+    fun interface_(name: String, block: JavaTypeScope.Block = {}) =
         +factory.interface_(name, block)
 
-    fun enum_(name: String, block: JavaTypeScope.(className: XClassName) -> Unit = {}): XClassName =
+    fun enum_(name: String, block: JavaTypeScope.Block = {}) =
         +factory.enum_(name, block)
 
-    fun annotation_(name: String, block: JavaTypeScope.(className: XClassName) -> Unit = {}): XClassName =
+    fun annotation_(name: String, block: JavaTypeScope.Block = {}) =
         +factory.annotation_(name, block)
 }
 

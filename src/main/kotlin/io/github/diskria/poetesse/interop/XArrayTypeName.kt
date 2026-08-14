@@ -14,9 +14,9 @@ import io.github.diskria.poetesse.kotlin.KPTypeName
 
 class XArrayTypeName internal constructor(
     override val settings: Poetesse.Settings,
-    val componentType: XTypeName<*, *>,
+    val componentType: XTypeName,
     override val isNullable: Boolean,
-) : XTypeName<KPTypeName, JPArrayTypeName>() {
+) : XTypedTypeName<KPTypeName, JPArrayTypeName>() {
 
     override fun interopToKotlinInternal(): KPTypeName =
         if (componentType is XPrimitiveTypeName && !componentType.isBoxed) {
@@ -52,5 +52,5 @@ context(scope: PoetesseScope)
 internal fun JPArrayTypeName.asXArrayTypeName(nullable: Boolean = false): XArrayTypeName =
     XArrayTypeName(scope.settings, componentType().toXType(), nullable)
 
-fun XTypeName<*, *>.array(nullable: Boolean = false): XArrayTypeName =
+fun XTypeName.array(nullable: Boolean = false): XArrayTypeName =
     XArrayTypeName(settings, this, nullable)

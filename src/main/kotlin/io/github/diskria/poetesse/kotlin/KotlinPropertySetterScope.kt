@@ -12,6 +12,8 @@ class KotlinPropertySetterScope private constructor(
     KotlinModifierContainer.WithVisibility,
     KotlinBodyContainer {
 
+    internal typealias Block = KotlinPropertySetterScope.() -> Unit
+
     internal val parameterContainer = KotlinParameterContainerInternal.of(
         append = { specBuilder.addParameter(it) }
     )
@@ -21,7 +23,7 @@ class KotlinPropertySetterScope private constructor(
     internal val modifierContainer = KotlinModifierContainerInternal.of(
         append = { specBuilder.addModifiers(*it) }
     )
-    internal val bodyContainer = KotlinBodyContainerInternal.of(
+    internal val statementContainer = KotlinBodyContainerInternal.of(
         append = { specBuilder.addStatement(it) },
     )
 
@@ -41,7 +43,6 @@ class KotlinPropertySetterScope private constructor(
         specBuilder.build()
 
     internal companion object {
-        fun of(settings: Poetesse.Settings): KotlinPropertySetterScope =
-            KotlinPropertySetterScope(settings, KPFunction.setterBuilder())
+        fun of(settings: Poetesse.Settings) = KotlinPropertySetterScope(settings, KPFunction.setterBuilder())
     }
 }

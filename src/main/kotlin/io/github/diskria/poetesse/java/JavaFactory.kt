@@ -13,9 +13,9 @@ class JavaFactory(
     JavaAnnotationFactory,
     JavaCodeBlockFactory {
 
-    fun file(packageName: String?, name: String, block: JavaFileScope.() -> Unit): JavaFileRef =
+    fun file(packageName: String?, name: String, block: JavaFileScope.Block): JavaFileRef =
         JavaFileScope.of(settings, packageName, name).apply(block).build(settings)
 
-    fun file(className: XClassName, block: JavaFileScope.() -> Unit): JavaFileRef =
+    fun file(className: XClassName, block: JavaFileScope.Block): JavaFileRef =
         file(className.packageName, className.simpleName, block)
 }

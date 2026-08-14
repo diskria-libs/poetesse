@@ -12,6 +12,8 @@ class KotlinFileScope private constructor(
     KotlinPropertyContainer,
     KotlinFunctionContainer {
 
+    internal typealias Block = KotlinFileScope.() -> Unit
+
     internal val typeContainer = KotlinTypeContainerInternal.of(
         appendType = { specBuilder.addType(it) },
         appendTypeAlias = { specBuilder.addTypeAlias(it) },
@@ -33,7 +35,7 @@ class KotlinFileScope private constructor(
     }
 
     internal companion object {
-        fun of(settings: Poetesse.Settings, packageName: String?, fileName: String): KotlinFileScope =
+        fun of(settings: Poetesse.Settings, packageName: String?, fileName: String) =
             KotlinFileScope(settings, packageName, fileName, KPFile.builder(packageName.orEmpty(), fileName))
     }
 }

@@ -4,7 +4,6 @@ import io.github.diskria.poetesse.EagerDelegate
 import io.github.diskria.poetesse.interop.XParameter
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.asXParameter
-import io.github.diskria.poetesse.xType
 import kotlin.reflect.KClass
 
 sealed interface JavaParameterContainer : JavaParameterFactory {
@@ -15,33 +14,33 @@ sealed interface JavaParameterContainer : JavaParameterFactory {
     }
 }
 
-fun JavaParameterContainer.parameter(name: String, type: XTypeName<*, *>, block: JavaParameterScope.() -> Unit = {}) =
+fun JavaParameterContainer.parameter(name: String, type: XTypeName, block: JavaParameterScope.Block = {}) =
     +factory.parameter(name, type, block)
 
-fun JavaParameterContainer.parameter(type: XTypeName<*, *>, block: JavaParameterScope.() -> Unit = {}) =
+fun JavaParameterContainer.parameter(type: XTypeName, block: JavaParameterScope.Block = {}) =
     EagerDelegate { name -> parameter(name, type, block) }
 
 fun JavaParameterContainer.parameter(
-    name: String, type: KClass<*>, nullable: Boolean = false, block: JavaParameterScope.() -> Unit = {}
-) = parameter(name, xType(type, nullable = nullable), block)
+    name: String, type: KClass<*>, nullable: Boolean = false, block: JavaParameterScope.Block = {}
+) = +factory.parameter(name, type, nullable, block)
 
 fun JavaParameterContainer.parameter(
-    type: KClass<*>, nullable: Boolean = false, block: JavaParameterScope.() -> Unit = {}
+    type: KClass<*>, nullable: Boolean = false, block: JavaParameterScope.Block = {}
 ) = EagerDelegate { name -> parameter(name, type, nullable, block) }
 
 inline fun <reified T> JavaParameterContainer.parameter(
-    name: String, nullable: Boolean = true, noinline block: JavaParameterScope.() -> Unit = {}
-) = parameter(name, T::class, nullable, block)
+    name: String, nullable: Boolean = true, noinline block: JavaParameterScope.Block = {}
+) = +factory.parameter<T>(name, nullable, block)
 
 inline fun <reified T : Any> JavaParameterContainer.parameter(
-    name: String, noinline block: JavaParameterScope.() -> Unit = {}
-) = parameter<T>(name, nullable = false, block)
+    name: String, noinline block: JavaParameterScope.Block = {}
+) = +factory.parameter<T>(name, block)
 
 inline fun <reified T> JavaParameterContainer.parameter(
-    nullable: Boolean = true, noinline block: JavaParameterScope.() -> Unit = {}
+    nullable: Boolean = true, noinline block: JavaParameterScope.Block = {}
 ) = EagerDelegate { name -> parameter<T>(name, nullable, block) }
 
-inline fun <reified T : Any> JavaParameterContainer.parameter(noinline block: JavaParameterScope.() -> Unit = {}) =
+inline fun <reified T : Any> JavaParameterContainer.parameter(noinline block: JavaParameterScope.Block = {}) =
     parameter<T>(nullable = false, block)
 
 internal interface JavaParameterContainerInternal {
@@ -57,7 +56,8 @@ internal interface JavaParameterContainerInternal {
     }
 }
 
-private val JavaParameterContainer.factory: JavaParameterFactory
+@PublishedApi
+internal val JavaParameterContainer.factory: JavaParameterFactory
     get() = this as JavaParameterFactory
 
 private val JavaParameterContainer.internal: JavaParameterContainerInternal

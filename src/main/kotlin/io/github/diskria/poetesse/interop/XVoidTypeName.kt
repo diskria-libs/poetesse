@@ -16,7 +16,7 @@ class XVoidTypeName internal constructor(
     override val settings: Poetesse.Settings,
     override val isBoxed: Boolean,
     override val isNullable: Boolean,
-) : XTypeName<KPTypeName, JPTypeName>() {
+) : XTypedTypeName<KPTypeName, JPTypeName>() {
 
     override fun interopToKotlinInternal(): KPTypeName = KPUnit
 

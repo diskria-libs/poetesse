@@ -12,6 +12,8 @@ class KotlinConstructorScope private constructor(
     KotlinModifierContainer.WithVisibility,
     KotlinBodyContainer {
 
+    internal typealias Block = KotlinConstructorScope.() -> Unit
+
     internal val parameterContainer = KotlinParameterContainerInternal.of(
         append = { specBuilder.addParameter(it) }
     )
@@ -21,7 +23,7 @@ class KotlinConstructorScope private constructor(
     internal val modifierContainer = KotlinModifierContainerInternal.of(
         append = { specBuilder.addModifiers(*it) }
     )
-    internal val bodyContainer = KotlinBodyContainerInternal.of(
+    internal val statementContainer = KotlinBodyContainerInternal.of(
         append = { specBuilder.addStatement(it) },
     )
 
@@ -37,7 +39,6 @@ class KotlinConstructorScope private constructor(
         specBuilder.build()
 
     internal companion object {
-        fun of(settings: Poetesse.Settings): KotlinConstructorScope =
-            KotlinConstructorScope(settings, KPFunction.constructorBuilder())
+        fun of(settings: Poetesse.Settings) = KotlinConstructorScope(settings, KPFunction.constructorBuilder())
     }
 }

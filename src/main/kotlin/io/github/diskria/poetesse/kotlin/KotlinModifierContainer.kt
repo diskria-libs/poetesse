@@ -62,3 +62,10 @@ private val KotlinModifierContainer.internal: KotlinModifierContainerInternal
         is KotlinParameterScope -> modifierContainer
         is KotlinVariableScope -> modifierContainer
     }
+
+enum class KotlinVisibility {
+    PUBLIC,
+    PROTECTED,
+    INTERNAL,
+    PRIVATE,
+}

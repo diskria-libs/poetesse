@@ -13,6 +13,8 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
     private val specBuilder: JPAnnotationBuilder,
 ) : PoetesseJavaScope {
 
+    internal typealias Block<A> = JavaAnnotationScope<A>.() -> Unit
+
     private typealias ArgumentProperty<A, V> = KProperty1<out A, V>
     private typealias ArrayArgumentProperty<A, E> = ArgumentProperty<A, Array<out E>>
 
@@ -97,19 +99,19 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
     }
 
     @JvmName("xTypeArgument")
-    fun argument(property: ArgumentProperty<A, KClass<*>>, value: XTypeName<*, *>) {
+    fun argument(property: ArgumentProperty<A, KClass<*>>, value: XTypeName) {
         argument(property.name) { expression.classLiteral(value) }
     }
 
     @JvmName("xTypeArrayArgument")
-    fun argument(property: ArrayArgumentProperty<A, KClass<*>>, values: Iterable<XTypeName<*, *>>) {
+    fun argument(property: ArrayArgumentProperty<A, KClass<*>>, values: Iterable<XTypeName>) {
         argument(property.name) {
             expression.arrayOf(values) { expression.classLiteral(it) }
         }
     }
 
     @JvmName("classNameArrayArgument")
-    fun argument(property: ArrayArgumentProperty<A, KClass<*>>, vararg values: XTypeName<*, *>) {
+    fun argument(property: ArrayArgumentProperty<A, KClass<*>>, vararg values: XTypeName) {
         argument(property, values.asIterable())
     }
 
@@ -141,7 +143,7 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
     @JvmName("annotationArgument")
     inline fun <reified Nested : Annotation> argument(
         property: ArgumentProperty<A, Nested>,
-        noinline block: JavaAnnotationScope<Nested>.() -> Unit = {}
+        noinline block: Block<Nested> = {}
     ) {
         argument(property, JavaTypedAnnotationRef {
             of<Nested>(settings, xClass<Nested>()).apply(block).build()
@@ -172,7 +174,7 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
 
     @PublishedApi
     internal companion object {
-        fun <A : Annotation> of(settings: Poetesse.Settings, className: XClassName): JavaAnnotationScope<A> =
-            JavaAnnotationScope(settings, JPAnnotation.builder(className.interopToJava(resolveNullability = false)))
+        fun <A : Annotation> of(settings: Poetesse.Settings, className: XClassName) =
+            JavaAnnotationScope<A>(settings, JPAnnotation.builder(className.interopToJava(resolveNullability = false)))
     }
 }

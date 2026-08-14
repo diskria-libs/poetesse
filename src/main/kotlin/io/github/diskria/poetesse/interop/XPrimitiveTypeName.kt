@@ -15,7 +15,7 @@ class XPrimitiveTypeName internal constructor(
     internal val kind: Kind,
     override val isBoxed: Boolean,
     override val isNullable: Boolean,
-) : XTypeName<KPClassName, JPTypeName>() {
+) : XTypedTypeName<KPClassName, JPTypeName>() {
 
     override fun interopToKotlinInternal(): KPClassName = kind.kotlin
 

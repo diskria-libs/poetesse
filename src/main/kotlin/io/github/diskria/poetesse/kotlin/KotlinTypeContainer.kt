@@ -16,37 +16,34 @@ sealed interface KotlinTypeContainer : KotlinTypeFactory {
         return internal.nestedClassName(name)
     }
 
-    fun typeAlias(
-        name: String,
-        type: XTypeName<*, *>,
-        block: KotlinTypeAliasScope.() -> Unit = {}
-    ) = +factory.typeAlias(name, type, block)
+    fun typeAlias(name: String, type: XTypeName, block: KotlinTypeAliasScope.Block = {}) =
+        +factory.typeAlias(name, type, block)
 
-    fun type(kind: KPTypeKind, name: String, block: KotlinTypeScope.(className: XClassName) -> Unit = {}): XClassName =
+    fun type(kind: KPTypeKind, name: String, block: KotlinTypeScope.Block = {}) =
         +factory.type(kind, name, block)
 
-    fun class_(name: String, block: KotlinTypeScope.(className: XClassName) -> Unit = {}): XClassName =
+    fun class_(name: String, block: KotlinTypeScope.Block = {}) =
         +factory.class_(name, block)
 
-    fun value_class_(name: String, block: KotlinTypeScope.(className: XClassName) -> Unit = {}): XClassName =
+    fun value_class_(name: String, block: KotlinTypeScope.Block = {}) =
         +factory.value_class_(name, block)
 
-    fun enum_class_(name: String, block: KotlinTypeScope.(className: XClassName) -> Unit = {}): XClassName =
+    fun enum_class_(name: String, block: KotlinTypeScope.Block = {}) =
         +factory.enum_class_(name, block)
 
-    fun data_class_(name: String, block: KotlinTypeScope.(className: XClassName) -> Unit = {}): XClassName =
+    fun data_class_(name: String, block: KotlinTypeScope.Block = {}) =
         +factory.data_class_(name, block)
 
-    fun annotation_class_(name: String, block: KotlinTypeScope.(className: XClassName) -> Unit = {}): XClassName =
+    fun annotation_class_(name: String, block: KotlinTypeScope.Block = {}) =
         +factory.annotation_class_(name, block)
 
-    fun object_(name: String, block: KotlinTypeScope.(className: XClassName) -> Unit = {}): XClassName =
+    fun object_(name: String, block: KotlinTypeScope.Block = {}) =
         +factory.object_(name, block)
 
-    fun interface_(name: String, block: KotlinTypeScope.(className: XClassName) -> Unit = {}): XClassName =
+    fun interface_(name: String, block: KotlinTypeScope.Block = {}) =
         +factory.interface_(name, block)
 
-    fun fun_interface_(name: String, block: KotlinTypeScope.(className: XClassName) -> Unit = {}): XClassName =
+    fun fun_interface_(name: String, block: KotlinTypeScope.Block = {}) =
         +factory.fun_interface_(name, block)
 }
 

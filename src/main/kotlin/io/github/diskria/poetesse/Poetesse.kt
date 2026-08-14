@@ -24,7 +24,7 @@ class Poetesse private constructor(override val settings: Settings) : PoetesseKo
 
         fun isNullable(typeName: JPTypeName): Boolean
 
-        fun <J : JPTypeName> setNullable(typeName: JPTypeName, isNullable: Boolean): J
+        fun setNullable(typeName: JPTypeName, isNullable: Boolean): JPTypeName
 
         companion object {
             val Default: JavaNullabilityResolver = object : JavaNullabilityResolver {
@@ -36,9 +36,9 @@ class Poetesse private constructor(override val settings: Settings) : PoetesseKo
                     typeName.annotations().any { it.type() == nullableAnnotationType }
 
                 @Suppress("UNCHECKED_CAST")
-                override fun <J : JPTypeName> setNullable(typeName: JPTypeName, isNullable: Boolean): J {
+                override fun setNullable(typeName: JPTypeName, isNullable: Boolean): JPTypeName {
                     val annotationType = if (isNullable) nullableAnnotationType else notNullAnnotationType
-                    return typeName.annotated(JPAnnotation.builder(annotationType).build()) as J
+                    return typeName.annotated(JPAnnotation.builder(annotationType).build())
                 }
             }
         }

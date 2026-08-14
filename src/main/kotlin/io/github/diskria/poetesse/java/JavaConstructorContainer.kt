@@ -6,7 +6,7 @@ sealed interface JavaConstructorContainer : JavaConstructorFactory {
         internal.append(spec)
     }
 
-    fun constructor(block: JavaConstructorScope.() -> Unit = {}) =
+    fun constructor(block: JavaConstructorScope.Block = {}) =
         +factory.constructor(block)
 }
 

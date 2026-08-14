@@ -5,7 +5,7 @@ import io.github.diskria.poetesse.java.JPParameter
 import io.github.diskria.poetesse.kotlin.KPParameter
 import io.github.diskria.poetesse.xType
 
-class XParameter(val name: String = "", val type: XTypeName<*, *>) {
+class XParameter(val name: String = "", val type: XTypeName) {
 
     fun interopToKotlin(fallbackName: String): KPParameter =
         KPParameter(name.ifEmpty { fallbackName }, type.interopToKotlin())

@@ -12,6 +12,8 @@ class KotlinTypeAliasScope private constructor(
     KotlinAnnotationContainer,
     KotlinModifierContainer.WithVisibility {
 
+    internal typealias Block = KotlinTypeAliasScope.() -> Unit
+
     internal val typeVariableContainer = KotlinTypeVariableContainerInternal.of(
         append = { specBuilder.addTypeVariable(it) }
     )
@@ -26,7 +28,7 @@ class KotlinTypeAliasScope private constructor(
         specBuilder.build()
 
     internal companion object {
-        fun of(settings: Poetesse.Settings, name: String, type: XTypeName<*, *>): KotlinTypeAliasScope =
+        fun of(settings: Poetesse.Settings, name: String, type: XTypeName) =
             KotlinTypeAliasScope(settings, KPTypeAlias.builder(name, type.interopToKotlin()))
     }
 }

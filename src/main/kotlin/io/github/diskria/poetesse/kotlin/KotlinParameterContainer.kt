@@ -4,7 +4,6 @@ import io.github.diskria.poetesse.EagerDelegate
 import io.github.diskria.poetesse.interop.XParameter
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.asXParameter
-import io.github.diskria.poetesse.xType
 import kotlin.reflect.KClass
 
 sealed interface KotlinParameterContainer : KotlinParameterFactory {
@@ -15,36 +14,33 @@ sealed interface KotlinParameterContainer : KotlinParameterFactory {
     }
 }
 
-fun KotlinParameterContainer.parameter(
-    name: String,
-    type: XTypeName<*, *>,
-    block: KotlinParameterScope.() -> Unit = {}
-) = +factory.parameter(name, type, block)
+fun KotlinParameterContainer.parameter(name: String, type: XTypeName, block: KotlinParameterScope.Block = {}) =
+    +factory.parameter(name, type, block)
 
-fun KotlinParameterContainer.parameter(type: XTypeName<*, *>, block: KotlinParameterScope.() -> Unit = {}) =
+fun KotlinParameterContainer.parameter(type: XTypeName, block: KotlinParameterScope.Block = {}) =
     EagerDelegate { name -> parameter(name, type, block) }
 
 fun KotlinParameterContainer.parameter(
-    name: String, type: KClass<*>, nullable: Boolean = false, block: KotlinParameterScope.() -> Unit = {}
-) = parameter(name, xType(type, nullable = nullable), block)
+    name: String, type: KClass<*>, nullable: Boolean = false, block: KotlinParameterScope.Block = {}
+) = +factory.parameter(name, type, nullable, block)
 
 fun KotlinParameterContainer.parameter(
-    type: KClass<*>, nullable: Boolean = false, block: KotlinParameterScope.() -> Unit = {}
+    type: KClass<*>, nullable: Boolean = false, block: KotlinParameterScope.Block = {}
 ) = EagerDelegate { name -> parameter(name, type, nullable, block) }
 
 inline fun <reified T> KotlinParameterContainer.parameter(
-    name: String, nullable: Boolean = true, noinline block: KotlinParameterScope.() -> Unit = {}
-) = parameter(name, T::class, nullable, block)
+    name: String, nullable: Boolean = true, noinline block: KotlinParameterScope.Block = {}
+) = +factory.parameter<T>(name, nullable, block)
 
 inline fun <reified T : Any> KotlinParameterContainer.parameter(
-    name: String, noinline block: KotlinParameterScope.() -> Unit = {}
-) = parameter<T>(name, nullable = false, block)
+    name: String, noinline block: KotlinParameterScope.Block = {}
+) = +factory.parameter<T>(name, block)
 
 inline fun <reified T> KotlinParameterContainer.parameter(
-    nullable: Boolean = true, noinline block: KotlinParameterScope.() -> Unit = {}
+    nullable: Boolean = true, noinline block: KotlinParameterScope.Block = {}
 ) = EagerDelegate { name -> parameter<T>(name, nullable, block) }
 
-inline fun <reified T : Any> KotlinParameterContainer.parameter(noinline block: KotlinParameterScope.() -> Unit = {}) =
+inline fun <reified T : Any> KotlinParameterContainer.parameter(noinline block: KotlinParameterScope.Block = {}) =
     parameter<T>(nullable = false, block)
 
 internal interface KotlinParameterContainerInternal {
@@ -60,7 +56,8 @@ internal interface KotlinParameterContainerInternal {
     }
 }
 
-private val KotlinParameterContainer.factory: KotlinParameterFactory
+@PublishedApi
+internal val KotlinParameterContainer.factory: KotlinParameterFactory
     get() = this as KotlinParameterFactory
 
 private val KotlinParameterContainer.internal: KotlinParameterContainerInternal

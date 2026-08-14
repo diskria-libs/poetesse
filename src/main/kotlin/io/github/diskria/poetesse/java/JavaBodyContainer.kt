@@ -4,7 +4,7 @@ import io.github.diskria.poetesse.Poetesse
 
 sealed interface JavaBodyContainer : PoetesseJavaScope
 
-fun JavaBodyContainer.body(block: JavaBodyScope.() -> Unit) {
+fun JavaBodyContainer.body(block: JavaBodyScope.Block = {}) {
     JavaBodyScope(settings, internal::append).apply(block)
 }
 
@@ -25,11 +25,14 @@ class JavaBodyScope(
     override val settings: Poetesse.Settings,
     append: (statement: JPCodeBlock) -> Unit,
 ) : JavaCodeBlockContainer {
+
+    internal typealias Block = JavaBodyScope.() -> Unit
+
     internal val codeBlockContainer = JavaCodeBlockContainerInternal.of(append)
 }
 
 private val JavaBodyContainer.internal: JavaBodyContainerInternal
     get() = when (this) {
-        is JavaConstructorScope -> bodyContainer
-        is JavaMethodScope -> bodyContainer
+        is JavaConstructorScope -> statementContainer
+        is JavaMethodScope -> statementContainer
     }

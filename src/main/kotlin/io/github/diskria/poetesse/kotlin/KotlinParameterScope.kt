@@ -11,6 +11,8 @@ class KotlinParameterScope private constructor(
     KotlinAnnotationContainer,
     KotlinModifierContainer {
 
+    internal typealias Block = KotlinParameterScope.() -> Unit
+
     internal val annotationContainer = KotlinAnnotationContainerInternal.of(
         append = { specBuilder.addAnnotation(it) },
     )
@@ -34,7 +36,7 @@ class KotlinParameterScope private constructor(
         specBuilder.build()
 
     internal companion object {
-        fun of(settings: Poetesse.Settings, name: String, type: XTypeName<*, *>): KotlinParameterScope =
+        fun of(settings: Poetesse.Settings, name: String, type: XTypeName) =
             KotlinParameterScope(settings, KPParameter.builder(name, type.interopToKotlin()))
     }
 }

@@ -15,7 +15,7 @@ class XClassName internal constructor(
     val packageName: String?,
     val simpleNames: List<String>,
     override val isNullable: Boolean,
-) : XTypeName<KPClassName, JPClassName>() {
+) : XTypedTypeName<KPClassName, JPClassName>() {
 
     val simpleName: String = simpleNames.last()
     val nestedName: String = simpleNames.joinToString(".")

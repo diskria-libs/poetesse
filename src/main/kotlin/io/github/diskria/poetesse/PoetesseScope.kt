@@ -13,19 +13,19 @@ interface PoetesseScope {
     val settings: Poetesse.Settings
 }
 
-fun PoetesseScope.xType(kp: KPTypeName, nullable: Boolean = kp.isNullable, boxed: Boolean = nullable): XTypeName<*, *> =
+fun PoetesseScope.xType(kp: KPTypeName, nullable: Boolean = kp.isNullable, boxed: Boolean = nullable): XTypeName =
     kp.setNullable(nullable).toXType(boxed)
 
-fun PoetesseScope.xType(type: KClass<*>, nullable: Boolean = false, boxed: Boolean = nullable): XTypeName<*, *> =
+fun PoetesseScope.xType(type: KClass<*>, nullable: Boolean = false, boxed: Boolean = nullable): XTypeName =
     type.toXType(nullable, boxed)
 
 inline fun <reified T> PoetesseScope.xType(nullable: Boolean = true, boxed: Boolean = nullable) =
     xType(T::class, nullable, boxed)
 
-inline fun <reified T : Any> PoetesseScope.xType(boxed: Boolean = false): XTypeName<*, *> =
+inline fun <reified T : Any> PoetesseScope.xType(boxed: Boolean = false): XTypeName =
     xType<T>(nullable = false, boxed = boxed)
 
-fun PoetesseScope.xType(jp: JPTypeName, nullable: Boolean = false): XTypeName<*, *> =
+fun PoetesseScope.xType(jp: JPTypeName, nullable: Boolean = false): XTypeName =
     jp.toXType(nullable)
 
 fun PoetesseScope.xClass(kp: KPClassName, nullable: Boolean = kp.isNullable): XClassName =
@@ -51,7 +51,7 @@ inline fun <reified T : Any> PoetesseScope.xClass(): XClassName =
 
 fun PoetesseScope.typeVariable(
     name: String,
-    bounds: Iterable<XTypeName<*, *>> = emptyList(),
+    bounds: Iterable<XTypeName> = emptyList(),
     variance: XVariance? = null,
     reified: Boolean = false,
     nullable: Boolean = false,
@@ -59,21 +59,21 @@ fun PoetesseScope.typeVariable(
 
 fun PoetesseScope.typeVariable(
     name: String,
-    vararg bounds: XTypeName<*, *>,
+    vararg bounds: XTypeName,
     variance: XVariance? = null,
     reified: Boolean = false,
     nullable: Boolean = false,
 ) = typeVariable(name, bounds.asIterable(), variance, reified, nullable)
 
 fun PoetesseScope.typeVariable(
-    bounds: Iterable<XTypeName<*, *>> = emptyList(),
+    bounds: Iterable<XTypeName> = emptyList(),
     variance: XVariance? = null,
     reified: Boolean = false,
     nullable: Boolean = false,
 ) = EagerDelegate { name -> typeVariable(name.capitalized(), bounds, variance, reified, nullable) }
 
 fun PoetesseScope.typeVariable(
-    vararg bounds: XTypeName<*, *>,
+    vararg bounds: XTypeName,
     variance: XVariance? = null,
     reified: Boolean = false,
     nullable: Boolean = false,

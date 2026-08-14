@@ -17,6 +17,8 @@ class KotlinFunctionScope private constructor(
     KotlinModifierContainer.WithVisibility,
     KotlinBodyContainer {
 
+    internal typealias Block = KotlinFunctionScope.() -> Unit
+
     internal val typeVariableContainer = KotlinTypeVariableContainerInternal.of(
         append = { specBuilder.addTypeVariable(it) }
     )
@@ -29,7 +31,7 @@ class KotlinFunctionScope private constructor(
     internal val modifierContainer = KotlinModifierContainerInternal.of(
         append = { specBuilder.addModifiers(*it) }
     )
-    internal val bodyContainer = KotlinBodyContainerInternal.of(
+    internal val statementContainer = KotlinBodyContainerInternal.of(
         append = { specBuilder.addStatement(it) },
     )
 
@@ -81,7 +83,7 @@ class KotlinFunctionScope private constructor(
         modifiers(KPModifier.OPERATOR)
     }
 
-    fun returns(type: XTypeName<*, *>) {
+    fun returns(type: XTypeName) {
         specBuilder.returns(type.interopToKotlin())
     }
 
@@ -98,7 +100,6 @@ class KotlinFunctionScope private constructor(
         specBuilder.build()
 
     internal companion object {
-        fun of(settings: Poetesse.Settings, name: String): KotlinFunctionScope =
-            KotlinFunctionScope(settings, KPFunction.builder(name))
+        fun of(settings: Poetesse.Settings, name: String) = KotlinFunctionScope(settings, KPFunction.builder(name))
     }
 }

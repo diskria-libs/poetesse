@@ -21,45 +21,42 @@ sealed interface JavaCodeBlockContainer : JavaCodeBlockFactory {
     }
 }
 
-fun JavaCodeBlockContainer.variable(
-    name: String, type: XTypeName<*, *>?, block: JavaVariableScope.() -> Unit
-): String {
+fun JavaCodeBlockContainer.variable(name: String, type: XTypeName?, block: JavaVariableScope.Block = {}): String {
     line(JavaVariableScope(settings, name, type).apply(block).build())
     return name
 }
 
 @JvmName("variableUntyped")
-fun JavaCodeBlockContainer.variable(name: String, block: JavaVariableScope.() -> Unit) =
+fun JavaCodeBlockContainer.variable(name: String, block: JavaVariableScope.Block = {}) =
     variable(name, type = null, block)
 
 fun JavaCodeBlockContainer.variable(
-    name: String, type: KClass<*>, nullable: Boolean = false, block: JavaVariableScope.() -> Unit
+    name: String, type: KClass<*>, nullable: Boolean = false, block: JavaVariableScope.Block = {}
 ) = variable(name, xType(type, nullable = nullable), block)
 
-fun JavaCodeBlockContainer.variable(
-    type: KClass<*>, nullable: Boolean = false, block: JavaVariableScope.() -> Unit
-) = EagerDelegate { name -> variable(name, type, nullable, block) }
+fun JavaCodeBlockContainer.variable(type: KClass<*>, nullable: Boolean = false, block: JavaVariableScope.Block = {}) =
+    EagerDelegate { name -> variable(name, type, nullable, block) }
 
-fun JavaCodeBlockContainer.variable(type: XTypeName<*, *>, block: JavaVariableScope.() -> Unit) =
+fun JavaCodeBlockContainer.variable(type: XTypeName, block: JavaVariableScope.Block = {}) =
     EagerDelegate { name -> variable(name, type, block) }
 
 @JvmName("variableUntypedDelegate")
-fun JavaCodeBlockContainer.variable(block: JavaVariableScope.() -> Unit) =
+fun JavaCodeBlockContainer.variable(block: JavaVariableScope.Block = {}) =
     EagerDelegate { name -> variable(name, type = null, block) }
 
 inline fun <reified T> JavaCodeBlockContainer.variable(
-    name: String, nullable: Boolean = true, noinline block: JavaVariableScope.() -> Unit
+    name: String, nullable: Boolean = true, noinline block: JavaVariableScope.Block = {}
 ) = variable(name, T::class, nullable, block)
 
 inline fun <reified T : Any> JavaCodeBlockContainer.variable(
-    name: String, noinline block: JavaVariableScope.() -> Unit
+    name: String, noinline block: JavaVariableScope.Block = {}
 ) = variable<T>(name, nullable = false, block)
 
 inline fun <reified T> JavaCodeBlockContainer.variable(
-    nullable: Boolean = true, noinline block: JavaVariableScope.() -> Unit
+    nullable: Boolean = true, noinline block: JavaVariableScope.Block = {}
 ) = EagerDelegate { name -> variable<T>(name, nullable, block) }
 
-inline fun <reified T : Any> JavaCodeBlockContainer.variable(noinline block: JavaVariableScope.() -> Unit) =
+inline fun <reified T : Any> JavaCodeBlockContainer.variable(noinline block: JavaVariableScope.Block = {}) =
     variable<T>(nullable = false, block)
 
 internal interface JavaCodeBlockContainerInternal {

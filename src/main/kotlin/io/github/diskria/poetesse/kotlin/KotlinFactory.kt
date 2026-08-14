@@ -13,9 +13,9 @@ class KotlinFactory(
     KotlinAnnotationFactory,
     KotlinCodeBlockFactory {
 
-    fun file(packageName: String?, name: String, block: KotlinFileScope.() -> Unit): KotlinFileRef =
+    fun file(packageName: String?, name: String, block: KotlinFileScope.Block = {}): KotlinFileRef =
         KotlinFileScope.of(settings, packageName, name).apply(block).build(settings)
 
-    fun file(className: XClassName, block: KotlinFileScope.() -> Unit): KotlinFileRef =
+    fun file(className: XClassName, block: KotlinFileScope.Block = {}): KotlinFileRef =
         file(className.packageName, className.simpleName, block)
 }
