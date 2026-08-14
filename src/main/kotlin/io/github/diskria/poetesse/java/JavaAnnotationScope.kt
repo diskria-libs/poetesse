@@ -181,6 +181,6 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
     @PublishedApi
     internal companion object {
         fun <A : Annotation> of(settings: Poetesse.Settings, className: XClassName): JavaAnnotationScope<A> =
-            JavaAnnotationScope(settings, JPAnnotation.builder(className.interopToJava()))
+            JavaAnnotationScope(settings, JPAnnotation.builder(className.interopToJava(resolveNullability = false)))
     }
 }
