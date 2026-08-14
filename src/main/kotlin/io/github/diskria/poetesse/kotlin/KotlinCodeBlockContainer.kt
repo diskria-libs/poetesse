@@ -8,7 +8,7 @@ import kotlin.reflect.KClass
 sealed interface KotlinCodeBlockContainer : KotlinCodeBlockFactory {
 
     operator fun KotlinCodeBlockRef.unaryPlus() {
-        codeBlocks.forEach { +it }
+        statements.forEach { +it }
     }
 
     fun line(build: KotlinCodeBuilder) {
@@ -77,8 +77,10 @@ internal interface KotlinCodeBlockContainerInternal {
 
 private val KotlinCodeBlockContainer.internal: KotlinCodeBlockContainerInternal
     get() = when (this) {
+        is KotlinPropertyGetterScope.BodyScope -> codeBlockContainer
+        is KotlinPropertySetterScope.BodyScope -> codeBlockContainer
         is KotlinConstructorScope.BodyScope -> codeBlockContainer
         is KotlinFunctionScope.BodyScope -> codeBlockContainer
-        is KotlinEmbeddedCodeBlockScope -> codeBlockContainer
+        is KotlinEmbeddableCodeBlockScope -> codeBlockContainer
         is KotlinCodeBlockScope -> codeBlockContainer
     }

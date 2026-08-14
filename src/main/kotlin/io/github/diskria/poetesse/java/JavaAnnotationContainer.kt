@@ -1,35 +1,25 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.interop.XClassName
-import io.github.diskria.poetesse.xClass
 import kotlin.reflect.KClass
 
 sealed interface JavaAnnotationContainer : JavaAnnotationFactory {
-
-    operator fun JavaAnnotationRef.unaryPlus() {
-        internal.append(spec)
-    }
+    operator fun JavaAnnotationRef.unaryPlus() = internal.append(spec)
 }
 
 fun <A : Annotation> JavaAnnotationContainer.annotation(
     className: XClassName,
     block: JavaAnnotationScope<A>.() -> Unit = {}
-) {
-    +factory.annotation(className, block)
-}
+) = +factory.annotation(className, block)
 
 fun <A : Annotation> JavaAnnotationContainer.annotation(
     type: KClass<out A>,
     block: JavaAnnotationScope<A>.() -> Unit = {}
-) {
-    annotation(xClass(type), block)
-}
+) = +factory.annotation(type, block)
 
 inline fun <reified A : Annotation> JavaAnnotationContainer.annotation(
     noinline block: JavaAnnotationScope<A>.() -> Unit = {}
-) {
-    annotation(A::class, block)
-}
+) = +factory.annotation<A>(block)
 
 internal interface JavaAnnotationContainerInternal {
 
@@ -44,7 +34,8 @@ internal interface JavaAnnotationContainerInternal {
     }
 }
 
-private val JavaAnnotationContainer.factory: JavaAnnotationFactory
+@PublishedApi
+internal val JavaAnnotationContainer.factory: JavaAnnotationFactory
     get() = this as JavaAnnotationFactory
 
 private val JavaAnnotationContainer.internal: JavaAnnotationContainerInternal

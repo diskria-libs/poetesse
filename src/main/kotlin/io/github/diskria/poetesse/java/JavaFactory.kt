@@ -2,12 +2,12 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseJava
-import io.github.diskria.poetesse.PoetesseScope
 import io.github.diskria.poetesse.interop.XClassName
 
 @PoetesseJava
-class JavaFactory(override val settings: Poetesse.Settings) : PoetesseScope,
-    JavaTypeFactory,
+class JavaFactory(
+    override val settings: Poetesse.Settings
+) : JavaTypeFactory,
     JavaFieldFactory,
     JavaConstructorFactory,
     JavaMethodFactory,

@@ -55,6 +55,8 @@ private val KotlinModifierContainer.internal: KotlinModifierContainerInternal
         is KotlinTypeScope -> modifierContainer
         is KotlinTypeAliasScope -> modifierContainer
         is KotlinPropertyScope -> modifierContainer
+        is KotlinPropertyGetterScope -> modifierContainer
+        is KotlinPropertySetterScope -> modifierContainer
         is KotlinConstructorScope -> modifierContainer
         is KotlinFunctionScope -> modifierContainer
         is KotlinParameterScope -> modifierContainer

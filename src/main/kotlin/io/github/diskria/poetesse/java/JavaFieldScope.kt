@@ -2,7 +2,6 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseJava
-import io.github.diskria.poetesse.PoetesseScope
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.interopToJava
 
@@ -10,8 +9,7 @@ import io.github.diskria.poetesse.interop.interopToJava
 class JavaFieldScope private constructor(
     override val settings: Poetesse.Settings,
     private val specBuilder: JPFieldBuilder
-) : PoetesseScope,
-    JavaAnnotationContainer,
+) : JavaAnnotationContainer,
     JavaModifierContainer.WithVisibility {
 
     internal val annotationContainer = JavaAnnotationContainerInternal.of(

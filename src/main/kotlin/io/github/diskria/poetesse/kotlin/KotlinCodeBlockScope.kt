@@ -25,10 +25,10 @@ class KotlinCodeBlockScope internal constructor(
     }
 }
 
-typealias KotlinEmbeddedCodeBlockBuilder = KotlinEmbeddedCodeBlockScope.() -> Unit
+typealias KotlinEmbeddableCodeBlockBuilder = KotlinEmbeddableCodeBlockScope.() -> Unit
 
 @PoetesseKotlin
-class KotlinEmbeddedCodeBlockScope internal constructor(
+class KotlinEmbeddableCodeBlockScope internal constructor(
     override val settings: Poetesse.Settings,
     internal val statements: MutableList<KPCodeBlock> = mutableListOf()
 ) : KotlinCodeBlockContainer {

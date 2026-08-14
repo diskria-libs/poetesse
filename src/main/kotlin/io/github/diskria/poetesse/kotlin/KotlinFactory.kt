@@ -2,12 +2,12 @@ package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseKotlin
-import io.github.diskria.poetesse.PoetesseScope
 import io.github.diskria.poetesse.interop.XClassName
 
 @PoetesseKotlin
-class KotlinFactory(override val settings: Poetesse.Settings) : PoetesseScope,
-    KotlinTypeFactory,
+class KotlinFactory(
+    override val settings: Poetesse.Settings
+) : KotlinTypeFactory,
     KotlinPropertyFactory,
     KotlinConstructorFactory,
     KotlinFunctionFactory,

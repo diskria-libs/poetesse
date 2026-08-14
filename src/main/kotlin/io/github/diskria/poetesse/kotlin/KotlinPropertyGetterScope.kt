@@ -5,16 +5,12 @@ import io.github.diskria.poetesse.PoetesseKotlin
 import io.github.diskria.poetesse.extensions.addStatement
 
 @PoetesseKotlin
-class KotlinConstructorScope private constructor(
+class KotlinPropertyGetterScope private constructor(
     override val settings: Poetesse.Settings,
-    private val specBuilder: KPFunctionBuilder
-) : KotlinParameterContainer,
-    KotlinAnnotationContainer,
+    internal val specBuilder: KPFunctionBuilder
+) : KotlinAnnotationContainer,
     KotlinModifierContainer.WithVisibility {
 
-    internal val parameterContainer = KotlinParameterContainerInternal.of(
-        append = { specBuilder.addParameter(it) }
-    )
     internal val annotationContainer = KotlinAnnotationContainerInternal.of(
         append = { specBuilder.addAnnotation(it) },
     )
@@ -28,6 +24,10 @@ class KotlinConstructorScope private constructor(
 
     fun actual() {
         modifiers(KPModifier.ACTUAL)
+    }
+
+    fun inline() {
+        modifiers(KPModifier.INLINE)
     }
 
     fun body(block: BodyScope.() -> Unit) {
@@ -44,12 +44,12 @@ class KotlinConstructorScope private constructor(
     @PoetesseKotlin
     inner class BodyScope(override val settings: Poetesse.Settings) : KotlinCodeBlockContainer {
         internal val codeBlockContainer = KotlinCodeBlockContainerInternal.of(
-            append = { this@KotlinConstructorScope.specBuilder.addStatement(it) }
+            append = { this@KotlinPropertyGetterScope.specBuilder.addStatement(it) }
         )
     }
 
     internal companion object {
-        fun of(settings: Poetesse.Settings): KotlinConstructorScope =
-            KotlinConstructorScope(settings, KPFunction.constructorBuilder())
+        fun of(settings: Poetesse.Settings): KotlinPropertyGetterScope =
+            KotlinPropertyGetterScope(settings, KPFunction.getterBuilder())
     }
 }

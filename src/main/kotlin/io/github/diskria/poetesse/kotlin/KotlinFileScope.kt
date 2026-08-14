@@ -2,7 +2,6 @@ package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseKotlin
-import io.github.diskria.poetesse.PoetesseScope
 import io.github.diskria.poetesse.xClass
 
 @PoetesseKotlin
@@ -11,8 +10,7 @@ class KotlinFileScope private constructor(
     private val packageName: String?,
     val fileName: String,
     private val specBuilder: KPFileBuilder,
-) : PoetesseScope,
-    KotlinTypeContainer,
+) : KotlinTypeContainer,
     KotlinPropertyContainer,
     KotlinFunctionContainer {
 

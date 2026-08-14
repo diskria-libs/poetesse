@@ -14,19 +14,19 @@ sealed interface JavaTypeContainer : JavaTypeFactory {
         +factory.type(kind, name, block)
 
     fun class_(name: String, block: JavaTypeScope.(className: XClassName) -> Unit = {}): XClassName =
-        type(JPTypeKind.CLASS, name, block)
+        +factory.class_(name, block)
 
     fun record_(name: String, block: JavaTypeScope.(className: XClassName) -> Unit = {}): XClassName =
-        type(JPTypeKind.RECORD, name, block)
+        +factory.record_(name, block)
 
     fun interface_(name: String, block: JavaTypeScope.(className: XClassName) -> Unit = {}): XClassName =
-        type(JPTypeKind.INTERFACE, name, block)
+        +factory.interface_(name, block)
 
     fun enum_(name: String, block: JavaTypeScope.(className: XClassName) -> Unit = {}): XClassName =
-        type(JPTypeKind.ENUM, name, block)
+        +factory.enum_(name, block)
 
     fun annotation_(name: String, block: JavaTypeScope.(className: XClassName) -> Unit = {}): XClassName =
-        type(JPTypeKind.ANNOTATION, name, block)
+        +factory.annotation_(name, block)
 }
 
 internal interface JavaTypeContainerInternal {

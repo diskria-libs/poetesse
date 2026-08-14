@@ -24,10 +24,10 @@ class JavaCodeBlockScope internal constructor(
     }
 }
 
-typealias JavaEmbeddedCodeBlockBuilder = JavaEmbeddedCodeBlockScope.() -> Unit
+typealias JavaEmbeddableCodeBlockBuilder = JavaEmbeddableCodeBlockScope.() -> Unit
 
 @PoetesseJava
-class JavaEmbeddedCodeBlockScope internal constructor(
+class JavaEmbeddableCodeBlockScope internal constructor(
     override val settings: Poetesse.Settings,
     internal val statements: MutableList<JPCodeBlock> = mutableListOf()
 ) : JavaCodeBlockContainer {

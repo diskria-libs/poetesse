@@ -2,6 +2,6 @@ package io.github.diskria.poetesse.kotlin
 
 interface KotlinCodeBlockFactory : KotlinCodeFactory {
 
-    fun codeBlock(build: KotlinEmbeddedCodeBlockBuilder): KotlinCodeBlockRef =
-        KotlinCodeBlockRef { KotlinEmbeddedCodeBlockScope(settings).apply(build).statements }
+    fun codeBlock(build: KotlinEmbeddableCodeBlockBuilder): KotlinCodeBlockRef =
+        KotlinCodeBlockRef { KotlinEmbeddableCodeBlockScope(settings).apply(build).statements }
 }

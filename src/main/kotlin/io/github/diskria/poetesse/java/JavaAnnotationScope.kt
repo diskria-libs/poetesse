@@ -15,6 +15,7 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
     override val settings: Poetesse.Settings,
     private val specBuilder: JPAnnotationBuilder
 ) : PoetesseScope {
+
     private typealias ArgumentProperty<A, V> = KProperty1<out A, V>
     private typealias ArrayArgumentProperty<A, E> = ArgumentProperty<A, Array<out E>>
 
@@ -138,27 +139,27 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
     }
 
     @JvmName("annotationArgument")
-    inline fun <reified Embedded : Annotation> argument(
-        property: ArgumentProperty<A, Embedded>,
-        annotation: JavaTypedAnnotationRef<Embedded>,
+    inline fun <reified Nested : Annotation> argument(
+        property: ArgumentProperty<A, Nested>,
+        annotation: JavaTypedAnnotationRef<Nested>,
     ) {
         argument(property) { L(annotation) }
     }
 
     @JvmName("annotationArgument")
-    inline fun <reified Embedded : Annotation> argument(
-        property: ArgumentProperty<A, Embedded>,
-        noinline block: JavaAnnotationScope<Embedded>.() -> Unit = {}
+    inline fun <reified Nested : Annotation> argument(
+        property: ArgumentProperty<A, Nested>,
+        noinline block: JavaAnnotationScope<Nested>.() -> Unit = {}
     ) {
         argument(property, JavaTypedAnnotationRef {
-            of<Embedded>(settings, xClass<Embedded>()).apply(block).build()
+            of<Nested>(settings, xClass<Nested>()).apply(block).build()
         })
     }
 
     @JvmName("annotationArrayArgument")
-    inline fun <reified Embedded : Annotation> argument(
-        property: ArrayArgumentProperty<A, Embedded>,
-        values: Iterable<JavaTypedAnnotationRef<Embedded>>
+    inline fun <reified Nested : Annotation> argument(
+        property: ArrayArgumentProperty<A, Nested>,
+        values: Iterable<JavaTypedAnnotationRef<Nested>>
     ) {
         argument(property.name) {
             expression.arrayOf(values) { L(it) }
@@ -166,9 +167,9 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
     }
 
     @JvmName("annotationArrayArgument")
-    inline fun <reified Embedded : Annotation> argument(
-        property: ArrayArgumentProperty<A, Embedded>,
-        vararg values: JavaTypedAnnotationRef<Embedded>
+    inline fun <reified Nested : Annotation> argument(
+        property: ArrayArgumentProperty<A, Nested>,
+        vararg values: JavaTypedAnnotationRef<Nested>
     ) {
         argument(property, values.asIterable())
     }

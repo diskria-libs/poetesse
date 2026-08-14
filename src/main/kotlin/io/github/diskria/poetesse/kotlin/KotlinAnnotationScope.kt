@@ -139,27 +139,27 @@ class KotlinAnnotationScope<A : Annotation> internal constructor(
     }
 
     @JvmName("annotationArgument")
-    inline fun <reified Embedded : Annotation> argument(
-        property: ArgumentProperty<A, Embedded>,
-        annotation: KotlinTypedAnnotationRef<Embedded>,
+    inline fun <reified Nested : Annotation> argument(
+        property: ArgumentProperty<A, Nested>,
+        annotation: KotlinTypedAnnotationRef<Nested>,
     ) {
         argument(property) { L(annotation) }
     }
 
     @JvmName("annotationArgument")
-    inline fun <reified Embedded : Annotation> argument(
-        property: ArgumentProperty<A, Embedded>,
-        noinline block: KotlinAnnotationScope<Embedded>.() -> Unit = {}
+    inline fun <reified Nested : Annotation> argument(
+        property: ArgumentProperty<A, Nested>,
+        noinline block: KotlinAnnotationScope<Nested>.() -> Unit = {}
     ) {
         argument(property, KotlinTypedAnnotationRef {
-            of<Embedded>(settings, xClass<Embedded>()).apply(block).build()
+            of<Nested>(settings, xClass<Nested>()).apply(block).build()
         })
     }
 
     @JvmName("annotationArrayArgument")
-    inline fun <reified Embedded : Annotation> argument(
-        property: ArrayArgumentProperty<A, Embedded>,
-        values: Iterable<KotlinTypedAnnotationRef<Embedded>>
+    inline fun <reified Nested : Annotation> argument(
+        property: ArrayArgumentProperty<A, Nested>,
+        values: Iterable<KotlinTypedAnnotationRef<Nested>>
     ) {
         argument(property.name) {
             expression.arrayOf(values) { L(it) }
@@ -167,9 +167,9 @@ class KotlinAnnotationScope<A : Annotation> internal constructor(
     }
 
     @JvmName("annotationArrayArgument")
-    inline fun <reified Embedded : Annotation> argument(
-        property: ArrayArgumentProperty<A, Embedded>,
-        vararg values: KotlinTypedAnnotationRef<Embedded>
+    inline fun <reified Nested : Annotation> argument(
+        property: ArrayArgumentProperty<A, Nested>,
+        vararg values: KotlinTypedAnnotationRef<Nested>
     ) {
         argument(property, values.asIterable())
     }

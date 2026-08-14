@@ -52,6 +52,8 @@ private val KotlinAnnotationContainer.internal: KotlinAnnotationContainerInterna
         is KotlinTypeScope -> annotationContainer
         is KotlinTypeAliasScope -> annotationContainer
         is KotlinPropertyScope -> annotationContainer
+        is KotlinPropertyGetterScope -> annotationContainer
+        is KotlinPropertySetterScope -> annotationContainer
         is KotlinConstructorScope -> annotationContainer
         is KotlinFunctionScope -> annotationContainer
         is KotlinParameterScope -> annotationContainer

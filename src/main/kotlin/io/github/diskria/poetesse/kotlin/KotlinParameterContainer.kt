@@ -65,6 +65,7 @@ private val KotlinParameterContainer.factory: KotlinParameterFactory
 
 private val KotlinParameterContainer.internal: KotlinParameterContainerInternal
     get() = when (this) {
+        is KotlinPropertySetterScope -> parameterContainer
         is KotlinConstructorScope -> parameterContainer
         is KotlinFunctionScope -> parameterContainer
     }

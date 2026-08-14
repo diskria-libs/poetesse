@@ -12,6 +12,7 @@ import kotlin.io.path.outputStream
 abstract class JavaFileRef : PoetesseFile {
 
     override val extensionName: String = "java"
+
     override val relativePath: String
         get() = buildString {
             packageName?.let { append(it.replace('.', '/') + "/") }

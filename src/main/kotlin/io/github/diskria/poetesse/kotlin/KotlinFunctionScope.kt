@@ -82,6 +82,10 @@ class KotlinFunctionScope private constructor(
         BodyScope(settings).apply(block)
     }
 
+    fun expression(block: KotlinCodeBuilder) {
+        body { line { "return ${L(block)}" } }
+    }
+
     fun returns(type: XTypeName<*, *>) {
         specBuilder.returns(type.interopToKotlin())
     }
