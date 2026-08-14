@@ -1,11 +1,9 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.PoetesseJava
 
 typealias JavaCodeBlockBuilder = JavaCodeBlockScope.() -> Unit
 
-@PoetesseJava
 class JavaCodeBlockScope internal constructor(
     override val settings: Poetesse.Settings,
     private val builder: JPCodeBlockBuilder = JPCodeBlock.builder(),
@@ -26,7 +24,6 @@ class JavaCodeBlockScope internal constructor(
 
 typealias JavaEmbeddableCodeBlockBuilder = JavaEmbeddableCodeBlockScope.() -> Unit
 
-@PoetesseJava
 class JavaEmbeddableCodeBlockScope internal constructor(
     override val settings: Poetesse.Settings,
     internal val statements: MutableList<JPCodeBlock> = mutableListOf()

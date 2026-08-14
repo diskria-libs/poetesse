@@ -1,8 +1,6 @@
 package io.github.diskria.poetesse.java
 
-import io.github.diskria.poetesse.PoetesseScope
-
-interface JavaConstructorFactory : PoetesseScope
+interface JavaConstructorFactory : PoetesseJavaScope
 
 fun JavaConstructorFactory.constructor(block: JavaConstructorScope.() -> Unit = {}): JavaConstructorRef =
     JavaConstructorRef { JavaConstructorScope.of(settings).apply(block).build() }

@@ -1,17 +1,16 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.PoetesseJava
 import io.github.diskria.poetesse.interop.XClassName
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.interopToJava
 
-@PoetesseJava
 class JavaTypeScope private constructor(
     override val settings: Poetesse.Settings,
     private val className: XClassName,
-    private val specBuilder: JPTypeBuilder
-) : JavaTypeVariableContainer,
+    private val specBuilder: JPTypeBuilder,
+) : PoetesseJavaScope,
+    JavaTypeVariableContainer,
     JavaTypeContainer,
     JavaFieldContainer,
     JavaConstructorContainer,

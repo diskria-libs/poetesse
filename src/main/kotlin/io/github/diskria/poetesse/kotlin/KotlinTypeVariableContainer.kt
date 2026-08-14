@@ -2,9 +2,12 @@ package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.EagerDelegate
 import io.github.diskria.poetesse.extensions.capitalized
-import io.github.diskria.poetesse.interop.*
+import io.github.diskria.poetesse.interop.XTypeName
+import io.github.diskria.poetesse.interop.XTypeVariableName
+import io.github.diskria.poetesse.interop.XVariance
+import io.github.diskria.poetesse.interop.interopToKotlin
 
-sealed interface KotlinTypeVariableContainer : XTypeVariableFactory {
+sealed interface KotlinTypeVariableContainer : PoetesseKotlinScope {
 
     operator fun XTypeVariableName.unaryPlus(): XTypeVariableName {
         this@KotlinTypeVariableContainer.internal.append(interopToKotlin())

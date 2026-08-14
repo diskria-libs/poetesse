@@ -1,12 +1,10 @@
 package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.PoetesseKotlin
 import io.github.diskria.poetesse.extensions.addStatement
 
 typealias KotlinCodeBlockBuilder = KotlinCodeBlockScope.() -> Unit
 
-@PoetesseKotlin
 class KotlinCodeBlockScope internal constructor(
     override val settings: Poetesse.Settings,
     private val builder: KPCodeBlockBuilder = KPCodeBlock.builder(),
@@ -27,7 +25,6 @@ class KotlinCodeBlockScope internal constructor(
 
 typealias KotlinEmbeddableCodeBlockBuilder = KotlinEmbeddableCodeBlockScope.() -> Unit
 
-@PoetesseKotlin
 class KotlinEmbeddableCodeBlockScope internal constructor(
     override val settings: Poetesse.Settings,
     internal val statements: MutableList<KPCodeBlock> = mutableListOf()

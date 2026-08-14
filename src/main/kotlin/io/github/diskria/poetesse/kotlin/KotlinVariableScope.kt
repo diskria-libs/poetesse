@@ -1,16 +1,15 @@
 package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.PoetesseKotlin
 import io.github.diskria.poetesse.extensions.joinWithTrailing
 import io.github.diskria.poetesse.interop.XTypeName
 
-@PoetesseKotlin
 class KotlinVariableScope internal constructor(
     override val settings: Poetesse.Settings,
     val name: String,
     private val type: XTypeName<*, *>?,
-) : KotlinAnnotationContainer,
+) : PoetesseKotlinScope,
+    KotlinAnnotationContainer,
     KotlinModifierContainer {
 
     private var isMutable: Boolean = false

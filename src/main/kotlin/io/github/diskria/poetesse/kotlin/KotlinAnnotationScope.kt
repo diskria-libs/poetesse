@@ -2,8 +2,6 @@ package io.github.diskria.poetesse.kotlin
 
 import com.squareup.kotlinpoet.AnnotationSpec
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.PoetesseKotlin
-import io.github.diskria.poetesse.PoetesseScope
 import io.github.diskria.poetesse.interop.XClassName
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.interopToKotlin
@@ -11,11 +9,10 @@ import io.github.diskria.poetesse.xClass
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 
-@PoetesseKotlin
 class KotlinAnnotationScope<A : Annotation> internal constructor(
     override val settings: Poetesse.Settings,
-    private val specBuilder: KPAnnotationBuilder
-) : PoetesseScope {
+    private val specBuilder: KPAnnotationBuilder,
+) : PoetesseKotlinScope {
 
     private typealias ArgumentProperty<A, V> = KProperty1<out A, V>
     private typealias ArrayArgumentProperty<A, E> = ArgumentProperty<A, Array<out E>>

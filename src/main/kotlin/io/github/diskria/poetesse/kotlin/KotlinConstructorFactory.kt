@@ -1,8 +1,6 @@
 package io.github.diskria.poetesse.kotlin
 
-import io.github.diskria.poetesse.PoetesseScope
-
-interface KotlinConstructorFactory : PoetesseScope
+interface KotlinConstructorFactory : PoetesseKotlinScope
 
 fun KotlinConstructorFactory.constructor(
     primary: Boolean = false,

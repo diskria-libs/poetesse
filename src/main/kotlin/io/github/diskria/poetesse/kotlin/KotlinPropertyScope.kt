@@ -1,16 +1,15 @@
 package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.PoetesseKotlin
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.interopToKotlin
 
-@PoetesseKotlin
 class KotlinPropertyScope private constructor(
     override val settings: Poetesse.Settings,
     private val type: XTypeName<*, *>,
-    private val specBuilder: KPPropertyBuilder
-) : KotlinTypeVariableContainer,
+    private val specBuilder: KPPropertyBuilder,
+) : PoetesseKotlinScope,
+    KotlinTypeVariableContainer,
     KotlinAnnotationContainer,
     KotlinModifierContainer.WithVisibility {
 

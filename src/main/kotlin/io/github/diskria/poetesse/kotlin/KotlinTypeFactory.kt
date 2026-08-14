@@ -1,10 +1,9 @@
 package io.github.diskria.poetesse.kotlin
 
-import io.github.diskria.poetesse.PoetesseScope
 import io.github.diskria.poetesse.interop.XClassName
 import io.github.diskria.poetesse.interop.XTypeName
 
-interface KotlinTypeFactory : PoetesseScope
+interface KotlinTypeFactory : PoetesseKotlinScope
 
 fun KotlinTypeFactory.typeAlias(
     name: String, type: XTypeName<*, *>, block: KotlinTypeAliasScope.() -> Unit

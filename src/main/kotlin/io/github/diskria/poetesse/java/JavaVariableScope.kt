@@ -1,16 +1,15 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.PoetesseJava
 import io.github.diskria.poetesse.extensions.joinWithTrailing
 import io.github.diskria.poetesse.interop.XTypeName
 
-@PoetesseJava
 class JavaVariableScope internal constructor(
     override val settings: Poetesse.Settings,
     val name: String,
     private val type: XTypeName<*, *>?,
-) : JavaAnnotationContainer,
+) : PoetesseJavaScope,
+    JavaAnnotationContainer,
     JavaModifierContainer {
 
     private val modifiers: MutableList<JPModifier> = mutableListOf()

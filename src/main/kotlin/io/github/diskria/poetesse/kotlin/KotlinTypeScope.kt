@@ -1,19 +1,18 @@
 package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.PoetesseKotlin
 import io.github.diskria.poetesse.interop.XClassName
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.interopToKotlin
 import io.github.diskria.poetesse.xType
 import kotlin.reflect.KClass
 
-@PoetesseKotlin
 class KotlinTypeScope private constructor(
     override val settings: Poetesse.Settings,
     private val className: XClassName,
-    private val specBuilder: KPTypeBuilder
-) : KotlinTypeVariableContainer,
+    private val specBuilder: KPTypeBuilder,
+) : PoetesseKotlinScope,
+    KotlinTypeVariableContainer,
     KotlinTypeContainer,
     KotlinPropertyContainer,
     KotlinConstructorContainer,
@@ -120,7 +119,6 @@ class KotlinTypeScope private constructor(
     internal fun build(): KPType =
         specBuilder.build()
 
-    @PoetesseKotlin
     inner class SuperclassConstructorScope(override val settings: Poetesse.Settings) : KotlinArgumentsContainer {
         internal val argumentsContainer = KotlinArgumentsContainerInternal.of(
             append = { this@KotlinTypeScope.specBuilder.addSuperclassConstructorParameter(it) }

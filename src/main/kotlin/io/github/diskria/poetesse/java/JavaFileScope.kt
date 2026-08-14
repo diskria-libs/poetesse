@@ -1,10 +1,8 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.PoetesseJava
 import io.github.diskria.poetesse.xClass
 
-@PoetesseJava
 class JavaFileScope private constructor(
     override val settings: Poetesse.Settings,
     private val packageName: String?,

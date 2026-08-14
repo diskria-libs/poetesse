@@ -1,10 +1,8 @@
 package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.PoetesseKotlin
 import io.github.diskria.poetesse.xClass
 
-@PoetesseKotlin
 class KotlinFileScope private constructor(
     override val settings: Poetesse.Settings,
     private val packageName: String?,

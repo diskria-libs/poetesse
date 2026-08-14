@@ -1,10 +1,8 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.PoetesseJava
-import io.github.diskria.poetesse.PoetesseScope
 
-sealed interface JavaBodyContainer : PoetesseScope
+sealed interface JavaBodyContainer : PoetesseJavaScope
 
 fun JavaBodyContainer.body(block: JavaBodyScope.() -> Unit) {
     JavaBodyScope(settings, internal::append).apply(block)
@@ -23,7 +21,6 @@ internal interface JavaBodyContainerInternal {
     }
 }
 
-@PoetesseJava
 class JavaBodyScope(
     override val settings: Poetesse.Settings,
     append: (statement: JPCodeBlock) -> Unit,

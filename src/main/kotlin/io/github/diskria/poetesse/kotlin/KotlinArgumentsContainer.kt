@@ -1,10 +1,6 @@
 package io.github.diskria.poetesse.kotlin
 
-import io.github.diskria.poetesse.PoetesseKotlin
-import io.github.diskria.poetesse.PoetesseScope
-
-@PoetesseKotlin
-sealed interface KotlinArgumentsContainer : PoetesseScope {
+sealed interface KotlinArgumentsContainer : PoetesseKotlinScope {
 
     fun argument(codeBlock: KPCodeBlock) {
         internal.append(codeBlock)

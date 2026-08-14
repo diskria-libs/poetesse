@@ -1,12 +1,11 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.LazyDelegate
-import io.github.diskria.poetesse.PoetesseScope
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.xType
 import kotlin.reflect.KClass
 
-interface JavaFieldFactory : PoetesseScope
+interface JavaFieldFactory : PoetesseJavaScope
 
 fun JavaFieldFactory.field(name: String, type: XTypeName<*, *>, block: JavaFieldScope.() -> Unit = {}) =
     JavaFieldRef(name) { JavaFieldScope.of(settings, name, type).apply(block).build() }

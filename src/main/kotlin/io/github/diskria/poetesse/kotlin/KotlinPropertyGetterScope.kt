@@ -1,14 +1,13 @@
 package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.PoetesseKotlin
 import io.github.diskria.poetesse.extensions.addStatement
 
-@PoetesseKotlin
 class KotlinPropertyGetterScope private constructor(
     override val settings: Poetesse.Settings,
-    internal val specBuilder: KPFunctionBuilder
-) : KotlinAnnotationContainer,
+    internal val specBuilder: KPFunctionBuilder,
+) : PoetesseKotlinScope,
+    KotlinAnnotationContainer,
     KotlinModifierContainer.WithVisibility,
     KotlinBodyContainer {
 

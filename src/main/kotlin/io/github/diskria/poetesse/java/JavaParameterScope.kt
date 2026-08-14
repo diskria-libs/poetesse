@@ -1,15 +1,14 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.PoetesseJava
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.interopToJava
 
-@PoetesseJava
 class JavaParameterScope private constructor(
     override val settings: Poetesse.Settings,
-    private val specBuilder: JPParameterBuilder
-) : JavaAnnotationContainer,
+    private val specBuilder: JPParameterBuilder,
+) : PoetesseJavaScope,
+    JavaAnnotationContainer,
     JavaModifierContainer {
 
     internal val annotationContainer = JavaAnnotationContainerInternal.of(

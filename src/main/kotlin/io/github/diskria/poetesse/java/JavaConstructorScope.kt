@@ -1,13 +1,12 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.PoetesseJava
 
-@PoetesseJava
 class JavaConstructorScope private constructor(
     override val settings: Poetesse.Settings,
-    private val specBuilder: JPMethodBuilder
-) : JavaParameterContainer,
+    private val specBuilder: JPMethodBuilder,
+) : PoetesseJavaScope,
+    JavaParameterContainer,
     JavaAnnotationContainer,
     JavaModifierContainer.WithVisibility,
     JavaBodyContainer {

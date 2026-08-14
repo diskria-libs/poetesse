@@ -1,17 +1,16 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.PoetesseJava
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.interopToJava
 import io.github.diskria.poetesse.xType
 import kotlin.reflect.KClass
 
-@PoetesseJava
 class JavaMethodScope private constructor(
     override val settings: Poetesse.Settings,
-    private val specBuilder: JPMethodBuilder
-) : JavaTypeVariableContainer,
+    private val specBuilder: JPMethodBuilder,
+) : PoetesseJavaScope,
+    JavaTypeVariableContainer,
     JavaParameterContainer,
     JavaAnnotationContainer,
     JavaModifierContainer.WithVisibility,

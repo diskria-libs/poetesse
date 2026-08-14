@@ -1,6 +1,6 @@
 package io.github.diskria.poetesse.java
 
-sealed interface JavaModifierContainer {
+sealed interface JavaModifierContainer : PoetesseJavaScope {
 
     fun modifiers(vararg modifiers: JPModifier) {
         internal.append(*modifiers)

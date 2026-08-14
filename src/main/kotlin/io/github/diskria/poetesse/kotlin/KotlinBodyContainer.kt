@@ -1,10 +1,8 @@
 package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.PoetesseKotlin
-import io.github.diskria.poetesse.PoetesseScope
 
-sealed interface KotlinBodyContainer : PoetesseScope
+sealed interface KotlinBodyContainer : PoetesseKotlinScope
 
 fun KotlinBodyContainer.body(block: KotlinBodyScope.() -> Unit) {
     KotlinBodyScope(settings, internal::append).apply(block)
@@ -27,7 +25,6 @@ internal interface KotlinBodyContainerInternal {
     }
 }
 
-@PoetesseKotlin
 class KotlinBodyScope(
     override val settings: Poetesse.Settings,
     append: (statement: KPCodeBlock) -> Unit,

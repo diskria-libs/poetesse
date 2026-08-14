@@ -3,11 +3,10 @@ package io.github.diskria.poetesse.java
 import io.github.diskria.poetesse.EagerDelegate
 import io.github.diskria.poetesse.extensions.capitalized
 import io.github.diskria.poetesse.interop.XTypeName
-import io.github.diskria.poetesse.interop.XTypeVariableFactory
 import io.github.diskria.poetesse.interop.XTypeVariableName
 import io.github.diskria.poetesse.interop.interopToJava
 
-sealed interface JavaTypeVariableContainer : XTypeVariableFactory {
+sealed interface JavaTypeVariableContainer : PoetesseJavaScope {
 
     operator fun XTypeVariableName.unaryPlus(): XTypeVariableName {
         this@JavaTypeVariableContainer.internal.append(interopToJava())

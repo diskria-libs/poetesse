@@ -1,11 +1,10 @@
 package io.github.diskria.poetesse.kotlin
 
-import io.github.diskria.poetesse.PoetesseScope
 import io.github.diskria.poetesse.interop.XClassName
 import io.github.diskria.poetesse.xClass
 import kotlin.reflect.KClass
 
-interface KotlinAnnotationFactory : PoetesseScope
+interface KotlinAnnotationFactory : PoetesseKotlinScope
 
 fun <A : Annotation> KotlinAnnotationFactory.annotation(
     className: XClassName,

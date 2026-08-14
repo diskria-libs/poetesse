@@ -1,12 +1,11 @@
 package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.LazyDelegate
-import io.github.diskria.poetesse.PoetesseScope
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.xType
 import kotlin.reflect.KClass
 
-interface KotlinPropertyFactory : PoetesseScope
+interface KotlinPropertyFactory : PoetesseKotlinScope
 
 fun KotlinPropertyFactory.property(name: String, type: XTypeName<*, *>, block: KotlinPropertyScope.() -> Unit = {}) =
     KotlinPropertyRef(name) { KotlinPropertyScope.of(settings, name, type).apply(block).build() }

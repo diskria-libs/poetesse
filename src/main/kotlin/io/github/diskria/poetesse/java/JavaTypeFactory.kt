@@ -1,9 +1,8 @@
 package io.github.diskria.poetesse.java
 
-import io.github.diskria.poetesse.PoetesseScope
 import io.github.diskria.poetesse.interop.XClassName
 
-interface JavaTypeFactory : PoetesseScope
+interface JavaTypeFactory : PoetesseJavaScope
 
 fun JavaTypeFactory.type(
     kind: JPTypeKind, name: String, block: JavaTypeScope.(className: XClassName) -> Unit = {}

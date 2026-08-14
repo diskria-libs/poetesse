@@ -1,7 +1,6 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.PoetesseJava
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.interopToJava
 import io.github.diskria.poetesse.xType
@@ -9,7 +8,6 @@ import kotlin.reflect.KClass
 
 typealias JavaCodeBuilder = JavaCodeScope.() -> String
 
-@PoetesseJava
 class JavaCodeScope internal constructor(
     override val settings: Poetesse.Settings,
     private val block: JavaCodeBuilder,

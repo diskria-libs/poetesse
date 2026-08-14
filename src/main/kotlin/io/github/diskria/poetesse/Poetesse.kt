@@ -1,16 +1,12 @@
 package io.github.diskria.poetesse
 
-import io.github.diskria.poetesse.java.JPAnnotation
-import io.github.diskria.poetesse.java.JPClassName
-import io.github.diskria.poetesse.java.JPTypeName
-import io.github.diskria.poetesse.java.JavaFactory
+import io.github.diskria.poetesse.java.*
 import io.github.diskria.poetesse.kotlin.KotlinFactory
+import io.github.diskria.poetesse.kotlin.PoetesseKotlinScope
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
 
-@PoetesseKotlin
-@PoetesseJava
-class Poetesse private constructor(override val settings: Settings) : PoetesseScope {
+class Poetesse private constructor(override val settings: Settings) : PoetesseKotlinScope, PoetesseJavaScope {
 
     val kotlin: KotlinFactory get() = KotlinFactory(settings)
     val java: JavaFactory get() = JavaFactory(settings)
