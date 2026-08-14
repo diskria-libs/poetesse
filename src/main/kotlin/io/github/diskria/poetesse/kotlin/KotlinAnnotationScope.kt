@@ -20,15 +20,19 @@ class KotlinAnnotationScope<A : Annotation> internal constructor(
     private typealias ArgumentProperty<A, V> = KProperty1<out A, V>
     private typealias ArrayArgumentProperty<A, E> = ArgumentProperty<A, Array<out E>>
 
-    fun argument(name: String, value: KPCodeBlock) {
-        specBuilder.addMember(name, value)
+    fun argument(name: String? = null, value: KPCodeBlock) {
+        val format = buildString {
+            name?.let { append("$it = ") }
+            append("%L")
+        }
+        specBuilder.addMember(format, value)
     }
 
-    fun argument(name: String, value: KotlinCodeRef) {
+    fun argument(name: String? = null, value: KotlinCodeRef) {
         argument(name, value.codeBlock)
     }
 
-    fun argument(name: String, value: KotlinCodeBuilder) {
+    fun argument(name: String? = null, value: KotlinCodeBuilder) {
         argument(name, KotlinCodeScope.of(settings, value))
     }
 
