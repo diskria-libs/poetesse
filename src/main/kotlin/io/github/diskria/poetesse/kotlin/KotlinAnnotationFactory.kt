@@ -9,18 +9,21 @@ interface KotlinAnnotationFactory : PoetesseScope
 
 fun <A : Annotation> KotlinAnnotationFactory.annotation(
     className: XClassName,
+    target: UseSite? = null,
     block: KotlinAnnotationScope<A>.() -> Unit = {}
 ): KotlinTypedAnnotationRef<A> = KotlinTypedAnnotationRef {
-    KotlinAnnotationScope.of<A>(settings, className).apply(block).build()
+    KotlinAnnotationScope.of<A>(settings, className, target).apply(block).build()
 }
 
 fun <A : Annotation> KotlinAnnotationFactory.annotation(
     type: KClass<out A>,
+    target: UseSite? = null,
     block: KotlinAnnotationScope<A>.() -> Unit = {}
 ): KotlinTypedAnnotationRef<A> =
-    annotation(xClass(type), block)
+    annotation(xClass(type), target, block)
 
 inline fun <reified A : Annotation> KotlinAnnotationFactory.annotation(
+    target: UseSite? = null,
     noinline block: KotlinAnnotationScope<A>.() -> Unit = {}
 ): KotlinTypedAnnotationRef<A> =
-    annotation(A::class, block)
+    annotation(A::class, target, block)

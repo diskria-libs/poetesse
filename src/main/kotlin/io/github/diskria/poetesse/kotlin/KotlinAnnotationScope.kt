@@ -1,5 +1,6 @@
 package io.github.diskria.poetesse.kotlin
 
+import com.squareup.kotlinpoet.AnnotationSpec
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseKotlin
 import io.github.diskria.poetesse.PoetesseScope
@@ -180,7 +181,15 @@ class KotlinAnnotationScope<A : Annotation> internal constructor(
 
     @PublishedApi
     internal companion object {
-        fun <A : Annotation> of(settings: Poetesse.Settings, className: XClassName): KotlinAnnotationScope<A> =
-            KotlinAnnotationScope(settings, KPAnnotation.builder(className.interopToKotlin()))
+        fun <A : Annotation> of(
+            settings: Poetesse.Settings,
+            className: XClassName,
+            useSiteTarget: UseSite? = null,
+        ): KotlinAnnotationScope<A> =
+            KotlinAnnotationScope(
+                settings, KPAnnotation.builder(className.interopToKotlin()).useSiteTarget(useSiteTarget)
+            )
     }
 }
+
+typealias UseSite = AnnotationSpec.UseSiteTarget

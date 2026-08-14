@@ -1,7 +1,6 @@
 package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.interop.XClassName
-import io.github.diskria.poetesse.xClass
 import kotlin.reflect.KClass
 
 sealed interface KotlinAnnotationContainer : KotlinAnnotationFactory {
@@ -13,23 +12,20 @@ sealed interface KotlinAnnotationContainer : KotlinAnnotationFactory {
 
 fun <A : Annotation> KotlinAnnotationContainer.annotation(
     className: XClassName,
+    target: UseSite? = null,
     block: KotlinAnnotationScope<A>.() -> Unit = {}
-) {
-    +factory.annotation(className, block)
-}
+) = +factory.annotation(className, target, block)
 
 fun <A : Annotation> KotlinAnnotationContainer.annotation(
     type: KClass<out A>,
+    target: UseSite? = null,
     block: KotlinAnnotationScope<A>.() -> Unit = {}
-) {
-    annotation(xClass(type), block)
-}
+) = +factory.annotation(type, target, block)
 
 inline fun <reified A : Annotation> KotlinAnnotationContainer.annotation(
+    target: UseSite? = null,
     noinline block: KotlinAnnotationScope<A>.() -> Unit = {}
-) {
-    annotation(A::class, block)
-}
+) = +factory.annotation<A>(target, block)
 
 internal interface KotlinAnnotationContainerInternal {
 
@@ -44,7 +40,8 @@ internal interface KotlinAnnotationContainerInternal {
     }
 }
 
-private val KotlinAnnotationContainer.factory: KotlinAnnotationFactory
+@PublishedApi
+internal val KotlinAnnotationContainer.factory: KotlinAnnotationFactory
     get() = this as KotlinAnnotationFactory
 
 private val KotlinAnnotationContainer.internal: KotlinAnnotationContainerInternal
