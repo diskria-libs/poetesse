@@ -21,12 +21,8 @@ class KotlinVariableScope private constructor(
 
     private var initializer: KotlinCodeRef? = null
 
-    internal val modifierContainer = KotlinModifierContainerInternal.of(
-        append = { modifiers += it }
-    )
-    internal val annotationContainer = KotlinAnnotationContainerInternal.of(
-        append = { annotations += it },
-    )
+    internal val modifierContainer = KotlinModifierContainerInternal { modifiers += it }
+    internal val annotationContainer = KotlinAnnotationContainerInternal { annotations += it }
 
     fun mutable(mutable: Boolean = true) {
         isMutable = mutable

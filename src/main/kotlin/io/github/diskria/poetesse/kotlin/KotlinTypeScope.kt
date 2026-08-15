@@ -19,32 +19,20 @@ class KotlinTypeScope private constructor(
 
     internal typealias Block = KotlinTypeScope.(className: XClassName) -> Unit
 
-    internal val typeVariableContainer = KotlinTypeVariableContainerInternal.of(
-        append = { specBuilder.addTypeVariable(it) }
-    )
-    internal val typeContainer = KotlinTypeContainerInternal.of(
+    internal val typeVariableContainer = KotlinTypeVariableContainerInternal { specBuilder.addTypeVariable(it) }
+    internal val typeContainer = KotlinTypeContainerInternal(
         appendType = { specBuilder.addType(it) },
         appendTypeAlias = { specBuilder.addTypeAlias(it) },
         nestedClassName = { name -> className.nested(name) },
     )
-    internal val propertyContainer = KotlinPropertyContainerInternal.of(
-        append = { specBuilder.addProperty(it) }
-    )
-    internal val constructorContainer = KotlinConstructorContainerInternal.of(
-        append = { constructor, isPrimary ->
-            if (isPrimary) specBuilder.primaryConstructor(constructor)
-            else specBuilder.addFunction(constructor)
-        }
-    )
-    internal val functionContainer = KotlinFunctionContainerInternal.of(
-        append = { specBuilder.addFunction(it) }
-    )
-    internal val modifierContainer = KotlinModifierContainerInternal.of(
-        append = { specBuilder.addModifiers(it) }
-    )
-    internal val annotationContainer = KotlinAnnotationContainerInternal.of(
-        append = { specBuilder.addAnnotation(it) }
-    )
+    internal val propertyContainer = KotlinPropertyContainerInternal { specBuilder.addProperty(it) }
+    internal val constructorContainer = KotlinConstructorContainerInternal { constructor, isPrimary ->
+        if (isPrimary) specBuilder.primaryConstructor(constructor)
+        else specBuilder.addFunction(constructor)
+    }
+    internal val functionContainer = KotlinFunctionContainerInternal { specBuilder.addFunction(it) }
+    internal val modifierContainer = KotlinModifierContainerInternal { specBuilder.addModifiers(it) }
+    internal val annotationContainer = KotlinAnnotationContainerInternal { specBuilder.addAnnotation(it) }
 
     fun expect() = modifier(KPModifier.EXPECT)
     fun actual() = modifier(KPModifier.ACTUAL)
@@ -90,9 +78,9 @@ class KotlinTypeScope private constructor(
 
         internal typealias Block = SuperclassConstructorScope.() -> Unit
 
-        internal val argumentsContainer = KotlinArgumentsContainerInternal.of(
-            append = { this@KotlinTypeScope.specBuilder.addSuperclassConstructorParameter(it) }
-        )
+        internal val argumentsContainer = KotlinArgumentsContainerInternal {
+            this@KotlinTypeScope.specBuilder.addSuperclassConstructorParameter(it)
+        }
     }
 
     internal companion object {

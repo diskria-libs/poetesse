@@ -6,25 +6,14 @@ import io.github.diskria.poetesse.interop.PoetesseXScope
 sealed interface KotlinBodyContainer : PoetesseKotlinScope
 
 fun KotlinBodyContainer.body(block: KotlinBodyScope.Block = {}) {
-    KotlinBodyScope.of(internal::append).apply(block)
+    KotlinBodyScope.of(internal.append).apply(block)
 }
 
 fun KotlinBodyContainer.expression(block: KotlinCodeScope.Block) {
     body { line { "return ${L(block)}" } }
 }
 
-internal interface KotlinBodyContainerInternal {
-
-    fun append(statement: KPCodeBlock)
-
-    companion object {
-        fun of(
-            append: (statement: KPCodeBlock) -> Unit,
-        ): KotlinBodyContainerInternal = object : KotlinBodyContainerInternal {
-            override fun append(statement: KPCodeBlock) = append(statement)
-        }
-    }
-}
+internal class KotlinBodyContainerInternal(val append: (statement: KPCodeBlock) -> Unit)
 
 class KotlinBodyScope private constructor(
     override val config: Poetesse.Config,
@@ -33,7 +22,7 @@ class KotlinBodyScope private constructor(
 
     internal typealias Block = KotlinBodyScope.() -> Unit
 
-    internal val codeBlockContainer = KotlinCodeBlockContainerInternal.of(append)
+    internal val codeBlockContainer = KotlinCodeBlockContainerInternal(append)
 
     internal companion object {
         context(scope: PoetesseXScope)

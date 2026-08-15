@@ -18,18 +18,7 @@ inline fun <reified A : Annotation> JavaAnnotationContainer.annotation(
     noinline block: JavaAnnotationScope.Block<A> = {}
 ) = +factory.annotation<A>(block)
 
-internal interface JavaAnnotationContainerInternal {
-
-    fun append(annotation: JPAnnotation)
-
-    companion object {
-        fun of(
-            append: (annotation: JPAnnotation) -> Unit,
-        ): JavaAnnotationContainerInternal = object : JavaAnnotationContainerInternal {
-            override fun append(annotation: JPAnnotation) = append(annotation)
-        }
-    }
-}
+internal class JavaAnnotationContainerInternal(val append: (annotation: JPAnnotation) -> Unit)
 
 @PublishedApi
 internal val JavaAnnotationContainer.factory: JavaAnnotationFactory

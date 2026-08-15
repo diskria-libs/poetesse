@@ -33,18 +33,7 @@ fun KotlinTypeVariableContainer.typeVariable(
     vararg bounds: XTypeName, variance: XVariance? = null, reified: Boolean = false, nullable: Boolean = false,
 ) = EagerDelegate { name -> typeVariable(name.capitalized(), bounds.asIterable(), variance, reified, nullable) }
 
-internal interface KotlinTypeVariableContainerInternal {
-
-    fun append(typeVariable: KPTypeVariableName)
-
-    companion object {
-        fun of(
-            append: (typeVariable: KPTypeVariableName) -> Unit,
-        ): KotlinTypeVariableContainerInternal = object : KotlinTypeVariableContainerInternal {
-            override fun append(typeVariable: KPTypeVariableName) = append(typeVariable)
-        }
-    }
-}
+internal class KotlinTypeVariableContainerInternal(val append: (typeVariable: KPTypeVariableName) -> Unit)
 
 private val KotlinTypeVariableContainer.internal: KotlinTypeVariableContainerInternal
     get() = when (this) {

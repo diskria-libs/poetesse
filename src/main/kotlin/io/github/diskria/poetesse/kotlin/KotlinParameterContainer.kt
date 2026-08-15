@@ -42,18 +42,7 @@ inline fun <reified T> KotlinParameterContainer.parameter(
 inline fun <reified T : Any> KotlinParameterContainer.parameter(noinline block: KotlinParameterScope.Block = {}) =
     parameter<T>(nullable = false, block)
 
-internal interface KotlinParameterContainerInternal {
-
-    fun append(parameter: KPParameter)
-
-    companion object {
-        fun of(
-            append: (parameter: KPParameter) -> Unit,
-        ): KotlinParameterContainerInternal = object : KotlinParameterContainerInternal {
-            override fun append(parameter: KPParameter) = append(parameter)
-        }
-    }
-}
+internal class KotlinParameterContainerInternal(val append: (parameter: KPParameter) -> Unit)
 
 @PublishedApi
 internal val KotlinParameterContainer.factory: KotlinParameterFactory

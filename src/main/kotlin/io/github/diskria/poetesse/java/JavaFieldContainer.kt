@@ -37,18 +37,7 @@ inline fun <reified T> JavaFieldContainer.field(nullable: Boolean = true, noinli
 inline fun <reified T : Any> JavaFieldContainer.field(noinline block: JavaFieldScope.Block = {}) =
     field<T>(nullable = false, block)
 
-internal interface JavaFieldContainerInternal {
-
-    fun append(field: JPField)
-
-    companion object {
-        fun of(
-            append: (field: JPField) -> Unit,
-        ): JavaFieldContainerInternal = object : JavaFieldContainerInternal {
-            override fun append(field: JPField) = append(field)
-        }
-    }
-}
+internal class JavaFieldContainerInternal(val append: (field: JPField) -> Unit)
 
 @PublishedApi
 internal val JavaFieldContainer.factory: JavaFieldFactory

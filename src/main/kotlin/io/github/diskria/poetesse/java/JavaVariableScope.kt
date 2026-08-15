@@ -20,12 +20,8 @@ class JavaVariableScope private constructor(
 
     private var initializer: JavaCodeRef? = null
 
-    internal val modifierContainer = JavaModifierContainerInternal.of(
-        append = { modifiers += it }
-    )
-    internal val annotationContainer = JavaAnnotationContainerInternal.of(
-        append = { annotations += it },
-    )
+    internal val modifierContainer = JavaModifierContainerInternal { modifiers += it }
+    internal val annotationContainer = JavaAnnotationContainerInternal { annotations += it }
 
     fun final() = modifier(JPModifier.FINAL)
 

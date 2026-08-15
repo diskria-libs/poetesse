@@ -16,15 +16,9 @@ class KotlinPropertyScope private constructor(
 
     internal typealias Block = KotlinPropertyScope.() -> Unit
 
-    internal val typeVariableContainer = KotlinTypeVariableContainerInternal.of(
-        append = { specBuilder.addTypeVariable(it) }
-    )
-    internal val annotationContainer = KotlinAnnotationContainerInternal.of(
-        append = { specBuilder.addAnnotation(it) },
-    )
-    internal val modifierContainer = KotlinModifierContainerInternal.of(
-        append = { specBuilder.addModifiers(it) }
-    )
+    internal val typeVariableContainer = KotlinTypeVariableContainerInternal { specBuilder.addTypeVariable(it) }
+    internal val annotationContainer = KotlinAnnotationContainerInternal { specBuilder.addAnnotation(it) }
+    internal val modifierContainer = KotlinModifierContainerInternal { specBuilder.addModifiers(it) }
 
     private var getter: KPFunctionBuilder? = null
     private var setter: KPFunctionBuilder? = null

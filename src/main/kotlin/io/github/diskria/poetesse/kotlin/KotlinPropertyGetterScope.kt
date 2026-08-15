@@ -14,15 +14,9 @@ class KotlinPropertyGetterScope private constructor(
 
     internal typealias Block = KotlinPropertyGetterScope.() -> Unit
 
-    internal val annotationContainer = KotlinAnnotationContainerInternal.of(
-        append = { specBuilder.addAnnotation(it) },
-    )
-    internal val modifierContainer = KotlinModifierContainerInternal.of(
-        append = { specBuilder.addModifiers(it) }
-    )
-    internal val statementContainer = KotlinBodyContainerInternal.of(
-        append = { specBuilder.addStatement(it) },
-    )
+    internal val annotationContainer = KotlinAnnotationContainerInternal { specBuilder.addAnnotation(it) }
+    internal val modifierContainer = KotlinModifierContainerInternal { specBuilder.addModifiers(it) }
+    internal val statementContainer = KotlinBodyContainerInternal { specBuilder.addStatement(it) }
 
     fun expect() = modifier(KPModifier.EXPECT)
     fun actual() = modifier(KPModifier.ACTUAL)

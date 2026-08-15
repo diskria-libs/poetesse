@@ -14,12 +14,8 @@ class KotlinParameterScope private constructor(
 
     internal typealias Block = KotlinParameterScope.() -> Unit
 
-    internal val annotationContainer = KotlinAnnotationContainerInternal.of(
-        append = { specBuilder.addAnnotation(it) },
-    )
-    internal val modifierContainer = KotlinModifierContainerInternal.of(
-        append = { specBuilder.addModifiers(it) }
-    )
+    internal val annotationContainer = KotlinAnnotationContainerInternal { specBuilder.addAnnotation(it) }
+    internal val modifierContainer = KotlinModifierContainerInternal { specBuilder.addModifiers(it) }
 
     fun vararg() = modifier(KPModifier.VARARG)
     fun noinline() = modifier(KPModifier.NOINLINE)

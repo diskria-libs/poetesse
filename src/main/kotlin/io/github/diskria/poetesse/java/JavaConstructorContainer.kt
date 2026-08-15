@@ -9,18 +9,7 @@ sealed interface JavaConstructorContainer : JavaConstructorFactory {
 fun JavaConstructorContainer.constructor(block: JavaConstructorScope.Block = {}) =
     +factory.constructor(block)
 
-internal interface JavaConstructorContainerInternal {
-
-    fun append(constructor: JPMethod)
-
-    companion object {
-        fun of(
-            append: (constructor: JPMethod) -> Unit,
-        ): JavaConstructorContainerInternal = object : JavaConstructorContainerInternal {
-            override fun append(constructor: JPMethod) = append(constructor)
-        }
-    }
-}
+internal class JavaConstructorContainerInternal(val append: (constructor: JPMethod) -> Unit)
 
 @PublishedApi
 internal val JavaConstructorContainer.factory: JavaConstructorFactory

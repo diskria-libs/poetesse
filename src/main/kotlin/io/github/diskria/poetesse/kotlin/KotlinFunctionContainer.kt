@@ -15,18 +15,7 @@ fun KotlinFunctionContainer.function(name: String, block: KotlinFunctionScope.Bl
 fun KotlinFunctionContainer.function(block: KotlinFunctionScope.Block = {}) =
     EagerDelegate { name -> function(name, block) }
 
-internal interface KotlinFunctionContainerInternal {
-
-    fun append(function: KPFunction)
-
-    companion object {
-        fun of(
-            append: (function: KPFunction) -> Unit,
-        ): KotlinFunctionContainerInternal = object : KotlinFunctionContainerInternal {
-            override fun append(function: KPFunction) = append(function)
-        }
-    }
-}
+internal class KotlinFunctionContainerInternal(val append: (function: KPFunction) -> Unit)
 
 @PublishedApi
 internal val KotlinFunctionContainer.factory: KotlinFunctionFactory

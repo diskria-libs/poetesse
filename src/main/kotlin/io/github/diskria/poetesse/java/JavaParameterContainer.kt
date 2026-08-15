@@ -42,18 +42,7 @@ inline fun <reified T> JavaParameterContainer.parameter(
 inline fun <reified T : Any> JavaParameterContainer.parameter(noinline block: JavaParameterScope.Block = {}) =
     parameter<T>(nullable = false, block)
 
-internal interface JavaParameterContainerInternal {
-
-    fun append(parameter: JPParameter)
-
-    companion object {
-        fun of(
-            append: (parameter: JPParameter) -> Unit,
-        ): JavaParameterContainerInternal = object : JavaParameterContainerInternal {
-            override fun append(parameter: JPParameter) = append(parameter)
-        }
-    }
-}
+internal class JavaParameterContainerInternal(val append: (parameter: JPParameter) -> Unit)
 
 @PublishedApi
 internal val JavaParameterContainer.factory: JavaParameterFactory

@@ -13,18 +13,7 @@ fun KotlinModifierContainer.modifier(modifier: KPModifier) {
     internal.append(modifier)
 }
 
-internal interface KotlinModifierContainerInternal {
-
-    fun append(modifier: KPModifier)
-
-    companion object {
-        fun of(
-            append: (modifier: KPModifier) -> Unit,
-        ): KotlinModifierContainerInternal = object : KotlinModifierContainerInternal {
-            override fun append(modifier: KPModifier) = append(modifier)
-        }
-    }
-}
+internal class KotlinModifierContainerInternal(val append: (modifier: KPModifier) -> Unit)
 
 private val KotlinModifierContainer.internal: KotlinModifierContainerInternal
     get() = when (this) {

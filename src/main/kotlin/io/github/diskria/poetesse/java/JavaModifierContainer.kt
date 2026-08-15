@@ -13,18 +13,7 @@ fun JavaModifierContainer.modifier(modifier: JPModifier) {
     internal.append(modifier)
 }
 
-internal interface JavaModifierContainerInternal {
-
-    fun append(modifier: JPModifier)
-
-    companion object {
-        fun of(
-            append: (modifier: JPModifier) -> Unit,
-        ): JavaModifierContainerInternal = object : JavaModifierContainerInternal {
-            override fun append(modifier: JPModifier) = append(modifier)
-        }
-    }
-}
+internal class JavaModifierContainerInternal(val append: (modifier: JPModifier) -> Unit)
 
 private val JavaModifierContainer.internal: JavaModifierContainerInternal
     get() = when (this) {

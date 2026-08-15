@@ -9,18 +9,7 @@ sealed interface KotlinConstructorContainer : KotlinConstructorFactory {
 fun KotlinConstructorContainer.constructor(primary: Boolean = false, block: KotlinConstructorScope.Block = {}) =
     +factory.constructor(primary, block)
 
-internal interface KotlinConstructorContainerInternal {
-
-    fun append(constructor: KPFunction, isPrimary: Boolean)
-
-    companion object {
-        fun of(
-            append: (constructor: KPFunction, isPrimary: Boolean) -> Unit,
-        ): KotlinConstructorContainerInternal = object : KotlinConstructorContainerInternal {
-            override fun append(constructor: KPFunction, isPrimary: Boolean) = append(constructor, isPrimary)
-        }
-    }
-}
+internal class KotlinConstructorContainerInternal(val append: (constructor: KPFunction, isPrimary: Boolean) -> Unit)
 
 @PublishedApi
 internal val KotlinConstructorContainer.factory: KotlinConstructorFactory

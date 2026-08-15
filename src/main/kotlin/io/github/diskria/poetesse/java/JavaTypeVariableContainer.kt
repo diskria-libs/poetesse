@@ -26,18 +26,7 @@ fun JavaTypeVariableContainer.typeVariable(bounds: Iterable<XTypeName> = emptyLi
 fun JavaTypeVariableContainer.typeVariable(vararg bounds: XTypeName, nullable: Boolean = false) =
     EagerDelegate { name -> typeVariable(name.capitalized(), bounds.asIterable(), nullable) }
 
-internal interface JavaTypeVariableContainerInternal {
-
-    fun append(typeVariable: JPTypeVariableName)
-
-    companion object {
-        fun of(
-            append: (typeVariable: JPTypeVariableName) -> Unit,
-        ): JavaTypeVariableContainerInternal = object : JavaTypeVariableContainerInternal {
-            override fun append(typeVariable: JPTypeVariableName) = append(typeVariable)
-        }
-    }
-}
+internal class JavaTypeVariableContainerInternal(val append: (typeVariable: JPTypeVariableName) -> Unit)
 
 private val JavaTypeVariableContainer.internal: JavaTypeVariableContainerInternal
     get() = when (this) {

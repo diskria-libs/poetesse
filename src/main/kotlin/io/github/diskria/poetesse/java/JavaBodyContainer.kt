@@ -6,21 +6,10 @@ import io.github.diskria.poetesse.interop.PoetesseXScope
 sealed interface JavaBodyContainer : PoetesseJavaScope
 
 fun JavaBodyContainer.body(block: JavaBodyScope.Block = {}) {
-    JavaBodyScope.of(internal::append).apply(block)
+    JavaBodyScope.of(internal.append).apply(block)
 }
 
-internal interface JavaBodyContainerInternal {
-
-    fun append(statement: JPCodeBlock)
-
-    companion object {
-        fun of(
-            append: (statement: JPCodeBlock) -> Unit,
-        ): JavaBodyContainerInternal = object : JavaBodyContainerInternal {
-            override fun append(statement: JPCodeBlock) = append(statement)
-        }
-    }
-}
+internal class JavaBodyContainerInternal(val append: (statement: JPCodeBlock) -> Unit)
 
 class JavaBodyScope private constructor(
     override val config: Poetesse.Config,
@@ -29,7 +18,7 @@ class JavaBodyScope private constructor(
 
     internal typealias Block = JavaBodyScope.() -> Unit
 
-    internal val codeBlockContainer = JavaCodeBlockContainerInternal.of(append)
+    internal val codeBlockContainer = JavaCodeBlockContainerInternal(append)
 
     internal companion object {
         context(scope: PoetesseXScope)

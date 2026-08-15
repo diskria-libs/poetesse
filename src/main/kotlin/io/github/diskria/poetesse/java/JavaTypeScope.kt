@@ -21,28 +21,16 @@ class JavaTypeScope private constructor(
 
     internal typealias Block = JavaTypeScope.(className: XClassName) -> Unit
 
-    internal val typeVariableContainer = JavaTypeVariableContainerInternal.of(
-        append = { specBuilder.addTypeVariable(it) }
-    )
-    internal val typeContainer = JavaTypeContainerInternal.of(
+    internal val typeVariableContainer = JavaTypeVariableContainerInternal { specBuilder.addTypeVariable(it) }
+    internal val typeContainer = JavaTypeContainerInternal(
         append = { specBuilder.addType(it) },
         nestedClassName = { name -> className.nested(name) },
     )
-    internal val fieldContainer = JavaFieldContainerInternal.of(
-        append = { specBuilder.addField(it) }
-    )
-    internal val constructorContainer = JavaConstructorContainerInternal.of(
-        append = { specBuilder.addMethod(it) }
-    )
-    internal val methodContainer = JavaMethodContainerInternal.of(
-        append = { specBuilder.addMethod(it) }
-    )
-    internal val annotationContainer = JavaAnnotationContainerInternal.of(
-        append = { specBuilder.addAnnotation(it) },
-    )
-    internal val modifierContainer = JavaModifierContainerInternal.of(
-        append = { specBuilder.addModifiers(it) }
-    )
+    internal val fieldContainer = JavaFieldContainerInternal { specBuilder.addField(it) }
+    internal val constructorContainer = JavaConstructorContainerInternal { specBuilder.addMethod(it) }
+    internal val methodContainer = JavaMethodContainerInternal { specBuilder.addMethod(it) }
+    internal val annotationContainer = JavaAnnotationContainerInternal { specBuilder.addAnnotation(it) }
+    internal val modifierContainer = JavaModifierContainerInternal { specBuilder.addModifiers(it) }
 
     fun abstract() = modifier(JPModifier.ABSTRACT)
     fun static() = modifier(JPModifier.STATIC)

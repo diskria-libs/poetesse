@@ -21,18 +21,7 @@ inline fun <reified A : Annotation> KotlinAnnotationContainer.annotation(
     target: UseSite? = null, noinline block: KotlinAnnotationScope.Block<A> = {}
 ) = +factory.annotation<A>(target, block)
 
-internal interface KotlinAnnotationContainerInternal {
-
-    fun append(annotation: KPAnnotation)
-
-    companion object {
-        fun of(
-            append: (annotation: KPAnnotation) -> Unit,
-        ): KotlinAnnotationContainerInternal = object : KotlinAnnotationContainerInternal {
-            override fun append(annotation: KPAnnotation) = append(annotation)
-        }
-    }
-}
+internal class KotlinAnnotationContainerInternal(val append: (annotation: KPAnnotation) -> Unit)
 
 @PublishedApi
 internal val KotlinAnnotationContainer.factory: KotlinAnnotationFactory

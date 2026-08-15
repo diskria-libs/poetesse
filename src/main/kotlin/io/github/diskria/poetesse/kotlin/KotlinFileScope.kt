@@ -15,17 +15,13 @@ class KotlinFileScope private constructor(
 
     internal typealias Block = KotlinFileScope.() -> Unit
 
-    internal val typeContainer = KotlinTypeContainerInternal.of(
+    internal val typeContainer = KotlinTypeContainerInternal(
         appendType = { specBuilder.addType(it) },
         appendTypeAlias = { specBuilder.addTypeAlias(it) },
         nestedClassName = { name -> xClass(packageName, name) },
     )
-    internal val propertyContainer = KotlinPropertyContainerInternal.of(
-        append = { specBuilder.addProperty(it) }
-    )
-    internal val functionContainer = KotlinFunctionContainerInternal.of(
-        append = { specBuilder.addFunction(it) }
-    )
+    internal val propertyContainer = KotlinPropertyContainerInternal { specBuilder.addProperty(it) }
+    internal val functionContainer = KotlinFunctionContainerInternal { specBuilder.addFunction(it) }
 
     internal fun build(): KotlinFileRef {
         val file = specBuilder.apply {

@@ -14,12 +14,8 @@ class JavaParameterScope private constructor(
 
     internal typealias Block = JavaParameterScope.() -> Unit
 
-    internal val annotationContainer = JavaAnnotationContainerInternal.of(
-        append = { specBuilder.addAnnotation(it) },
-    )
-    internal val modifierContainer = JavaModifierContainerInternal.of(
-        append = { specBuilder.addModifiers(it) }
-    )
+    internal val annotationContainer = JavaAnnotationContainerInternal { specBuilder.addAnnotation(it) }
+    internal val modifierContainer = JavaModifierContainerInternal { specBuilder.addModifiers(it) }
 
     fun final() = modifier(JPModifier.FINAL)
 

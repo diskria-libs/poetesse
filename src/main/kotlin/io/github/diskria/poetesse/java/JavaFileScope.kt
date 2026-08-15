@@ -14,7 +14,7 @@ class JavaFileScope private constructor(
 
     private val types: MutableList<JPType> = mutableListOf()
 
-    internal val typeContainer = JavaTypeContainerInternal.of(
+    internal val typeContainer = JavaTypeContainerInternal(
         append = { types += it },
         nestedClassName = { name -> xClass(packageName, name) },
     )

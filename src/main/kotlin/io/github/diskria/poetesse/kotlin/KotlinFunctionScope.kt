@@ -20,21 +20,11 @@ class KotlinFunctionScope private constructor(
 
     internal typealias Block = KotlinFunctionScope.() -> Unit
 
-    internal val typeVariableContainer = KotlinTypeVariableContainerInternal.of(
-        append = { specBuilder.addTypeVariable(it) }
-    )
-    internal val parameterContainer = KotlinParameterContainerInternal.of(
-        append = { specBuilder.addParameter(it) }
-    )
-    internal val annotationContainer = KotlinAnnotationContainerInternal.of(
-        append = { specBuilder.addAnnotation(it) },
-    )
-    internal val modifierContainer = KotlinModifierContainerInternal.of(
-        append = { specBuilder.addModifiers(it) }
-    )
-    internal val statementContainer = KotlinBodyContainerInternal.of(
-        append = { specBuilder.addStatement(it) },
-    )
+    internal val typeVariableContainer = KotlinTypeVariableContainerInternal { specBuilder.addTypeVariable(it) }
+    internal val parameterContainer = KotlinParameterContainerInternal { specBuilder.addParameter(it) }
+    internal val annotationContainer = KotlinAnnotationContainerInternal { specBuilder.addAnnotation(it) }
+    internal val modifierContainer = KotlinModifierContainerInternal { specBuilder.addModifiers(it) }
+    internal val statementContainer = KotlinBodyContainerInternal { specBuilder.addStatement(it) }
 
     fun expect() = modifier(KPModifier.EXPECT)
     fun actual() = modifier(KPModifier.ACTUAL)

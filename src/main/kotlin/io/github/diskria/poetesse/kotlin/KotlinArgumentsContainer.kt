@@ -36,18 +36,7 @@ sealed interface KotlinArgumentsContainer : PoetesseKotlinScope {
     }
 }
 
-internal interface KotlinArgumentsContainerInternal {
-
-    fun append(codeBlock: KPCodeBlock)
-
-    companion object {
-        fun of(
-            append: (codeBlock: KPCodeBlock) -> Unit,
-        ): KotlinArgumentsContainerInternal = object : KotlinArgumentsContainerInternal {
-            override fun append(codeBlock: KPCodeBlock) = append(codeBlock)
-        }
-    }
-}
+internal class KotlinArgumentsContainerInternal(val append: (codeBlock: KPCodeBlock) -> Unit)
 
 private val KotlinArgumentsContainer.internal: KotlinArgumentsContainerInternal
     get() = when (this) {

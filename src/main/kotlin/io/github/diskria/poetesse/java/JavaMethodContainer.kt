@@ -15,18 +15,7 @@ fun JavaMethodContainer.method(name: String, block: JavaMethodScope.Block = {}) 
 fun JavaMethodContainer.method(block: JavaMethodScope.Block = {}) =
     EagerDelegate { name -> method(name, block) }
 
-internal interface JavaMethodContainerInternal {
-
-    fun append(method: JPMethod)
-
-    companion object {
-        fun of(
-            append: (method: JPMethod) -> Unit,
-        ): JavaMethodContainerInternal = object : JavaMethodContainerInternal {
-            override fun append(method: JPMethod) = append(method)
-        }
-    }
-}
+internal class JavaMethodContainerInternal(val append: (method: JPMethod) -> Unit)
 
 @PublishedApi
 internal val JavaMethodContainer.factory: JavaMethodFactory

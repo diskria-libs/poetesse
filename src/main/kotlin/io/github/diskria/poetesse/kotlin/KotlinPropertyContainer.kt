@@ -40,18 +40,7 @@ inline fun <reified T> KotlinPropertyContainer.property(
 inline fun <reified T : Any> KotlinPropertyContainer.property(noinline block: KotlinPropertyScope.Block = {}) =
     property<T>(nullable = false, block)
 
-internal interface KotlinPropertyContainerInternal {
-
-    fun append(property: KPProperty)
-
-    companion object {
-        fun of(
-            append: (property: KPProperty) -> Unit,
-        ): KotlinPropertyContainerInternal = object : KotlinPropertyContainerInternal {
-            override fun append(property: KPProperty) = append(property)
-        }
-    }
-}
+internal class KotlinPropertyContainerInternal(val append: (property: KPProperty) -> Unit)
 
 @PublishedApi
 internal val KotlinPropertyContainer.factory: KotlinPropertyFactory

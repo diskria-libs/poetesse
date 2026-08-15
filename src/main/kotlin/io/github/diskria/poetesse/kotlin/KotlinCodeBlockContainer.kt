@@ -59,18 +59,7 @@ inline fun <reified T> KotlinCodeBlockContainer.variable(
 inline fun <reified T : Any> KotlinCodeBlockContainer.variable(noinline block: KotlinVariableScope.Block = {}) =
     variable<T>(nullable = false, block)
 
-internal interface KotlinCodeBlockContainerInternal {
-
-    fun append(codeBlock: KPCodeBlock)
-
-    companion object {
-        fun of(
-            append: (codeBlock: KPCodeBlock) -> Unit,
-        ): KotlinCodeBlockContainerInternal = object : KotlinCodeBlockContainerInternal {
-            override fun append(codeBlock: KPCodeBlock) = append(codeBlock)
-        }
-    }
-}
+internal class KotlinCodeBlockContainerInternal(val append: (codeBlock: KPCodeBlock) -> Unit)
 
 private val KotlinCodeBlockContainer.internal: KotlinCodeBlockContainerInternal
     get() = when (this) {

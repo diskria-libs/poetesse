@@ -28,21 +28,10 @@ fun JavaTypeContainer.enum_(name: String, block: JavaTypeScope.Block = {}) =
 fun JavaTypeContainer.annotation_(name: String, block: JavaTypeScope.Block = {}) =
     +factory.annotation_(name, block)
 
-internal interface JavaTypeContainerInternal {
-
-    fun append(typeSpec: JPType)
-    fun nestedClassName(name: String): XClassName
-
-    companion object {
-        fun of(
-            append: (type: JPType) -> Unit,
-            nestedClassName: (name: String) -> XClassName,
-        ): JavaTypeContainerInternal = object : JavaTypeContainerInternal {
-            override fun append(typeSpec: JPType) = append(typeSpec)
-            override fun nestedClassName(name: String): XClassName = nestedClassName(name)
-        }
-    }
-}
+internal class JavaTypeContainerInternal(
+    val append: (type: JPType) -> Unit,
+    val nestedClassName: (name: String) -> XClassName,
+)
 
 @PublishedApi
 internal val JavaTypeContainer.factory: JavaTypeFactory

@@ -46,24 +46,11 @@ fun KotlinTypeContainer.interface_(name: String, block: KotlinTypeScope.Block = 
 fun KotlinTypeContainer.fun_interface_(name: String, block: KotlinTypeScope.Block = {}) =
     +factory.fun_interface_(name, block)
 
-internal interface KotlinTypeContainerInternal {
-
-    fun appendType(type: KPType)
-    fun appendTypeAlias(typeAlias: KPTypeAlias)
-    fun nestedClassName(name: String): XClassName
-
-    companion object {
-        fun of(
-            appendType: (type: KPType) -> Unit,
-            appendTypeAlias: (typeAlias: KPTypeAlias) -> Unit,
-            nestedClassName: (name: String) -> XClassName,
-        ): KotlinTypeContainerInternal = object : KotlinTypeContainerInternal {
-            override fun appendType(type: KPType) = appendType(type)
-            override fun appendTypeAlias(typeAlias: KPTypeAlias) = appendTypeAlias(typeAlias)
-            override fun nestedClassName(name: String): XClassName = nestedClassName(name)
-        }
-    }
-}
+internal class KotlinTypeContainerInternal(
+    val appendType: (type: KPType) -> Unit,
+    val appendTypeAlias: (typeAlias: KPTypeAlias) -> Unit,
+    val nestedClassName: (name: String) -> XClassName,
+)
 
 @PublishedApi
 internal val KotlinTypeContainer.factory: KotlinTypeFactory
