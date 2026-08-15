@@ -26,9 +26,9 @@ fun JavaTypeVariableTrait.typeVariable(bounds: Iterable<XTypeName> = emptyList()
 fun JavaTypeVariableTrait.typeVariable(vararg bounds: XTypeName, nullable: Boolean = false) =
     EagerDelegate { typeVariable(it.capitalized(), bounds.asIterable(), nullable) }
 
-internal class JavaTypeVariableContainerInternal(val append: (typeVariable: JPTypeVariableName) -> Unit)
+internal class JavaTypeVariableContainer(val append: (typeVariable: JPTypeVariableName) -> Unit)
 
-private val JavaTypeVariableTrait.internal: JavaTypeVariableContainerInternal
+private val JavaTypeVariableTrait.internal: JavaTypeVariableContainer
     get() = when (this) {
         is JavaTypeScope -> typeVariableContainer
         is JavaMethodScope -> typeVariableContainer

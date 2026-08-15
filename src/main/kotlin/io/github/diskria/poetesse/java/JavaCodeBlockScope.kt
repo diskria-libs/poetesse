@@ -10,7 +10,7 @@ class JavaCodeBlockScope private constructor(
 
     internal typealias Block = JavaCodeBlockScope.() -> Unit
 
-    internal val codeBlockContainer = JavaCodeBlockContainerInternal(builder::addStatement)
+    internal val codeBlockContainer = JavaCodeBlockContainer(builder::addStatement)
 
     internal fun build() = builder.build()
 
@@ -27,7 +27,7 @@ class JavaEmbeddableCodeBlockScope private constructor(
 
     internal typealias Block = JavaEmbeddableCodeBlockScope.() -> Unit
 
-    internal val codeBlockContainer = JavaCodeBlockContainerInternal { statements += it }
+    internal val codeBlockContainer = JavaCodeBlockContainer { statements += it }
 
     internal companion object {
         context(poetesse: PoetesseScope)

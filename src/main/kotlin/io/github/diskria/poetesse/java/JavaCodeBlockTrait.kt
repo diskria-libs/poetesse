@@ -58,9 +58,9 @@ inline fun <reified T> JavaCodeBlockTrait.variable(
 inline fun <reified T : Any> JavaCodeBlockTrait.variable(noinline block: JavaVariableScope.Block = {}) =
     variable<T>(nullable = false, block)
 
-internal class JavaCodeBlockContainerInternal(val append: (codeBlock: JPCodeBlock) -> Unit)
+internal class JavaCodeBlockContainer(val append: (codeBlock: JPCodeBlock) -> Unit)
 
-private val JavaCodeBlockTrait.internal: JavaCodeBlockContainerInternal
+private val JavaCodeBlockTrait.internal: JavaCodeBlockContainer
     get() = when (this) {
         is JavaBodyScope -> codeBlockContainer
         is JavaEmbeddableCodeBlockScope -> codeBlockContainer

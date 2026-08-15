@@ -36,9 +36,9 @@ sealed interface KotlinArgumentTrait : PoetesseKotlinScope {
     }
 }
 
-internal class KotlinArgumentsContainerInternal(val append: (codeBlock: KPCodeBlock) -> Unit)
+internal class KotlinArgumentContainer(val append: (codeBlock: KPCodeBlock) -> Unit)
 
-private val KotlinArgumentTrait.internal: KotlinArgumentsContainerInternal
+private val KotlinArgumentTrait.internal: KotlinArgumentContainer
     get() = when (this) {
         is KotlinTypeScope.SuperclassConstructorScope -> argumentsContainer
     }

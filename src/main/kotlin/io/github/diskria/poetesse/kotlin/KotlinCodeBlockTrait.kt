@@ -59,9 +59,9 @@ inline fun <reified T> KotlinCodeBlockTrait.variable(
 inline fun <reified T : Any> KotlinCodeBlockTrait.variable(noinline block: KotlinVariableScope.Block = {}) =
     variable<T>(nullable = false, block)
 
-internal class KotlinCodeBlockContainerInternal(val append: (codeBlock: KPCodeBlock) -> Unit)
+internal class KotlinCodeBlockContainer(val append: (codeBlock: KPCodeBlock) -> Unit)
 
-private val KotlinCodeBlockTrait.internal: KotlinCodeBlockContainerInternal
+private val KotlinCodeBlockTrait.internal: KotlinCodeBlockContainer
     get() = when (this) {
         is KotlinBodyScope -> codeBlockContainer
         is KotlinEmbeddableCodeBlockScope -> codeBlockContainer

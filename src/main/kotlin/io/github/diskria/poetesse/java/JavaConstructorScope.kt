@@ -16,8 +16,8 @@ class JavaConstructorScope private constructor(
 
     internal val parameterContainer = JavaParameterContainer(builder::addParameter)
     internal val annotationContainer = JavaAnnotationContainer(builder::addAnnotation)
-    internal val modifierContainer = JavaModifierContainerInternal(builder::addModifiers)
-    internal val statementContainer = JavaBodyContainerInternal(builder::addStatement)
+    internal val modifierContainer = JavaModifierContainer(builder::addModifiers)
+    internal val statementContainer = JavaBodyContainer(builder::addStatement)
 
     internal fun build() = builder.build()
 

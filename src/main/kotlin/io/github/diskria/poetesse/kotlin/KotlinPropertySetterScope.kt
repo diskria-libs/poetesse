@@ -17,8 +17,8 @@ class KotlinPropertySetterScope private constructor(
 
     internal val parameterContainer = KotlinParameterContainer(builder::addParameter)
     internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
-    internal val modifierContainer = KotlinModifierContainerInternal(builder::addModifiers)
-    internal val statementContainer = KotlinBodyContainerInternal(builder::addStatement)
+    internal val modifierContainer = KotlinModifierContainer(builder::addModifiers)
+    internal val statementContainer = KotlinBodyContainer(builder::addStatement)
 
     fun expect() = modifier(KPModifier.EXPECT)
     fun actual() = modifier(KPModifier.ACTUAL)

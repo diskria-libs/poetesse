@@ -14,9 +14,9 @@ fun KotlinModifierTrait.modifier(modifier: KPModifier) {
     internal.append(modifier)
 }
 
-internal class KotlinModifierContainerInternal(val append: (modifier: KPModifier) -> Unit)
+internal class KotlinModifierContainer(val append: (modifier: KPModifier) -> Unit)
 
-private val KotlinModifierTrait.internal: KotlinModifierContainerInternal
+private val KotlinModifierTrait.internal: KotlinModifierContainer
     get() = when (this) {
         is KotlinTypeScope -> modifierContainer
         is KotlinTypeAliasScope -> modifierContainer

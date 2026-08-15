@@ -15,7 +15,7 @@ class JavaParameterScope private constructor(
     internal typealias Block = JavaParameterScope.() -> Unit
 
     internal val annotationContainer = JavaAnnotationContainer(builder::addAnnotation)
-    internal val modifierContainer = JavaModifierContainerInternal(builder::addModifiers)
+    internal val modifierContainer = JavaModifierContainer(builder::addModifiers)
 
     fun final() = modifier(JPModifier.FINAL)
 

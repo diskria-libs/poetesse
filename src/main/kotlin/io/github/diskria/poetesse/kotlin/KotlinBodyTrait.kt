@@ -13,11 +13,11 @@ fun KotlinBodyTrait.expression(block: KotlinCodeScope.Block) {
     body { line { "return ${L(block)}" } }
 }
 
-internal class KotlinBodyContainerInternal(val append: (statement: KPCodeBlock) -> Unit)
+internal class KotlinBodyContainer(val append: (statement: KPCodeBlock) -> Unit)
 
 class KotlinBodyScope private constructor(
     override val config: Poetesse.Config,
-    internal val codeBlockContainer: KotlinCodeBlockContainerInternal,
+    internal val codeBlockContainer: KotlinCodeBlockContainer,
 ) : KotlinCodeBlockTrait {
 
     internal typealias Block = KotlinBodyScope.() -> Unit
@@ -25,11 +25,11 @@ class KotlinBodyScope private constructor(
     internal companion object {
         context(poetesse: PoetesseScope)
         fun of(append: (statement: KPCodeBlock) -> Unit) =
-            KotlinBodyScope(poetesse.config, KotlinCodeBlockContainerInternal(append))
+            KotlinBodyScope(poetesse.config, KotlinCodeBlockContainer(append))
     }
 }
 
-private val KotlinBodyTrait.internal: KotlinBodyContainerInternal
+private val KotlinBodyTrait.internal: KotlinBodyContainer
     get() = when (this) {
         is KotlinPropertyGetterScope -> statementContainer
         is KotlinPropertySetterScope -> statementContainer

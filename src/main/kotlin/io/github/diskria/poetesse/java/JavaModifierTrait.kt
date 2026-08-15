@@ -13,9 +13,9 @@ fun JavaModifierTrait.modifier(modifier: JPModifier) {
     internal.append(modifier)
 }
 
-internal class JavaModifierContainerInternal(val append: (modifier: JPModifier) -> Unit)
+internal class JavaModifierContainer(val append: (modifier: JPModifier) -> Unit)
 
-private val JavaModifierTrait.internal: JavaModifierContainerInternal
+private val JavaModifierTrait.internal: JavaModifierContainer
     get() = when (this) {
         is JavaTypeScope -> modifierContainer
         is JavaFieldScope -> modifierContainer

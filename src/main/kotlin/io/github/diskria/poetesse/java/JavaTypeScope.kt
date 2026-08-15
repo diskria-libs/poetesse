@@ -21,13 +21,13 @@ class JavaTypeScope private constructor(
 
     internal typealias Block = JavaTypeScope.(className: XClassName) -> Unit
 
-    internal val typeVariableContainer = JavaTypeVariableContainerInternal(builder::addTypeVariable)
+    internal val typeVariableContainer = JavaTypeVariableContainer(builder::addTypeVariable)
     internal val typeContainer = JavaTypeContainer(className::nested, builder::addType)
     internal val fieldContainer = JavaFieldContainer(builder::addField)
     internal val constructorContainer = JavaConstructorContainer(builder::addMethod)
     internal val methodContainer = JavaMethodContainer(builder::addMethod)
     internal val annotationContainer = JavaAnnotationContainer(builder::addAnnotation)
-    internal val modifierContainer = JavaModifierContainerInternal(builder::addModifiers)
+    internal val modifierContainer = JavaModifierContainer(builder::addModifiers)
 
     fun abstract() = modifier(JPModifier.ABSTRACT)
     fun static() = modifier(JPModifier.STATIC)

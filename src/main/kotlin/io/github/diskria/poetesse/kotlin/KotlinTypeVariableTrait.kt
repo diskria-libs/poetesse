@@ -33,9 +33,9 @@ fun KotlinTypeVariableTrait.typeVariable(
     vararg bounds: XTypeName, variance: XVariance? = null, reified: Boolean = false, nullable: Boolean = false,
 ) = EagerDelegate { typeVariable(it.capitalized(), bounds.asIterable(), variance, reified, nullable) }
 
-internal class KotlinTypeVariableContainerInternal(val append: (typeVariable: KPTypeVariableName) -> Unit)
+internal class KotlinTypeVariableContainer(val append: (typeVariable: KPTypeVariableName) -> Unit)
 
-private val KotlinTypeVariableTrait.internal: KotlinTypeVariableContainerInternal
+private val KotlinTypeVariableTrait.internal: KotlinTypeVariableContainer
     get() = when (this) {
         is KotlinTypeScope -> typeVariableContainer
         is KotlinTypeAliasScope -> typeVariableContainer

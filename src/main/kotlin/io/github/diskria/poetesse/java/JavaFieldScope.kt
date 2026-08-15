@@ -15,7 +15,7 @@ class JavaFieldScope private constructor(
     internal typealias Block = JavaFieldScope.() -> Unit
 
     internal val annotationContainer = JavaAnnotationContainer(builder::addAnnotation)
-    internal val modifierContainer = JavaModifierContainerInternal(builder::addModifiers)
+    internal val modifierContainer = JavaModifierContainer(builder::addModifiers)
 
     fun initializer(block: JavaCodeScope.Block) {
         builder.initializer(JavaCodeScope.of(block).codeBlock)

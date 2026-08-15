@@ -16,9 +16,9 @@ class KotlinPropertyScope private constructor(
 
     internal typealias Block = KotlinPropertyScope.() -> Unit
 
-    internal val typeVariableContainer = KotlinTypeVariableContainerInternal(builder::addTypeVariable)
+    internal val typeVariableContainer = KotlinTypeVariableContainer(builder::addTypeVariable)
     internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
-    internal val modifierContainer = KotlinModifierContainerInternal(builder::addModifiers)
+    internal val modifierContainer = KotlinModifierContainer(builder::addModifiers)
 
     private var getter: KPFunctionBuilder? = null
     private var setter: KPFunctionBuilder? = null

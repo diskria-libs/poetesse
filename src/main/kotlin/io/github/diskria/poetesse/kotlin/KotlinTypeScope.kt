@@ -20,16 +20,15 @@ class KotlinTypeScope private constructor(
 
     internal typealias Block = KotlinTypeScope.(className: XClassName) -> Unit
 
-    internal val typeVariableContainer = KotlinTypeVariableContainerInternal(builder::addTypeVariable)
+    internal val typeVariableContainer = KotlinTypeVariableContainer(builder::addTypeVariable)
     internal val typeContainer = KotlinTypeContainer(className::nested, builder::addType)
     internal val typeAliasContainer = KotlinTypeAliasContainer(className::nested, builder::addTypeAlias)
     internal val propertyContainer = KotlinPropertyContainer(builder::addProperty)
     internal val constructorContainer = KotlinConstructorContainer(builder) { constructor, isPrimary ->
-        if (isPrimary) builder.primaryConstructor(constructor)
-        else builder.addFunction(constructor)
+        if (isPrimary) builder.primaryConstructor(constructor) else builder.addFunction(constructor)
     }
     internal val functionContainer = KotlinFunctionContainer(builder::addFunction)
-    internal val modifierContainer = KotlinModifierContainerInternal(builder::addModifiers)
+    internal val modifierContainer = KotlinModifierContainer(builder::addModifiers)
     internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
 
     fun expect() = modifier(KPModifier.EXPECT)
@@ -78,7 +77,7 @@ class KotlinTypeScope private constructor(
 
         internal typealias Block = SuperclassConstructorScope.() -> Unit
 
-        internal val argumentsContainer = KotlinArgumentsContainerInternal(
+        internal val argumentsContainer = KotlinArgumentContainer(
             this@KotlinTypeScope.builder::addSuperclassConstructorParameter
         )
     }

@@ -19,11 +19,11 @@ class JavaMethodScope private constructor(
 
     internal typealias Block = JavaMethodScope.() -> Unit
 
-    internal val typeVariableContainer = JavaTypeVariableContainerInternal(builder::addTypeVariable)
+    internal val typeVariableContainer = JavaTypeVariableContainer(builder::addTypeVariable)
     internal val parameterContainer = JavaParameterContainer(builder::addParameter)
     internal val annotationContainer = JavaAnnotationContainer(builder::addAnnotation)
-    internal val modifierContainer = JavaModifierContainerInternal(builder::addModifiers)
-    internal val statementContainer = JavaBodyContainerInternal(builder::addStatement)
+    internal val modifierContainer = JavaModifierContainer(builder::addModifiers)
+    internal val statementContainer = JavaBodyContainer(builder::addStatement)
 
     fun abstract() = modifier(JPModifier.ABSTRACT)
     fun static() = modifier(JPModifier.STATIC)
