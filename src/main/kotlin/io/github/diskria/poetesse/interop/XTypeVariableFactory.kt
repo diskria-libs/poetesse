@@ -3,7 +3,7 @@ package io.github.diskria.poetesse.interop
 import io.github.diskria.poetesse.EagerDelegate
 import io.github.diskria.poetesse.extensions.capitalized
 
-interface XTypeVariableFactory : PoetesseXScope
+interface XTypeVariableFactory : PoetesseScope
 
 fun XTypeVariableFactory.xTypeVariable(
     name: String, bounds: Iterable<XTypeName> = emptyList(), variance: XVariance? = null, reified: Boolean = false,

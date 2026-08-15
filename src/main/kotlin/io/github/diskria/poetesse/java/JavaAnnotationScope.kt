@@ -7,7 +7,7 @@ import kotlin.reflect.KProperty1
 
 class JavaAnnotationScope<A : Annotation> private constructor(
     override val config: Poetesse.Config,
-    private val specBuilder: JPAnnotationBuilder,
+    private val builder: JPAnnotationBuilder,
 ) : PoetesseJavaScope {
 
     internal typealias Block<A> = JavaAnnotationScope<A>.() -> Unit
@@ -16,7 +16,7 @@ class JavaAnnotationScope<A : Annotation> private constructor(
     private typealias ArrayArgumentProperty<A, E> = ArgumentProperty<A, Array<out E>>
 
     fun member(name: String, value: JPCodeBlock) {
-        specBuilder.addMember(name, value)
+        builder.addMember(name, value)
     }
 
     fun argument(name: String, value: JavaCodeRef) {
@@ -166,14 +166,14 @@ class JavaAnnotationScope<A : Annotation> private constructor(
     }
 
     @PublishedApi
-    internal fun build() = specBuilder.build()
+    internal fun build() = builder.build()
 
     @PublishedApi
     internal companion object {
-        context(scope: PoetesseXScope)
+        context(poetesse: PoetesseScope)
         fun <A : Annotation> of(className: XClassName) = JavaAnnotationScope<A>(
-            config = scope.config,
-            specBuilder = JPAnnotation.builder(className.interopToJava(resolveNullability = false)),
+            config = poetesse.config,
+            builder = JPAnnotation.builder(className.interopToJava(resolveNullability = false)),
         )
     }
 }

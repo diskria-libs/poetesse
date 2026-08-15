@@ -7,7 +7,7 @@ import kotlin.reflect.KClass
 class KotlinTypeScope private constructor(
     override val config: Poetesse.Config,
     private val className: XClassName,
-    private val specBuilder: KPTypeBuilder,
+    private val builder: KPTypeBuilder,
 ) : PoetesseKotlinScope,
     KotlinTypeVariableContainer,
     KotlinTypeContainer,
@@ -19,20 +19,20 @@ class KotlinTypeScope private constructor(
 
     internal typealias Block = KotlinTypeScope.(className: XClassName) -> Unit
 
-    internal val typeVariableContainer = KotlinTypeVariableContainerInternal { specBuilder.addTypeVariable(it) }
+    internal val typeVariableContainer = KotlinTypeVariableContainerInternal { builder.addTypeVariable(it) }
     internal val typeContainer = KotlinTypeContainerInternal(
-        appendType = { specBuilder.addType(it) },
-        appendTypeAlias = { specBuilder.addTypeAlias(it) },
+        appendType = { builder.addType(it) },
+        appendTypeAlias = { builder.addTypeAlias(it) },
         nestedClassName = { name -> className.nested(name) },
     )
-    internal val propertyContainer = KotlinPropertyContainerInternal { specBuilder.addProperty(it) }
-    internal val constructorContainer = KotlinConstructorContainerInternal { constructor, isPrimary ->
-        if (isPrimary) specBuilder.primaryConstructor(constructor)
-        else specBuilder.addFunction(constructor)
+    internal val propertyContainer = KotlinPropertyContainerInternal { builder.addProperty(it) }
+    internal val constructorContainer = KotlinConstructorContainerInternal(builder) { constructor, isPrimary ->
+        if (isPrimary) builder.primaryConstructor(constructor)
+        else builder.addFunction(constructor)
     }
-    internal val functionContainer = KotlinFunctionContainerInternal { specBuilder.addFunction(it) }
-    internal val modifierContainer = KotlinModifierContainerInternal { specBuilder.addModifiers(it) }
-    internal val annotationContainer = KotlinAnnotationContainerInternal { specBuilder.addAnnotation(it) }
+    internal val functionContainer = KotlinFunctionContainerInternal { builder.addFunction(it) }
+    internal val modifierContainer = KotlinModifierContainerInternal { builder.addModifiers(it) }
+    internal val annotationContainer = KotlinAnnotationContainerInternal { builder.addAnnotation(it) }
 
     fun expect() = modifier(KPModifier.EXPECT)
     fun actual() = modifier(KPModifier.ACTUAL)
@@ -44,7 +44,7 @@ class KotlinTypeScope private constructor(
     fun inner() = modifier(KPModifier.INNER)
 
     fun superclass(type: XTypeName, block: SuperclassConstructorScope.Block = {}) {
-        specBuilder.superclass(type.interopToKotlin())
+        builder.superclass(type.interopToKotlin())
         SuperclassConstructorScope(config).block()
     }
 
@@ -57,7 +57,7 @@ class KotlinTypeScope private constructor(
     }
 
     fun superinterface(type: XTypeName) {
-        specBuilder.addSuperinterface(type.interopToKotlin())
+        builder.addSuperinterface(type.interopToKotlin())
     }
 
     fun superinterface(type: KClass<*>) {
@@ -69,29 +69,31 @@ class KotlinTypeScope private constructor(
     }
 
     fun initializerBlock(block: KotlinCodeBlockScope.Block = {}) {
-        specBuilder.addInitializerBlock(KotlinCodeBlockScope.of(block).build())
+        builder.addInitializerBlock(KotlinCodeBlockScope.of().apply(block).build())
     }
 
-    internal fun build() = specBuilder.build()
+    internal fun build() = builder.build()
 
-    inner class SuperclassConstructorScope(override val config: Poetesse.Config) : KotlinArgumentsContainer {
+    inner class SuperclassConstructorScope(
+        override val config: Poetesse.Config
+    ) : KotlinArgumentsContainer {
 
         internal typealias Block = SuperclassConstructorScope.() -> Unit
 
         internal val argumentsContainer = KotlinArgumentsContainerInternal {
-            this@KotlinTypeScope.specBuilder.addSuperclassConstructorParameter(it)
+            this@KotlinTypeScope.builder.addSuperclassConstructorParameter(it)
         }
     }
 
     internal companion object {
-        context(scope: PoetesseXScope)
+        context(poetesse: PoetesseScope)
         fun of(kind: KPTypeKind, name: String, className: XClassName): KotlinTypeScope {
-            val specBuilder = when (kind) {
+            val builder = when (kind) {
                 KPTypeKind.CLASS -> KPType.classBuilder(name)
                 KPTypeKind.OBJECT -> KPType.objectBuilder(name)
                 KPTypeKind.INTERFACE -> KPType.interfaceBuilder(name)
             }
-            return KotlinTypeScope(scope.config, className, specBuilder)
+            return KotlinTypeScope(poetesse.config, className, builder)
         }
     }
 }

@@ -1,14 +1,14 @@
 package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.interop.PoetesseXScope
+import io.github.diskria.poetesse.interop.PoetesseScope
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.interopToKotlin
 
 class KotlinPropertyScope private constructor(
     override val config: Poetesse.Config,
     private val type: XTypeName,
-    private val specBuilder: KPPropertyBuilder,
+    private val builder: KPPropertyBuilder,
 ) : PoetesseKotlinScope,
     KotlinTypeVariableContainer,
     KotlinAnnotationContainer,
@@ -16,9 +16,9 @@ class KotlinPropertyScope private constructor(
 
     internal typealias Block = KotlinPropertyScope.() -> Unit
 
-    internal val typeVariableContainer = KotlinTypeVariableContainerInternal { specBuilder.addTypeVariable(it) }
-    internal val annotationContainer = KotlinAnnotationContainerInternal { specBuilder.addAnnotation(it) }
-    internal val modifierContainer = KotlinModifierContainerInternal { specBuilder.addModifiers(it) }
+    internal val typeVariableContainer = KotlinTypeVariableContainerInternal { builder.addTypeVariable(it) }
+    internal val annotationContainer = KotlinAnnotationContainerInternal { builder.addAnnotation(it) }
+    internal val modifierContainer = KotlinModifierContainerInternal { builder.addModifiers(it) }
 
     private var getter: KPFunctionBuilder? = null
     private var setter: KPFunctionBuilder? = null
@@ -35,11 +35,11 @@ class KotlinPropertyScope private constructor(
     fun lateinit() = modifier(KPModifier.LATEINIT)
 
     fun initializer(block: KotlinCodeScope.Block) {
-        specBuilder.initializer(KotlinCodeScope.of(block).codeBlock)
+        builder.initializer(KotlinCodeScope.of(block).codeBlock)
     }
 
     fun mutable(mutable: Boolean = true) {
-        specBuilder.mutable(mutable)
+        builder.mutable(mutable)
     }
 
     fun inline(inline: Boolean = true) {
@@ -48,11 +48,11 @@ class KotlinPropertyScope private constructor(
     }
 
     fun getter(block: KotlinPropertyGetterScope.Block = {}) {
-        getter = KotlinPropertyGetterScope.of().apply(block).specBuilder
+        getter = KotlinPropertyGetterScope.of().apply(block).builder
     }
 
     fun fullSetter(block: KotlinPropertySetterScope.Block = {}) {
-        setter = KotlinPropertySetterScope.of().apply(block).specBuilder
+        setter = KotlinPropertySetterScope.of().apply(block).builder
     }
 
     fun setter(parameterName: String = "value", block: KotlinPropertySetterScope.(String) -> Unit = {}) {
@@ -63,17 +63,14 @@ class KotlinPropertyScope private constructor(
     }
 
     internal fun build(): KPProperty =
-        specBuilder.apply {
+        builder.apply {
             getter?.let { getter(it.addModifiers(accessorModifiers).build()) }
-            setter?.let {
-                mutable()
-                setter(it.addModifiers(accessorModifiers).build())
-            }
+            setter?.let { mutable().setter(it.addModifiers(accessorModifiers).build()) }
         }.build()
 
     internal companion object {
-        context(scope: PoetesseXScope)
+        context(poetesse: PoetesseScope)
         fun of(name: String, type: XTypeName) =
-            KotlinPropertyScope(scope.config, type, KPProperty.builder(name, type.interopToKotlin()))
+            KotlinPropertyScope(poetesse.config, type, KPProperty.builder(name, type.interopToKotlin()))
     }
 }

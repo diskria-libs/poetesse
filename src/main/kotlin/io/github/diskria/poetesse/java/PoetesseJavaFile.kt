@@ -2,7 +2,7 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseFile
-import io.github.diskria.poetesse.interop.PoetesseXScope
+import io.github.diskria.poetesse.interop.PoetesseScope
 import java.nio.file.Path
 import javax.annotation.processing.Filer
 import kotlin.io.path.createDirectories
@@ -10,7 +10,7 @@ import kotlin.io.path.isDirectory
 import kotlin.io.path.notExists
 import kotlin.io.path.outputStream
 
-abstract class JavaFileRef : PoetesseFile {
+abstract class PoetesseJavaFile : PoetesseFile {
 
     override val extensionName: String = "java"
 
@@ -31,11 +31,11 @@ abstract class JavaFileRef : PoetesseFile {
     }
 }
 
-class SingleClassJavaFileRef internal constructor(
+class SingleClassJavaFile internal constructor(
     override val packageName: String?,
     override val fileName: String,
     private val file: JPFile,
-) : JavaFileRef() {
+) : PoetesseJavaFile() {
 
     override fun writeTo(out: Appendable) {
         file.writeTo(out)
@@ -46,12 +46,12 @@ class SingleClassJavaFileRef internal constructor(
     }
 }
 
-class MultiClassJavaFileRef private constructor(
+class MultiClassJavaFile private constructor(
     override val packageName: String?,
     override val fileName: String,
     private val types: List<JPType>,
     private val config: Poetesse.Config,
-) : JavaFileRef() {
+) : PoetesseJavaFile() {
 
     private val staticImports: MutableSet<String> = mutableSetOf()
     private val imports: MutableSet<String> = mutableSetOf()
@@ -103,12 +103,12 @@ class MultiClassJavaFileRef private constructor(
     }
 
     internal companion object {
-        context(scope: PoetesseXScope)
-        fun mergeFrom(packageName: String?, fileName: String, types: List<JPType>): MultiClassJavaFileRef {
-            val file = MultiClassJavaFileRef(packageName, fileName, types, scope.config)
+        context(poetesse: PoetesseScope)
+        fun mergeFrom(packageName: String?, fileName: String, types: List<JPType>): MultiClassJavaFile {
+            val file = MultiClassJavaFile(packageName, fileName, types, poetesse.config)
             types.forEach { typeSpec ->
                 val source = JPFile.builder(packageName.orEmpty(), typeSpec)
-                    .indent(scope.config.indent)
+                    .indent(poetesse.config.indent)
                     .build()
                     .toString()
                 file.collectType(source)

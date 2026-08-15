@@ -117,24 +117,24 @@ class XClassName private constructor(
         }
         private val javaToKotlin = kotlinToJava.entries.associate { (k, j) -> j to k }
 
-        context(scope: PoetesseXScope)
+        context(poetesse: PoetesseScope)
         fun of(packageName: String?, simpleNames: List<String>, isNullable: Boolean) =
-            XClassName(scope.config, packageName, simpleNames, isNullable)
+            XClassName(poetesse.config, packageName, simpleNames, isNullable)
     }
 }
 
 @PublishedApi
-context(scope: PoetesseXScope)
+context(poetesse: PoetesseScope)
 internal fun KPClassName.asXClassName() =
     XClassName.of(packageName.takeIf { it.isNotEmpty() }, simpleNames, isNullable)
 
 @PublishedApi
-context(scope: PoetesseXScope)
+context(poetesse: PoetesseScope)
 internal fun JPClassName.asXClassName(nullable: Boolean = false) =
     XClassName.of(packageName().takeIf { it.isNotEmpty() }, simpleNames(), nullable)
 
 @PublishedApi
-context(scope: PoetesseXScope)
+context(poetesse: PoetesseScope)
 internal fun KClass<*>.toXClass(nullable: Boolean = false): XClassName {
     require(this != Array::class && !java.isArray) {
         val className = simpleName ?: this.toString()

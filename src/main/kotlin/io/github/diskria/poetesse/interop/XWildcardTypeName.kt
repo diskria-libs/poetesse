@@ -34,15 +34,15 @@ class XWildcardTypeName private constructor(
     }
 
     internal companion object {
-        context(scope: PoetesseXScope)
+        context(poetesse: PoetesseScope)
         fun of(inType: XTypeName?, outType: XTypeName?, isNullable: Boolean) =
-            XWildcardTypeName(scope.config, inType, outType, isNullable)
+            XWildcardTypeName(poetesse.config, inType, outType, isNullable)
     }
 }
 
 @PublishedApi
-context(scope: PoetesseXScope)
-internal fun KPWildcardTypeName.asXWildcardTypeName() = with(scope) {
+context(poetesse: PoetesseScope)
+internal fun KPWildcardTypeName.asXWildcardTypeName() = with(poetesse) {
     XWildcardTypeName.of(
         inType = inTypes.firstOrNull()?.let { xType(it) },
         outType = outTypes.firstOrNull()?.let { xType(it) },
@@ -51,8 +51,8 @@ internal fun KPWildcardTypeName.asXWildcardTypeName() = with(scope) {
 }
 
 @PublishedApi
-context(scope: PoetesseXScope)
-internal fun JPWildcardTypeName.asXWildcardTypeName(nullable: Boolean = false) = with(scope) {
+context(poetesse: PoetesseScope)
+internal fun JPWildcardTypeName.asXWildcardTypeName(nullable: Boolean = false) = with(poetesse) {
     XWildcardTypeName.of(
         inType = lowerBounds().firstOrNull()?.let { xType(it) },
         outType = if (lowerBounds().isNotEmpty()) null else upperBounds().firstOrNull()?.let { xType(it) },

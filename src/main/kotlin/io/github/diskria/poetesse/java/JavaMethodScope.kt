@@ -1,7 +1,7 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.interop.PoetesseXScope
+import io.github.diskria.poetesse.interop.PoetesseScope
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.interopToJava
 import io.github.diskria.poetesse.interop.xType
@@ -9,7 +9,7 @@ import kotlin.reflect.KClass
 
 class JavaMethodScope private constructor(
     override val config: Poetesse.Config,
-    private val specBuilder: JPMethodBuilder,
+    private val builder: JPMethodBuilder,
 ) : PoetesseJavaScope,
     JavaTypeVariableContainer,
     JavaParameterContainer,
@@ -19,11 +19,11 @@ class JavaMethodScope private constructor(
 
     internal typealias Block = JavaMethodScope.() -> Unit
 
-    internal val typeVariableContainer = JavaTypeVariableContainerInternal { specBuilder.addTypeVariable(it) }
-    internal val parameterContainer = JavaParameterContainerInternal { specBuilder.addParameter(it) }
-    internal val annotationContainer = JavaAnnotationContainerInternal { specBuilder.addAnnotation(it) }
-    internal val modifierContainer = JavaModifierContainerInternal { specBuilder.addModifiers(it) }
-    internal val statementContainer = JavaBodyContainerInternal { specBuilder.addStatement(it) }
+    internal val typeVariableContainer = JavaTypeVariableContainerInternal { builder.addTypeVariable(it) }
+    internal val parameterContainer = JavaParameterContainerInternal { builder.addParameter(it) }
+    internal val annotationContainer = JavaAnnotationContainerInternal { builder.addAnnotation(it) }
+    internal val modifierContainer = JavaModifierContainerInternal { builder.addModifiers(it) }
+    internal val statementContainer = JavaBodyContainerInternal { builder.addStatement(it) }
 
     fun abstract() = modifier(JPModifier.ABSTRACT)
     fun static() = modifier(JPModifier.STATIC)
@@ -32,7 +32,7 @@ class JavaMethodScope private constructor(
     fun strictfp() = modifier(JPModifier.STRICTFP)
 
     fun returns(type: XTypeName) {
-        specBuilder.returns(type.interopToJava())
+        builder.returns(type.interopToJava())
     }
 
     fun returns(type: KClass<*>, nullable: Boolean = false) =
@@ -44,10 +44,10 @@ class JavaMethodScope private constructor(
     inline fun <reified T : Any> returns() =
         returns<T>(nullable = false)
 
-    internal fun build() = specBuilder.build()
+    internal fun build() = builder.build()
 
     internal companion object {
-        context(scope: PoetesseXScope)
-        fun of(name: String) = JavaMethodScope(scope.config, JPMethod.methodBuilder(name))
+        context(poetesse: PoetesseScope)
+        fun of(name: String) = JavaMethodScope(poetesse.config, JPMethod.methodBuilder(name))
     }
 }

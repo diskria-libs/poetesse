@@ -1,14 +1,14 @@
 package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.interop.PoetesseXScope
+import io.github.diskria.poetesse.interop.PoetesseScope
 import io.github.diskria.poetesse.interop.xClass
 
 class KotlinFileScope private constructor(
     override val config: Poetesse.Config,
     private val packageName: String?,
     val fileName: String,
-    private val specBuilder: KPFileBuilder,
+    private val builder: KPFileBuilder,
 ) : KotlinTypeContainer,
     KotlinPropertyContainer,
     KotlinFunctionContainer {
@@ -16,24 +16,24 @@ class KotlinFileScope private constructor(
     internal typealias Block = KotlinFileScope.() -> Unit
 
     internal val typeContainer = KotlinTypeContainerInternal(
-        appendType = { specBuilder.addType(it) },
-        appendTypeAlias = { specBuilder.addTypeAlias(it) },
+        appendType = { builder.addType(it) },
+        appendTypeAlias = { builder.addTypeAlias(it) },
         nestedClassName = { name -> xClass(packageName, name) },
     )
-    internal val propertyContainer = KotlinPropertyContainerInternal { specBuilder.addProperty(it) }
-    internal val functionContainer = KotlinFunctionContainerInternal { specBuilder.addFunction(it) }
+    internal val propertyContainer = KotlinPropertyContainerInternal { builder.addProperty(it) }
+    internal val functionContainer = KotlinFunctionContainerInternal { builder.addFunction(it) }
 
-    internal fun build(): KotlinFileRef {
-        val file = specBuilder.apply {
+    internal fun build(): PoetesseKotlinFile {
+        val file = builder.apply {
             indent(config.indent)
             config.comment?.let { addFileComment(it) }
         }.build()
-        return KotlinFileRef(file)
+        return PoetesseKotlinFile(file)
     }
 
     internal companion object {
-        context(scope: PoetesseXScope)
+        context(poetesse: PoetesseScope)
         fun of(packageName: String?, fileName: String) =
-            KotlinFileScope(scope.config, packageName, fileName, KPFile.builder(packageName.orEmpty(), fileName))
+            KotlinFileScope(poetesse.config, packageName, fileName, KPFile.builder(packageName.orEmpty(), fileName))
     }
 }

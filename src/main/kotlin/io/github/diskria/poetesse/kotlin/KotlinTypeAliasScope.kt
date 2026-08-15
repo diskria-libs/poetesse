@@ -1,13 +1,13 @@
 package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.interop.PoetesseXScope
+import io.github.diskria.poetesse.interop.PoetesseScope
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.interopToKotlin
 
 class KotlinTypeAliasScope private constructor(
     override val config: Poetesse.Config,
-    private val specBuilder: KPTypeAliasBuilder,
+    private val builder: KPTypeAliasBuilder,
 ) : PoetesseKotlinScope,
     KotlinTypeVariableContainer,
     KotlinAnnotationContainer,
@@ -15,15 +15,15 @@ class KotlinTypeAliasScope private constructor(
 
     internal typealias Block = KotlinTypeAliasScope.() -> Unit
 
-    internal val typeVariableContainer = KotlinTypeVariableContainerInternal { specBuilder.addTypeVariable(it) }
-    internal val annotationContainer = KotlinAnnotationContainerInternal { specBuilder.addAnnotation(it) }
-    internal val modifierContainer = KotlinModifierContainerInternal { specBuilder.addModifiers(it) }
+    internal val typeVariableContainer = KotlinTypeVariableContainerInternal { builder.addTypeVariable(it) }
+    internal val annotationContainer = KotlinAnnotationContainerInternal { builder.addAnnotation(it) }
+    internal val modifierContainer = KotlinModifierContainerInternal { builder.addModifiers(it) }
 
-    internal fun build() = specBuilder.build()
+    internal fun build() = builder.build()
 
     internal companion object {
-        context(scope: PoetesseXScope)
+        context(poetesse: PoetesseScope)
         fun of(name: String, type: XTypeName) =
-            KotlinTypeAliasScope(scope.config, KPTypeAlias.builder(name, type.interopToKotlin()))
+            KotlinTypeAliasScope(poetesse.config, KPTypeAlias.builder(name, type.interopToKotlin()))
     }
 }

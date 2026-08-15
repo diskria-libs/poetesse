@@ -1,7 +1,7 @@
 package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.interop.PoetesseXScope
+import io.github.diskria.poetesse.interop.PoetesseScope
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.interopToKotlin
 import io.github.diskria.poetesse.interop.xType
@@ -11,7 +11,8 @@ class KotlinCodeScope private constructor(
     override val config: Poetesse.Config,
     private val block: Block,
     private val arguments: MutableList<Any?> = mutableListOf(),
-) : KotlinCodeFactory {
+) : PoetesseKotlinScope,
+    KotlinCodeFactory {
 
     internal typealias Block = KotlinCodeScope.() -> String
 
@@ -63,9 +64,9 @@ class KotlinCodeScope private constructor(
     internal fun build() = KPCodeBlock.of(block(), *arguments.toTypedArray())
 
     internal companion object {
-        context(scope: PoetesseXScope)
+        context(poetesse: PoetesseScope)
         fun of(block: Block) = KotlinCodeRef {
-            KotlinCodeScope(scope.config, block).build()
+            KotlinCodeScope(poetesse.config, block).build()
         }
     }
 }

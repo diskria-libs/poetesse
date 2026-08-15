@@ -2,7 +2,7 @@ package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.extensions.addStatement
-import io.github.diskria.poetesse.interop.PoetesseXScope
+import io.github.diskria.poetesse.interop.PoetesseScope
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.interopToKotlin
 import io.github.diskria.poetesse.interop.xType
@@ -10,7 +10,7 @@ import kotlin.reflect.KClass
 
 class KotlinFunctionScope private constructor(
     override val config: Poetesse.Config,
-    private val specBuilder: KPFunctionBuilder,
+    private val builder: KPFunctionBuilder,
 ) : PoetesseKotlinScope,
     KotlinTypeVariableContainer,
     KotlinParameterContainer,
@@ -20,11 +20,11 @@ class KotlinFunctionScope private constructor(
 
     internal typealias Block = KotlinFunctionScope.() -> Unit
 
-    internal val typeVariableContainer = KotlinTypeVariableContainerInternal { specBuilder.addTypeVariable(it) }
-    internal val parameterContainer = KotlinParameterContainerInternal { specBuilder.addParameter(it) }
-    internal val annotationContainer = KotlinAnnotationContainerInternal { specBuilder.addAnnotation(it) }
-    internal val modifierContainer = KotlinModifierContainerInternal { specBuilder.addModifiers(it) }
-    internal val statementContainer = KotlinBodyContainerInternal { specBuilder.addStatement(it) }
+    internal val typeVariableContainer = KotlinTypeVariableContainerInternal { builder.addTypeVariable(it) }
+    internal val parameterContainer = KotlinParameterContainerInternal { builder.addParameter(it) }
+    internal val annotationContainer = KotlinAnnotationContainerInternal { builder.addAnnotation(it) }
+    internal val modifierContainer = KotlinModifierContainerInternal { builder.addModifiers(it) }
+    internal val statementContainer = KotlinBodyContainerInternal { builder.addStatement(it) }
 
     fun expect() = modifier(KPModifier.EXPECT)
     fun actual() = modifier(KPModifier.ACTUAL)
@@ -40,7 +40,7 @@ class KotlinFunctionScope private constructor(
     fun operator() = modifier(KPModifier.OPERATOR)
 
     fun returns(type: XTypeName) {
-        specBuilder.returns(type.interopToKotlin())
+        builder.returns(type.interopToKotlin())
     }
 
     fun returns(type: KClass<*>, nullable: Boolean = false) =
@@ -52,10 +52,10 @@ class KotlinFunctionScope private constructor(
     inline fun <reified T : Any> returns() =
         returns<T>(nullable = false)
 
-    internal fun build() = specBuilder.build()
+    internal fun build() = builder.build()
 
     internal companion object {
-        context(scope: PoetesseXScope)
-        fun of(name: String) = KotlinFunctionScope(scope.config, KPFunction.builder(name))
+        context(poetesse: PoetesseScope)
+        fun of(name: String) = KotlinFunctionScope(poetesse.config, KPFunction.builder(name))
     }
 }

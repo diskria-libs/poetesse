@@ -43,21 +43,21 @@ class XPrimitiveTypeName private constructor(
         val kotlinToKind: Map<KPClassName, Kind> = Kind.entries.associateBy { it.kotlin }
         val javaToKind: Map<JPTypeName, Kind> = Kind.entries.associateBy { it.java }
 
-        context(scope: PoetesseXScope)
+        context(poetesse: PoetesseScope)
         fun of(kind: Kind, isBoxed: Boolean, isNullable: Boolean) =
-            XPrimitiveTypeName(scope.config, kind, isBoxed, isNullable)
+            XPrimitiveTypeName(poetesse.config, kind, isBoxed, isNullable)
     }
 }
 
 @PublishedApi
-context(scope: PoetesseXScope)
+context(poetesse: PoetesseScope)
 internal fun KPTypeName.asXPrimitiveTypeNameOrNull(boxed: Boolean = isNullable): XPrimitiveTypeName? {
     val kind = kotlinToKind[setNullable(false).withoutAnnotations()] ?: return null
     return XPrimitiveTypeName.of(kind, isNullable || boxed, isNullable)
 }
 
 @PublishedApi
-context(scope: PoetesseXScope)
+context(poetesse: PoetesseScope)
 internal fun JPTypeName.asXPrimitiveTypeNameOrNull(nullable: Boolean = false): XPrimitiveTypeName? {
     val kind = javaToKind[setBoxed(false).withoutAnnotations()] ?: return null
     return XPrimitiveTypeName.of(kind, nullable || isBoxedPrimitive, nullable)

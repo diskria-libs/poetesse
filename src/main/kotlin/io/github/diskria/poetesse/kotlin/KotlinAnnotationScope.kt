@@ -8,7 +8,7 @@ import kotlin.reflect.KProperty1
 
 class KotlinAnnotationScope<A : Annotation> private constructor(
     override val config: Poetesse.Config,
-    private val specBuilder: KPAnnotationBuilder,
+    private val builder: KPAnnotationBuilder,
 ) : PoetesseKotlinScope {
 
     internal typealias Block<A> = KotlinAnnotationScope<A>.() -> Unit
@@ -17,7 +17,7 @@ class KotlinAnnotationScope<A : Annotation> private constructor(
     private typealias ArrayArgumentProperty<A, E> = ArgumentProperty<A, Array<out E>>
 
     fun member(name: String? = null, value: KPCodeBlock) {
-        specBuilder.addMember(KotlinCodeScope.of {
+        builder.addMember(KotlinCodeScope.of {
             buildString {
                 name?.let { append("$it = ") }
                 append(L(value))
@@ -172,14 +172,14 @@ class KotlinAnnotationScope<A : Annotation> private constructor(
     }
 
     @PublishedApi
-    internal fun build() = specBuilder.build()
+    internal fun build() = builder.build()
 
     @PublishedApi
     internal companion object {
-        context(scope: PoetesseXScope)
+        context(poetesse: PoetesseScope)
         fun <A : Annotation> of(className: XClassName, useSiteTarget: UseSite? = null) = KotlinAnnotationScope<A>(
-            config = scope.config,
-            specBuilder = KPAnnotation.builder(className.interopToKotlin()).useSiteTarget(useSiteTarget),
+            config = poetesse.config,
+            builder = KPAnnotation.builder(className.interopToKotlin()).useSiteTarget(useSiteTarget),
         )
     }
 }

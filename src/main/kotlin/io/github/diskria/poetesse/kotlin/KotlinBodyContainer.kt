@@ -1,7 +1,7 @@
 package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.interop.PoetesseXScope
+import io.github.diskria.poetesse.interop.PoetesseScope
 
 sealed interface KotlinBodyContainer : PoetesseKotlinScope
 
@@ -17,16 +17,15 @@ internal class KotlinBodyContainerInternal(val append: (statement: KPCodeBlock) 
 
 class KotlinBodyScope private constructor(
     override val config: Poetesse.Config,
-    append: (statement: KPCodeBlock) -> Unit,
+    internal val codeBlockContainer: KotlinCodeBlockContainerInternal,
 ) : KotlinCodeBlockContainer {
 
     internal typealias Block = KotlinBodyScope.() -> Unit
 
-    internal val codeBlockContainer = KotlinCodeBlockContainerInternal(append)
-
     internal companion object {
-        context(scope: PoetesseXScope)
-        fun of(append: (statement: KPCodeBlock) -> Unit) = KotlinBodyScope(scope.config, append)
+        context(poetesse: PoetesseScope)
+        fun of(append: (statement: KPCodeBlock) -> Unit) =
+            KotlinBodyScope(poetesse.config, KotlinCodeBlockContainerInternal(append))
     }
 }
 

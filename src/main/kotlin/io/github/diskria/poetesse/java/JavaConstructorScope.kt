@@ -1,11 +1,11 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.interop.PoetesseXScope
+import io.github.diskria.poetesse.interop.PoetesseScope
 
 class JavaConstructorScope private constructor(
     override val config: Poetesse.Config,
-    private val specBuilder: JPMethodBuilder,
+    private val builder: JPMethodBuilder,
 ) : PoetesseJavaScope,
     JavaParameterContainer,
     JavaAnnotationContainer,
@@ -14,15 +14,15 @@ class JavaConstructorScope private constructor(
 
     internal typealias Block = JavaConstructorScope.() -> Unit
 
-    internal val parameterContainer = JavaParameterContainerInternal { specBuilder.addParameter(it) }
-    internal val annotationContainer = JavaAnnotationContainerInternal { specBuilder.addAnnotation(it) }
-    internal val modifierContainer = JavaModifierContainerInternal { specBuilder.addModifiers(it) }
-    internal val statementContainer = JavaBodyContainerInternal { specBuilder.addStatement(it) }
+    internal val parameterContainer = JavaParameterContainerInternal { builder.addParameter(it) }
+    internal val annotationContainer = JavaAnnotationContainerInternal { builder.addAnnotation(it) }
+    internal val modifierContainer = JavaModifierContainerInternal { builder.addModifiers(it) }
+    internal val statementContainer = JavaBodyContainerInternal { builder.addStatement(it) }
 
-    internal fun build() = specBuilder.build()
+    internal fun build() = builder.build()
 
     internal companion object {
-        context(scope: PoetesseXScope)
-        fun of() = JavaConstructorScope(scope.config, JPMethod.constructorBuilder())
+        context(poetesse: PoetesseScope)
+        fun of() = JavaConstructorScope(poetesse.config, JPMethod.constructorBuilder())
     }
 }

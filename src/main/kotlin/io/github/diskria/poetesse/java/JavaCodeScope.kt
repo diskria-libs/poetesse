@@ -1,7 +1,7 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.interop.PoetesseXScope
+import io.github.diskria.poetesse.interop.PoetesseScope
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.interopToJava
 import io.github.diskria.poetesse.interop.xType
@@ -11,7 +11,8 @@ class JavaCodeScope private constructor(
     override val config: Poetesse.Config,
     private val block: Block,
     private val arguments: MutableList<Any?> = mutableListOf(),
-) : JavaCodeFactory {
+) : PoetesseJavaScope,
+    JavaCodeFactory {
 
     internal typealias Block = JavaCodeScope.() -> String
 
@@ -71,9 +72,9 @@ class JavaCodeScope private constructor(
     internal fun build() = JPCodeBlock.of(block(), *arguments.toTypedArray())
 
     internal companion object {
-        context(scope: PoetesseXScope)
+        context(poetesse: PoetesseScope)
         fun of(block: Block) = JavaCodeRef {
-            JavaCodeScope(scope.config, block).build()
+            JavaCodeScope(poetesse.config, block).build()
         }
     }
 }

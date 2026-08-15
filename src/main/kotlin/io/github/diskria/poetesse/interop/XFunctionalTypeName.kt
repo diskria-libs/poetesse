@@ -40,18 +40,18 @@ class XFunctionalTypeName private constructor(
     }
 
     internal companion object {
-        context(scope: PoetesseXScope)
+        context(poetesse: PoetesseScope)
         fun of(
             contextParameters: List<XTypeName>, receiver: XTypeName?, parameters: List<XParameter>,
             returnType: XTypeName, isNullable: Boolean
-        ) = XFunctionalTypeName(scope.config, contextParameters, receiver, parameters, returnType, isNullable)
+        ) = XFunctionalTypeName(poetesse.config, contextParameters, receiver, parameters, returnType, isNullable)
     }
 }
 
 @OptIn(ExperimentalKotlinPoetApi::class)
 @PublishedApi
-context(scope: PoetesseXScope)
-internal fun KPFunctionalTypeName.asXFunctionalTypeName() = with(scope) {
+context(poetesse: PoetesseScope)
+internal fun KPFunctionalTypeName.asXFunctionalTypeName() = with(poetesse) {
     XFunctionalTypeName.of(
         contextParameters = contextParameters.map { xType(it) },
         receiver = receiver?.let { xType(it) },
@@ -62,7 +62,7 @@ internal fun KPFunctionalTypeName.asXFunctionalTypeName() = with(scope) {
 }
 
 @PublishedApi
-context(scope: PoetesseXScope)
+context(poetesse: PoetesseScope)
 internal fun JPParameterizedTypeName.asXFunctionalTypeNameOrNull(nullable: Boolean = false): XFunctionalTypeName? {
     val rawType = rawType()
     if (rawType.packageName() != "kotlin.jvm.functions" || !rawType.simpleName().startsWith("Function")) {
@@ -75,7 +75,7 @@ internal fun JPParameterizedTypeName.asXFunctionalTypeNameOrNull(nullable: Boole
     }
     val parameterTypes = typeArguments.dropLast(1)
     val returnType = typeArguments.last()
-    return with(scope) {
+    return with(poetesse) {
         XFunctionalTypeName.of(
             contextParameters = emptyList(),
             receiver = null,

@@ -24,9 +24,9 @@ class XTypeVariableName private constructor(
     }
 
     internal companion object {
-        context(scope: PoetesseXScope)
+        context(poetesse: PoetesseScope)
         fun of(name: String, bounds: List<XTypeName>, variance: XVariance?, isReified: Boolean, isNullable: Boolean) =
-            XTypeVariableName(scope.config, name, bounds, variance, isReified, isNullable)
+            XTypeVariableName(poetesse.config, name, bounds, variance, isReified, isNullable)
     }
 }
 
@@ -42,11 +42,13 @@ enum class XVariance(internal val modifier: KPModifier) {
 }
 
 @PublishedApi
-context(scope: PoetesseXScope)
-internal fun KPTypeVariableName.asXTypeVariableName() =
-    XTypeVariableName.of(name, bounds.map { scope.xType(it) }, XVariance.of(variance), isReified, isNullable)
+context(poetesse: PoetesseScope)
+internal fun KPTypeVariableName.asXTypeVariableName() = with(poetesse) {
+    XTypeVariableName.of(name, bounds.map { xType(it) }, XVariance.of(variance), isReified, isNullable)
+}
 
 @PublishedApi
-context(scope: PoetesseXScope)
-internal fun JPTypeVariableName.asXTypeVariableName(nullable: Boolean = false) =
-    XTypeVariableName.of(name(), bounds().map { scope.xType(it) }, variance = null, isReified = false, nullable)
+context(poetesse: PoetesseScope)
+internal fun JPTypeVariableName.asXTypeVariableName(nullable: Boolean = false) = with(poetesse) {
+    XTypeVariableName.of(name(), bounds().map { xType(it) }, variance = null, isReified = false, nullable)
+}

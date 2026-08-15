@@ -1,7 +1,7 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.interop.PoetesseXScope
+import io.github.diskria.poetesse.interop.PoetesseScope
 import io.github.diskria.poetesse.interop.XClassName
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.interopToJava
@@ -9,7 +9,7 @@ import io.github.diskria.poetesse.interop.interopToJava
 class JavaTypeScope private constructor(
     override val config: Poetesse.Config,
     private val className: XClassName,
-    private val specBuilder: JPTypeBuilder,
+    private val builder: JPTypeBuilder,
 ) : PoetesseJavaScope,
     JavaTypeVariableContainer,
     JavaTypeContainer,
@@ -21,16 +21,16 @@ class JavaTypeScope private constructor(
 
     internal typealias Block = JavaTypeScope.(className: XClassName) -> Unit
 
-    internal val typeVariableContainer = JavaTypeVariableContainerInternal { specBuilder.addTypeVariable(it) }
+    internal val typeVariableContainer = JavaTypeVariableContainerInternal { builder.addTypeVariable(it) }
     internal val typeContainer = JavaTypeContainerInternal(
-        append = { specBuilder.addType(it) },
+        append = { builder.addType(it) },
         nestedClassName = { name -> className.nested(name) },
     )
-    internal val fieldContainer = JavaFieldContainerInternal { specBuilder.addField(it) }
-    internal val constructorContainer = JavaConstructorContainerInternal { specBuilder.addMethod(it) }
-    internal val methodContainer = JavaMethodContainerInternal { specBuilder.addMethod(it) }
-    internal val annotationContainer = JavaAnnotationContainerInternal { specBuilder.addAnnotation(it) }
-    internal val modifierContainer = JavaModifierContainerInternal { specBuilder.addModifiers(it) }
+    internal val fieldContainer = JavaFieldContainerInternal { builder.addField(it) }
+    internal val constructorContainer = JavaConstructorContainerInternal { builder.addMethod(it) }
+    internal val methodContainer = JavaMethodContainerInternal { builder.addMethod(it) }
+    internal val annotationContainer = JavaAnnotationContainerInternal { builder.addAnnotation(it) }
+    internal val modifierContainer = JavaModifierContainerInternal { builder.addModifiers(it) }
 
     fun abstract() = modifier(JPModifier.ABSTRACT)
     fun static() = modifier(JPModifier.STATIC)
@@ -40,33 +40,33 @@ class JavaTypeScope private constructor(
     fun sealed(permits: Iterable<XTypeName>) {
         modifier(JPModifier.SEALED)
         permits.forEach {
-            specBuilder.addPermittedSubclass(it.interopToJava())
+            builder.addPermittedSubclass(it.interopToJava())
         }
     }
 
     fun sealed(vararg permits: XTypeName) = sealed(permits.asIterable())
 
     fun initializerBlock(block: JavaCodeBlockScope.Block = {}) {
-        specBuilder.addInitializerBlock(JavaCodeBlockScope.of(block).build())
+        builder.addInitializerBlock(JavaCodeBlockScope.of().apply(block).build())
     }
 
     fun staticBlock(block: JavaCodeBlockScope.Block = {}) {
-        specBuilder.addStaticBlock(JavaCodeBlockScope.of(block).build())
+        builder.addStaticBlock(JavaCodeBlockScope.of().apply(block).build())
     }
 
-    internal fun build() = specBuilder.build()
+    internal fun build() = builder.build()
 
     internal companion object {
-        context(scope: PoetesseXScope)
+        context(poetesse: PoetesseScope)
         fun of(kind: JPTypeKind, name: String, className: XClassName): JavaTypeScope {
-            val specBuilder = when (kind) {
+            val builder = when (kind) {
                 JPTypeKind.CLASS -> JPType.classBuilder(name)
                 JPTypeKind.RECORD -> JPType.recordBuilder(name)
                 JPTypeKind.INTERFACE -> JPType.interfaceBuilder(name)
                 JPTypeKind.ENUM -> JPType.enumBuilder(name)
                 JPTypeKind.ANNOTATION -> JPType.annotationBuilder(name)
             }
-            return JavaTypeScope(scope.config, className, specBuilder)
+            return JavaTypeScope(poetesse.config, className, builder)
         }
     }
 }

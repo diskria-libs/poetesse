@@ -22,20 +22,20 @@ class XParameterizedTypeName private constructor(
             .parameterizedBy(typeArguments.map { it.box().interopToJava() })
 
     internal companion object {
-        context(scope: PoetesseXScope)
+        context(poetesse: PoetesseScope)
         fun of(rawType: XClassName, typeArguments: List<XTypeName>, isNullable: Boolean) =
-            XParameterizedTypeName(scope.config, rawType, typeArguments, isNullable)
+            XParameterizedTypeName(poetesse.config, rawType, typeArguments, isNullable)
     }
 }
 
 @PublishedApi
-context(scope: PoetesseXScope)
+context(poetesse: PoetesseScope)
 internal fun KPParameterizedTypeName.asXParameterizedTypeName() =
     XParameterizedTypeName.of(rawType.asX<XClassName>(), typeArguments.map { it.toXType() }, isNullable)
 
 @PublishedApi
-context(scope: PoetesseXScope)
-internal fun JPParameterizedTypeName.asXParameterizedTypeName(nullable: Boolean = false) = with(scope) {
+context(poetesse: PoetesseScope)
+internal fun JPParameterizedTypeName.asXParameterizedTypeName(nullable: Boolean = false) = with(poetesse) {
     XParameterizedTypeName.of(rawType().asX<XClassName>(), typeArguments().map { xType(it) }, nullable)
 }
 

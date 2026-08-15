@@ -24,20 +24,20 @@ class XVoidTypeName private constructor(
     override fun boxInternal(): XVoidTypeName = XVoidTypeName(config, true, isNullable)
 
     internal companion object {
-        context(scope: PoetesseXScope)
+        context(poetesse: PoetesseScope)
         fun of(isBoxed: Boolean, isNullable: Boolean) =
-            XVoidTypeName(scope.config, isBoxed, isNullable)
+            XVoidTypeName(poetesse.config, isBoxed, isNullable)
     }
 }
 
 @PublishedApi
-context(scope: PoetesseXScope)
+context(poetesse: PoetesseScope)
 internal fun KPTypeName.asXVoidTypeNameOrNull(boxed: Boolean = isNullable): XVoidTypeName? =
     if (setNullable(false).withoutAnnotations() == KPUnit) XVoidTypeName.of(isNullable || boxed, isNullable)
     else null
 
 @PublishedApi
-context(scope: PoetesseXScope)
+context(poetesse: PoetesseScope)
 internal fun JPTypeName.asXVoidTypeNameOrNull(nullable: Boolean = false): XVoidTypeName? =
     if (setBoxed(false).withoutAnnotations() == JPVoid) XVoidTypeName.of(nullable || isBoxedVoid, nullable)
     else null

@@ -53,13 +53,15 @@ class Poetesse private constructor(
         var javaNullabilityResolver: JavaNullabilityResolver = Default.config.javaNullabilityResolver
 
         internal fun build() = Poetesse(Config(indent, commentHeader, javaNullabilityResolver))
+
+        internal typealias Block = Builder.() -> Unit
     }
 
     companion object {
         val Default: Poetesse = Poetesse(Config())
 
-        operator fun invoke(action: Builder.() -> Unit = {}): Poetesse =
-            Builder().apply(action).build()
+        operator fun invoke(block: Builder.Block = {}): Poetesse =
+            Builder().apply(block).build()
     }
 }
 

@@ -12,10 +12,12 @@ class XParameter(val name: String = "", val type: XTypeName) {
         JPParameter.builder(type.interopToJava(), name.ifEmpty { fallbackName }).build()
 }
 
-context(scope: PoetesseXScope)
-fun KPParameter.asXParameter(): XParameter =
-    XParameter(name, scope.xType(type))
+context(poetesse: PoetesseScope)
+fun KPParameter.asXParameter(): XParameter = with(poetesse) {
+    XParameter(name, xType(type))
+}
 
-context(scope: PoetesseXScope)
-fun JPParameter.asXParameter(): XParameter =
-    XParameter(name(), scope.xType(type()))
+context(poetesse: PoetesseScope)
+fun JPParameter.asXParameter(): XParameter = with(poetesse) {
+    XParameter(name(), xType(type()))
+}

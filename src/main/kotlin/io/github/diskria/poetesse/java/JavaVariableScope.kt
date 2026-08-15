@@ -2,7 +2,7 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.extensions.joinWithTrailing
-import io.github.diskria.poetesse.interop.PoetesseXScope
+import io.github.diskria.poetesse.interop.PoetesseScope
 import io.github.diskria.poetesse.interop.XTypeName
 
 class JavaVariableScope private constructor(
@@ -30,22 +30,22 @@ class JavaVariableScope private constructor(
     }
 
     internal fun build(): JavaCodeScope.Block {
-        val annotations = this@JavaVariableScope.annotations
-        val modifiers = this@JavaVariableScope.modifiers
-        val type = this@JavaVariableScope.type
-        val name = this@JavaVariableScope.name
-        val initializer = this@JavaVariableScope.initializer
+        val annotations = annotations
+        val modifiers = modifiers
+        val type = type
+        val name = name
+        val initializer = initializer
         return {
             val annotations = annotations.joinWithTrailing(" ") { L(it) }
             val modifiers = modifiers.joinWithTrailing(" ")
             val type = type?.let { T(it, resolveNullability = true) } ?: L("var")
             val initializer = initializer?.takeIf { !it.codeBlock.isEmpty }?.let { " = ${L(it)}" }.orEmpty()
-            "$annotations$modifiers$type $name$initializer"
+            "$modifiers$annotations$type $name$initializer"
         }
     }
 
     internal companion object {
-        context(scope: PoetesseXScope)
-        fun of(name: String, type: XTypeName?) = JavaVariableScope(scope.config, name, type)
+        context(poetesse: PoetesseScope)
+        fun of(name: String, type: XTypeName?) = JavaVariableScope(poetesse.config, name, type)
     }
 }

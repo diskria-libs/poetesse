@@ -1,22 +1,22 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.interop.PoetesseXScope
+import io.github.diskria.poetesse.interop.PoetesseScope
 
 class JavaCodeBlockScope private constructor(
     override val config: Poetesse.Config,
     private val builder: JPCodeBlockBuilder = JPCodeBlock.builder(),
 ) : JavaCodeBlockContainer {
 
-    typealias Block = JavaCodeBlockScope.() -> Unit
+    internal typealias Block = JavaCodeBlockScope.() -> Unit
 
     internal val codeBlockContainer = JavaCodeBlockContainerInternal { builder.addStatement(it) }
 
     internal fun build() = builder.build()
 
     internal companion object {
-        context(scope: PoetesseXScope)
-        fun of(block: Block) = JavaCodeBlockScope(scope.config).apply(block)
+        context(poetesse: PoetesseScope)
+        fun of() = JavaCodeBlockScope(poetesse.config)
     }
 }
 
@@ -25,12 +25,12 @@ class JavaEmbeddableCodeBlockScope private constructor(
     internal val statements: MutableList<JPCodeBlock> = mutableListOf()
 ) : JavaCodeBlockContainer {
 
-    typealias Block = JavaEmbeddableCodeBlockScope.() -> Unit
+    internal typealias Block = JavaEmbeddableCodeBlockScope.() -> Unit
 
     internal val codeBlockContainer = JavaCodeBlockContainerInternal { statements += it }
 
     internal companion object {
-        context(scope: PoetesseXScope)
-        fun of() = JavaEmbeddableCodeBlockScope(scope.config)
+        context(poetesse: PoetesseScope)
+        fun of() = JavaEmbeddableCodeBlockScope(poetesse.config)
     }
 }

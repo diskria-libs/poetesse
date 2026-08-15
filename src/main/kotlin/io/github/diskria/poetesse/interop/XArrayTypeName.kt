@@ -31,18 +31,18 @@ class XArrayTypeName private constructor(
         val kotlinPrimitiveArrays: Map<KPClassName, KPClassName> =
             XPrimitiveTypeName.Kind.entries.associate { it.kotlinArray to it.kotlin }
 
-        context(scope: PoetesseXScope)
+        context(poetesse: PoetesseScope)
         fun of(componentType: XTypeName, isNullable: Boolean) =
-            XArrayTypeName(scope.config, componentType, isNullable)
+            XArrayTypeName(poetesse.config, componentType, isNullable)
     }
 }
 
 @PublishedApi
-context(scope: PoetesseXScope)
+context(poetesse: PoetesseScope)
 internal fun KPTypeName.asXArrayTypeNameOrNull(): XArrayTypeName? {
     val componentType = when (this) {
         is KPClassName -> kotlinPrimitiveArrays[this]?.asX<XPrimitiveTypeName>()
-        is KPParameterizedTypeName if (rawType.setNullable(false).withoutAnnotations() == KPArray) -> with(scope) {
+        is KPParameterizedTypeName if (rawType.setNullable(false).withoutAnnotations() == KPArray) -> with(poetesse) {
             typeArguments.firstOrNull()?.let { xType(it) }
         }
 
@@ -52,8 +52,8 @@ internal fun KPTypeName.asXArrayTypeNameOrNull(): XArrayTypeName? {
 }
 
 @PublishedApi
-context(scope: PoetesseXScope)
-internal fun JPArrayTypeName.asXArrayTypeName(nullable: Boolean = false) = with(scope) {
+context(poetesse: PoetesseScope)
+internal fun JPArrayTypeName.asXArrayTypeName(nullable: Boolean = false) = with(poetesse) {
     XArrayTypeName.of(xType(componentType()), nullable)
 }
 
