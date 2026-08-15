@@ -8,16 +8,13 @@ class JavaFileScope private constructor(
     override val config: Poetesse.Config,
     private val packageName: String?,
     val fileName: String,
-) : JavaTypeContainer {
+) : JavaTypeTrait {
 
     internal typealias Block = JavaFileScope.() -> Unit
 
     private val types: MutableList<JPType> = mutableListOf()
 
-    internal val typeContainer = JavaTypeContainerInternal(
-        append = { types += it },
-        nestedClassName = { name -> xClass(packageName, name) },
-    )
+    internal val typeContainer = JavaTypeContainer({ xClass(packageName, it) }) { types += it }
 
     internal fun build(): PoetesseJavaFile {
         val primaryType = requireNotNull(types.find { it.name() == fileName }) {

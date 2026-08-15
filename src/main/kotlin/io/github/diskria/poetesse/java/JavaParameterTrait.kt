@@ -6,49 +6,49 @@ import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.asXParameter
 import kotlin.reflect.KClass
 
-sealed interface JavaParameterContainer : JavaParameterFactory {
+sealed interface JavaParameterTrait : JavaParameterFactory {
     operator fun JavaParameterRef.unaryPlus(): XParameter {
-        internal.append(spec)
+        container.append(spec)
         return spec.asXParameter()
     }
 }
 
-fun JavaParameterContainer.parameter(name: String, type: XTypeName, block: JavaParameterScope.Block = {}) =
+fun JavaParameterTrait.parameter(name: String, type: XTypeName, block: JavaParameterScope.Block = {}) =
     +factory.parameter(name, type, block)
 
-fun JavaParameterContainer.parameter(type: XTypeName, block: JavaParameterScope.Block = {}) =
-    EagerDelegate { name -> parameter(name, type, block) }
+fun JavaParameterTrait.parameter(type: XTypeName, block: JavaParameterScope.Block = {}) =
+    EagerDelegate { parameter(it, type, block) }
 
-fun JavaParameterContainer.parameter(
+fun JavaParameterTrait.parameter(
     name: String, type: KClass<*>, nullable: Boolean = false, block: JavaParameterScope.Block = {}
 ) = +factory.parameter(name, type, nullable, block)
 
-fun JavaParameterContainer.parameter(
+fun JavaParameterTrait.parameter(
     type: KClass<*>, nullable: Boolean = false, block: JavaParameterScope.Block = {}
-) = EagerDelegate { name -> parameter(name, type, nullable, block) }
+) = EagerDelegate { parameter(it, type, nullable, block) }
 
-inline fun <reified T> JavaParameterContainer.parameter(
+inline fun <reified T> JavaParameterTrait.parameter(
     name: String, nullable: Boolean = true, noinline block: JavaParameterScope.Block = {}
 ) = +factory.parameter<T>(name, nullable, block)
 
-inline fun <reified T : Any> JavaParameterContainer.parameter(
+inline fun <reified T : Any> JavaParameterTrait.parameter(
     name: String, noinline block: JavaParameterScope.Block = {}
 ) = +factory.parameter<T>(name, block)
 
-inline fun <reified T> JavaParameterContainer.parameter(
+inline fun <reified T> JavaParameterTrait.parameter(
     nullable: Boolean = true, noinline block: JavaParameterScope.Block = {}
-) = EagerDelegate { name -> parameter<T>(name, nullable, block) }
+) = EagerDelegate { parameter<T>(it, nullable, block) }
 
-inline fun <reified T : Any> JavaParameterContainer.parameter(noinline block: JavaParameterScope.Block = {}) =
+inline fun <reified T : Any> JavaParameterTrait.parameter(noinline block: JavaParameterScope.Block = {}) =
     parameter<T>(nullable = false, block)
 
-internal class JavaParameterContainerInternal(val append: (parameter: JPParameter) -> Unit)
+internal class JavaParameterContainer(val append: (parameter: JPParameter) -> Unit)
 
 @PublishedApi
-internal val JavaParameterContainer.factory: JavaParameterFactory
+internal val JavaParameterTrait.factory: JavaParameterFactory
     get() = this as JavaParameterFactory
 
-private val JavaParameterContainer.internal: JavaParameterContainerInternal
+private val JavaParameterTrait.container: JavaParameterContainer
     get() = when (this) {
         is JavaConstructorScope -> parameterContainer
         is JavaMethodScope -> parameterContainer

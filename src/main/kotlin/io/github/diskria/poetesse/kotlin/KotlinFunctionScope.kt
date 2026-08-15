@@ -12,19 +12,19 @@ class KotlinFunctionScope private constructor(
     override val config: Poetesse.Config,
     private val builder: KPFunctionBuilder,
 ) : PoetesseKotlinScope,
-    KotlinTypeVariableContainer,
-    KotlinParameterContainer,
-    KotlinAnnotationContainer,
-    KotlinModifierContainer.WithVisibility,
-    KotlinBodyContainer {
+    KotlinTypeVariableTrait,
+    KotlinParameterTrait,
+    KotlinAnnotationTrait,
+    KotlinModifierTrait.WithVisibility,
+    KotlinBodyTrait {
 
     internal typealias Block = KotlinFunctionScope.() -> Unit
 
-    internal val typeVariableContainer = KotlinTypeVariableContainerInternal { builder.addTypeVariable(it) }
-    internal val parameterContainer = KotlinParameterContainerInternal { builder.addParameter(it) }
-    internal val annotationContainer = KotlinAnnotationContainerInternal { builder.addAnnotation(it) }
-    internal val modifierContainer = KotlinModifierContainerInternal { builder.addModifiers(it) }
-    internal val statementContainer = KotlinBodyContainerInternal { builder.addStatement(it) }
+    internal val typeVariableContainer = KotlinTypeVariableContainerInternal(builder::addTypeVariable)
+    internal val parameterContainer = KotlinParameterContainer(builder::addParameter)
+    internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
+    internal val modifierContainer = KotlinModifierContainerInternal(builder::addModifiers)
+    internal val statementContainer = KotlinBodyContainerInternal(builder::addStatement)
 
     fun expect() = modifier(KPModifier.EXPECT)
     fun actual() = modifier(KPModifier.ACTUAL)

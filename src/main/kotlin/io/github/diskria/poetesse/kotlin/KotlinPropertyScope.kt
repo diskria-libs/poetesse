@@ -10,15 +10,15 @@ class KotlinPropertyScope private constructor(
     private val type: XTypeName,
     private val builder: KPPropertyBuilder,
 ) : PoetesseKotlinScope,
-    KotlinTypeVariableContainer,
-    KotlinAnnotationContainer,
-    KotlinModifierContainer.WithVisibility {
+    KotlinTypeVariableTrait,
+    KotlinAnnotationTrait,
+    KotlinModifierTrait.WithVisibility {
 
     internal typealias Block = KotlinPropertyScope.() -> Unit
 
-    internal val typeVariableContainer = KotlinTypeVariableContainerInternal { builder.addTypeVariable(it) }
-    internal val annotationContainer = KotlinAnnotationContainerInternal { builder.addAnnotation(it) }
-    internal val modifierContainer = KotlinModifierContainerInternal { builder.addModifiers(it) }
+    internal val typeVariableContainer = KotlinTypeVariableContainerInternal(builder::addTypeVariable)
+    internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
+    internal val modifierContainer = KotlinModifierContainerInternal(builder::addModifiers)
 
     private var getter: KPFunctionBuilder? = null
     private var setter: KPFunctionBuilder? = null

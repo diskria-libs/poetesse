@@ -11,7 +11,7 @@ fun KotlinPropertyFactory.property(name: String, type: XTypeName, block: KotlinP
     KotlinPropertyRef(name) { KotlinPropertyScope.of(name, type).apply(block).build() }
 
 fun KotlinPropertyFactory.property(type: XTypeName, block: KotlinPropertyScope.Block = {}) =
-    LazyDelegate { name -> property(name, type, block) }
+    LazyDelegate { property(it, type, block) }
 
 fun KotlinPropertyFactory.property(
     name: String, type: KClass<*>, nullable: Boolean = false, block: KotlinPropertyScope.Block = {}
@@ -19,7 +19,7 @@ fun KotlinPropertyFactory.property(
 
 fun KotlinPropertyFactory.property(
     type: KClass<*>, nullable: Boolean = false, block: KotlinPropertyScope.Block = {}
-) = LazyDelegate { name -> property(name, type, nullable, block) }
+) = LazyDelegate { property(it, type, nullable, block) }
 
 inline fun <reified T> KotlinPropertyFactory.property(
     name: String, nullable: Boolean = true, noinline block: KotlinPropertyScope.Block = {}
@@ -31,7 +31,7 @@ inline fun <reified T : Any> KotlinPropertyFactory.property(
 
 inline fun <reified T> KotlinPropertyFactory.property(
     nullable: Boolean = true, noinline block: KotlinPropertyScope.Block = {}
-) = LazyDelegate { name -> property<T>(name, nullable, block) }
+) = LazyDelegate { property<T>(it, nullable, block) }
 
 inline fun <reified T : Any> KotlinPropertyFactory.property(noinline block: KotlinPropertyScope.Block = {}) =
     property<T>(nullable = false, block)

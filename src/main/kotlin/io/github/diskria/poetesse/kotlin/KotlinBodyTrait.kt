@@ -3,13 +3,13 @@ package io.github.diskria.poetesse.kotlin
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.interop.PoetesseScope
 
-sealed interface KotlinBodyContainer : PoetesseKotlinScope
+sealed interface KotlinBodyTrait : PoetesseKotlinScope
 
-fun KotlinBodyContainer.body(block: KotlinBodyScope.Block = {}) {
+fun KotlinBodyTrait.body(block: KotlinBodyScope.Block = {}) {
     KotlinBodyScope.of(internal.append).apply(block)
 }
 
-fun KotlinBodyContainer.expression(block: KotlinCodeScope.Block) {
+fun KotlinBodyTrait.expression(block: KotlinCodeScope.Block) {
     body { line { "return ${L(block)}" } }
 }
 
@@ -18,7 +18,7 @@ internal class KotlinBodyContainerInternal(val append: (statement: KPCodeBlock) 
 class KotlinBodyScope private constructor(
     override val config: Poetesse.Config,
     internal val codeBlockContainer: KotlinCodeBlockContainerInternal,
-) : KotlinCodeBlockContainer {
+) : KotlinCodeBlockTrait {
 
     internal typealias Block = KotlinBodyScope.() -> Unit
 
@@ -29,7 +29,7 @@ class KotlinBodyScope private constructor(
     }
 }
 
-private val KotlinBodyContainer.internal: KotlinBodyContainerInternal
+private val KotlinBodyTrait.internal: KotlinBodyContainerInternal
     get() = when (this) {
         is KotlinPropertyGetterScope -> statementContainer
         is KotlinPropertySetterScope -> statementContainer

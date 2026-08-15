@@ -6,49 +6,49 @@ import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.asXParameter
 import kotlin.reflect.KClass
 
-sealed interface KotlinParameterContainer : KotlinParameterFactory {
+sealed interface KotlinParameterTrait : KotlinParameterFactory {
     operator fun KotlinParameterRef.unaryPlus(): XParameter {
-        internal.append(spec)
+        container.append(spec)
         return spec.asXParameter()
     }
 }
 
-fun KotlinParameterContainer.parameter(name: String, type: XTypeName, block: KotlinParameterScope.Block = {}) =
+fun KotlinParameterTrait.parameter(name: String, type: XTypeName, block: KotlinParameterScope.Block = {}) =
     +factory.parameter(name, type, block)
 
-fun KotlinParameterContainer.parameter(type: XTypeName, block: KotlinParameterScope.Block = {}) =
-    EagerDelegate { name -> parameter(name, type, block) }
+fun KotlinParameterTrait.parameter(type: XTypeName, block: KotlinParameterScope.Block = {}) =
+    EagerDelegate { parameter(it, type, block) }
 
-fun KotlinParameterContainer.parameter(
+fun KotlinParameterTrait.parameter(
     name: String, type: KClass<*>, nullable: Boolean = false, block: KotlinParameterScope.Block = {}
 ) = +factory.parameter(name, type, nullable, block)
 
-fun KotlinParameterContainer.parameter(
+fun KotlinParameterTrait.parameter(
     type: KClass<*>, nullable: Boolean = false, block: KotlinParameterScope.Block = {}
-) = EagerDelegate { name -> parameter(name, type, nullable, block) }
+) = EagerDelegate { parameter(it, type, nullable, block) }
 
-inline fun <reified T> KotlinParameterContainer.parameter(
+inline fun <reified T> KotlinParameterTrait.parameter(
     name: String, nullable: Boolean = true, noinline block: KotlinParameterScope.Block = {}
 ) = +factory.parameter<T>(name, nullable, block)
 
-inline fun <reified T : Any> KotlinParameterContainer.parameter(
+inline fun <reified T : Any> KotlinParameterTrait.parameter(
     name: String, noinline block: KotlinParameterScope.Block = {}
 ) = +factory.parameter<T>(name, block)
 
-inline fun <reified T> KotlinParameterContainer.parameter(
+inline fun <reified T> KotlinParameterTrait.parameter(
     nullable: Boolean = true, noinline block: KotlinParameterScope.Block = {}
-) = EagerDelegate { name -> parameter<T>(name, nullable, block) }
+) = EagerDelegate { parameter<T>(it, nullable, block) }
 
-inline fun <reified T : Any> KotlinParameterContainer.parameter(noinline block: KotlinParameterScope.Block = {}) =
+inline fun <reified T : Any> KotlinParameterTrait.parameter(noinline block: KotlinParameterScope.Block = {}) =
     parameter<T>(nullable = false, block)
 
-internal class KotlinParameterContainerInternal(val append: (parameter: KPParameter) -> Unit)
+internal class KotlinParameterContainer(val append: (parameter: KPParameter) -> Unit)
 
 @PublishedApi
-internal val KotlinParameterContainer.factory: KotlinParameterFactory
+internal val KotlinParameterTrait.factory: KotlinParameterFactory
     get() = this as KotlinParameterFactory
 
-private val KotlinParameterContainer.internal: KotlinParameterContainerInternal
+private val KotlinParameterTrait.container: KotlinParameterContainer
     get() = when (this) {
         is KotlinPropertySetterScope -> parameterContainer
         is KotlinConstructorScope -> parameterContainer

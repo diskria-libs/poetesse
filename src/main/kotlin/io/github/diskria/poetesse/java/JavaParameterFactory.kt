@@ -11,7 +11,7 @@ fun JavaParameterFactory.parameter(name: String, type: XTypeName, block: JavaPar
     JavaParameterRef(name) { JavaParameterScope.of(name, type).apply(block).build() }
 
 fun JavaParameterFactory.parameter(type: XTypeName, block: JavaParameterScope.Block = {}) =
-    LazyDelegate { name -> parameter(name, type, block) }
+    LazyDelegate { parameter(it, type, block) }
 
 fun JavaParameterFactory.parameter(
     name: String, type: KClass<*>, nullable: Boolean = false, block: JavaParameterScope.Block = {}
@@ -19,7 +19,7 @@ fun JavaParameterFactory.parameter(
 
 fun JavaParameterFactory.parameter(
     type: KClass<*>, nullable: Boolean = false, block: JavaParameterScope.Block = {}
-) = LazyDelegate { name -> parameter(name, type, nullable, block) }
+) = LazyDelegate { parameter(it, type, nullable, block) }
 
 inline fun <reified T> JavaParameterFactory.parameter(
     name: String, nullable: Boolean = true, noinline block: JavaParameterScope.Block = {}
@@ -31,7 +31,7 @@ inline fun <reified T : Any> JavaParameterFactory.parameter(
 
 inline fun <reified T> JavaParameterFactory.parameter(
     nullable: Boolean = true, noinline block: JavaParameterScope.Block = {}
-) = LazyDelegate { name -> parameter<T>(name, nullable, block) }
+) = LazyDelegate { parameter<T>(it, nullable, block) }
 
 inline fun <reified T : Any> JavaParameterFactory.parameter(noinline block: JavaParameterScope.Block = {}) =
     parameter<T>(nullable = false, block)

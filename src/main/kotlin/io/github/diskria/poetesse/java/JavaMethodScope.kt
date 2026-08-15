@@ -11,19 +11,19 @@ class JavaMethodScope private constructor(
     override val config: Poetesse.Config,
     private val builder: JPMethodBuilder,
 ) : PoetesseJavaScope,
-    JavaTypeVariableContainer,
-    JavaParameterContainer,
-    JavaAnnotationContainer,
-    JavaModifierContainer.WithVisibility,
-    JavaBodyContainer {
+    JavaTypeVariableTrait,
+    JavaParameterTrait,
+    JavaAnnotationTrait,
+    JavaModifierTrait.WithVisibility,
+    JavaBodyTrait {
 
     internal typealias Block = JavaMethodScope.() -> Unit
 
-    internal val typeVariableContainer = JavaTypeVariableContainerInternal { builder.addTypeVariable(it) }
-    internal val parameterContainer = JavaParameterContainerInternal { builder.addParameter(it) }
-    internal val annotationContainer = JavaAnnotationContainerInternal { builder.addAnnotation(it) }
-    internal val modifierContainer = JavaModifierContainerInternal { builder.addModifiers(it) }
-    internal val statementContainer = JavaBodyContainerInternal { builder.addStatement(it) }
+    internal val typeVariableContainer = JavaTypeVariableContainerInternal(builder::addTypeVariable)
+    internal val parameterContainer = JavaParameterContainer(builder::addParameter)
+    internal val annotationContainer = JavaAnnotationContainer(builder::addAnnotation)
+    internal val modifierContainer = JavaModifierContainerInternal(builder::addModifiers)
+    internal val statementContainer = JavaBodyContainerInternal(builder::addStatement)
 
     fun abstract() = modifier(JPModifier.ABSTRACT)
     fun static() = modifier(JPModifier.STATIC)

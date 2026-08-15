@@ -11,26 +11,23 @@ class JavaTypeScope private constructor(
     private val className: XClassName,
     private val builder: JPTypeBuilder,
 ) : PoetesseJavaScope,
-    JavaTypeVariableContainer,
-    JavaTypeContainer,
-    JavaFieldContainer,
-    JavaConstructorContainer,
-    JavaMethodContainer,
-    JavaAnnotationContainer,
-    JavaModifierContainer.WithVisibility {
+    JavaTypeVariableTrait,
+    JavaTypeTrait,
+    JavaFieldTrait,
+    JavaConstructorTrait,
+    JavaMethodTrait,
+    JavaAnnotationTrait,
+    JavaModifierTrait.WithVisibility {
 
     internal typealias Block = JavaTypeScope.(className: XClassName) -> Unit
 
-    internal val typeVariableContainer = JavaTypeVariableContainerInternal { builder.addTypeVariable(it) }
-    internal val typeContainer = JavaTypeContainerInternal(
-        append = { builder.addType(it) },
-        nestedClassName = { name -> className.nested(name) },
-    )
-    internal val fieldContainer = JavaFieldContainerInternal { builder.addField(it) }
-    internal val constructorContainer = JavaConstructorContainerInternal { builder.addMethod(it) }
-    internal val methodContainer = JavaMethodContainerInternal { builder.addMethod(it) }
-    internal val annotationContainer = JavaAnnotationContainerInternal { builder.addAnnotation(it) }
-    internal val modifierContainer = JavaModifierContainerInternal { builder.addModifiers(it) }
+    internal val typeVariableContainer = JavaTypeVariableContainerInternal(builder::addTypeVariable)
+    internal val typeContainer = JavaTypeContainer(className::nested, builder::addType)
+    internal val fieldContainer = JavaFieldContainer(builder::addField)
+    internal val constructorContainer = JavaConstructorContainer(builder::addMethod)
+    internal val methodContainer = JavaMethodContainer(builder::addMethod)
+    internal val annotationContainer = JavaAnnotationContainer(builder::addAnnotation)
+    internal val modifierContainer = JavaModifierContainerInternal(builder::addModifiers)
 
     fun abstract() = modifier(JPModifier.ABSTRACT)
     fun static() = modifier(JPModifier.STATIC)

@@ -8,15 +8,15 @@ class KotlinPropertyGetterScope private constructor(
     override val config: Poetesse.Config,
     internal val builder: KPFunctionBuilder,
 ) : PoetesseKotlinScope,
-    KotlinAnnotationContainer,
-    KotlinModifierContainer.WithVisibility,
-    KotlinBodyContainer {
+    KotlinAnnotationTrait,
+    KotlinModifierTrait.WithVisibility,
+    KotlinBodyTrait {
 
     internal typealias Block = KotlinPropertyGetterScope.() -> Unit
 
-    internal val annotationContainer = KotlinAnnotationContainerInternal { builder.addAnnotation(it) }
-    internal val modifierContainer = KotlinModifierContainerInternal { builder.addModifiers(it) }
-    internal val statementContainer = KotlinBodyContainerInternal { builder.addStatement(it) }
+    internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
+    internal val modifierContainer = KotlinModifierContainerInternal(builder::addModifiers)
+    internal val statementContainer = KotlinBodyContainerInternal(builder::addStatement)
 
     fun expect() = modifier(KPModifier.EXPECT)
     fun actual() = modifier(KPModifier.ACTUAL)

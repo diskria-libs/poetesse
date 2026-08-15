@@ -6,6 +6,7 @@ class KotlinFactory(
     override val config: Poetesse.Config
 ) : KotlinFileFactory,
     KotlinTypeFactory,
+    KotlinTypeAliasFactory,
     KotlinPropertyFactory,
     KotlinConstructorFactory,
     KotlinFunctionFactory,

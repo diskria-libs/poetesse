@@ -8,4 +8,4 @@ fun KotlinFunctionFactory.function(name: String, block: KotlinFunctionScope.Bloc
     KotlinFunctionRef(name) { KotlinFunctionScope.of(name).apply(block).build() }
 
 fun KotlinFunctionFactory.function(block: KotlinFunctionScope.Block = {}) =
-    LazyDelegate { name -> function(name, block) }
+    LazyDelegate { function(it, block) }

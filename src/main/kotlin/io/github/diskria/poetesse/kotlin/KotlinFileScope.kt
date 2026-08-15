@@ -9,19 +9,17 @@ class KotlinFileScope private constructor(
     private val packageName: String?,
     val fileName: String,
     private val builder: KPFileBuilder,
-) : KotlinTypeContainer,
-    KotlinPropertyContainer,
-    KotlinFunctionContainer {
+) : KotlinTypeTrait,
+    KotlinTypeAliasTrait,
+    KotlinPropertyTrait,
+    KotlinFunctionTrait {
 
     internal typealias Block = KotlinFileScope.() -> Unit
 
-    internal val typeContainer = KotlinTypeContainerInternal(
-        appendType = { builder.addType(it) },
-        appendTypeAlias = { builder.addTypeAlias(it) },
-        nestedClassName = { name -> xClass(packageName, name) },
-    )
-    internal val propertyContainer = KotlinPropertyContainerInternal { builder.addProperty(it) }
-    internal val functionContainer = KotlinFunctionContainerInternal { builder.addFunction(it) }
+    internal val typeContainer = KotlinTypeContainer({ xClass(packageName, it) }, builder::addType)
+    internal val typeAliasContainer = KotlinTypeAliasContainer({ xClass(packageName, it) }, builder::addTypeAlias)
+    internal val propertyContainer = KotlinPropertyContainer(builder::addProperty)
+    internal val functionContainer = KotlinFunctionContainer(builder::addFunction)
 
     internal fun build(): PoetesseKotlinFile {
         val file = builder.apply {

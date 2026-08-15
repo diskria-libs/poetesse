@@ -1,11 +1,6 @@
 package io.github.diskria.poetesse.kotlin
 
-import io.github.diskria.poetesse.interop.XTypeName
-
 interface KotlinTypeFactory : PoetesseKotlinScope
-
-fun KotlinTypeFactory.typeAlias(name: String, type: XTypeName, block: KotlinTypeAliasScope.Block = {}) =
-    KotlinTypeAliasRef(name) { KotlinTypeAliasScope.of(name, type).apply(block).build() }
 
 fun KotlinTypeFactory.type(kind: KPTypeKind, name: String, block: KotlinTypeScope.Block = {}) =
     KotlinTypeRef(name) { KotlinTypeScope.of(kind, name, it).apply { block(it) }.build() }
@@ -24,6 +19,9 @@ fun KotlinTypeFactory.data_class_(name: String, block: KotlinTypeScope.Block = {
 
 fun KotlinTypeFactory.annotation_class_(name: String, block: KotlinTypeScope.Block = {}) =
     class_(name) { modifier(KPModifier.ANNOTATION); block(it) }
+
+fun KotlinTypeFactory.expect_class_(name: String, block: KotlinTypeScope.Block = {}) =
+    class_(name) { expect(); block(it) }
 
 fun KotlinTypeFactory.object_(name: String, block: KotlinTypeScope.Block = {}) =
     type(KPTypeKind.OBJECT, name, block)

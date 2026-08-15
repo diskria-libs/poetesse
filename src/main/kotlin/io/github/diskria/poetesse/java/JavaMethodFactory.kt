@@ -8,4 +8,4 @@ fun JavaMethodFactory.method(name: String, block: JavaMethodScope.Block = {}) =
     JavaMethodRef(name) { JavaMethodScope.of(name).apply(block).build() }
 
 fun JavaMethodFactory.method(block: JavaMethodScope.Block = {}) =
-    LazyDelegate { name -> method(name, block) }
+    LazyDelegate { method(it, block) }

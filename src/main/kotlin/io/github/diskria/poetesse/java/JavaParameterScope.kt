@@ -9,13 +9,13 @@ class JavaParameterScope private constructor(
     override val config: Poetesse.Config,
     private val builder: JPParameterBuilder,
 ) : PoetesseJavaScope,
-    JavaAnnotationContainer,
-    JavaModifierContainer {
+    JavaAnnotationTrait,
+    JavaModifierTrait {
 
     internal typealias Block = JavaParameterScope.() -> Unit
 
-    internal val annotationContainer = JavaAnnotationContainerInternal { builder.addAnnotation(it) }
-    internal val modifierContainer = JavaModifierContainerInternal { builder.addModifiers(it) }
+    internal val annotationContainer = JavaAnnotationContainer(builder::addAnnotation)
+    internal val modifierContainer = JavaModifierContainerInternal(builder::addModifiers)
 
     fun final() = modifier(JPModifier.FINAL)
 

@@ -9,13 +9,13 @@ class KotlinParameterScope private constructor(
     override val config: Poetesse.Config,
     private val builder: KPParameterBuilder,
 ) : PoetesseKotlinScope,
-    KotlinAnnotationContainer,
-    KotlinModifierContainer {
+    KotlinAnnotationTrait,
+    KotlinModifierTrait {
 
     internal typealias Block = KotlinParameterScope.() -> Unit
 
-    internal val annotationContainer = KotlinAnnotationContainerInternal { builder.addAnnotation(it) }
-    internal val modifierContainer = KotlinModifierContainerInternal { builder.addModifiers(it) }
+    internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
+    internal val modifierContainer = KotlinModifierContainerInternal(builder::addModifiers)
 
     fun vararg() = modifier(KPModifier.VARARG)
     fun noinline() = modifier(KPModifier.NOINLINE)

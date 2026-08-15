@@ -3,28 +3,28 @@ package io.github.diskria.poetesse.java
 import io.github.diskria.poetesse.interop.XClassName
 import kotlin.reflect.KClass
 
-sealed interface JavaAnnotationContainer : JavaAnnotationFactory {
-    operator fun JavaAnnotationRef.unaryPlus() = internal.append(spec)
+sealed interface JavaAnnotationTrait : JavaAnnotationFactory {
+    operator fun JavaAnnotationRef.unaryPlus() = container.append(spec)
 }
 
-fun <A : Annotation> JavaAnnotationContainer.annotation(
+fun <A : Annotation> JavaAnnotationTrait.annotation(
     className: XClassName, block: JavaAnnotationScope.Block<A> = {}
 ) = +factory.annotation(className, block)
 
-fun <A : Annotation> JavaAnnotationContainer.annotation(type: KClass<out A>, block: JavaAnnotationScope.Block<A> = {}) =
+fun <A : Annotation> JavaAnnotationTrait.annotation(type: KClass<out A>, block: JavaAnnotationScope.Block<A> = {}) =
     +factory.annotation(type, block)
 
-inline fun <reified A : Annotation> JavaAnnotationContainer.annotation(
+inline fun <reified A : Annotation> JavaAnnotationTrait.annotation(
     noinline block: JavaAnnotationScope.Block<A> = {}
 ) = +factory.annotation<A>(block)
 
-internal class JavaAnnotationContainerInternal(val append: (annotation: JPAnnotation) -> Unit)
+internal class JavaAnnotationContainer(val append: (annotation: JPAnnotation) -> Unit)
 
 @PublishedApi
-internal val JavaAnnotationContainer.factory: JavaAnnotationFactory
+internal val JavaAnnotationTrait.factory: JavaAnnotationFactory
     get() = this as JavaAnnotationFactory
 
-private val JavaAnnotationContainer.internal: JavaAnnotationContainerInternal
+private val JavaAnnotationTrait.container: JavaAnnotationContainer
     get() = when (this) {
         is JavaTypeScope -> annotationContainer
         is JavaFieldScope -> annotationContainer

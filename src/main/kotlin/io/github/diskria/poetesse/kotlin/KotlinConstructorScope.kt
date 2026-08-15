@@ -10,17 +10,17 @@ class KotlinConstructorScope private constructor(
     private val outerBuilder: KPTypeBuilder,
     private val builder: KPFunctionBuilder,
 ) : PoetesseKotlinScope,
-    KotlinParameterContainer,
-    KotlinAnnotationContainer,
-    KotlinModifierContainer.WithVisibility,
-    KotlinBodyContainer {
+    KotlinParameterTrait,
+    KotlinAnnotationTrait,
+    KotlinModifierTrait.WithVisibility,
+    KotlinBodyTrait {
 
     internal typealias Block = KotlinConstructorScope.() -> Unit
 
-    internal val parameterContainer = KotlinParameterContainerInternal { builder.addParameter(it) }
-    internal val annotationContainer = KotlinAnnotationContainerInternal { builder.addAnnotation(it) }
-    internal val modifierContainer = KotlinModifierContainerInternal { builder.addModifiers(it) }
-    internal val statementContainer = KotlinBodyContainerInternal { builder.addStatement(it) }
+    internal val parameterContainer = KotlinParameterContainer(builder::addParameter)
+    internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
+    internal val modifierContainer = KotlinModifierContainerInternal(builder::addModifiers)
+    internal val statementContainer = KotlinBodyContainerInternal(builder::addStatement)
 
     fun expect() = modifier(KPModifier.EXPECT)
     fun actual() = modifier(KPModifier.ACTUAL)

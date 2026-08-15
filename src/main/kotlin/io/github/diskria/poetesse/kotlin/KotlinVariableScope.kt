@@ -10,8 +10,8 @@ class KotlinVariableScope private constructor(
     val name: String,
     private val type: XTypeName?,
 ) : PoetesseKotlinScope,
-    KotlinAnnotationContainer,
-    KotlinModifierContainer {
+    KotlinAnnotationTrait,
+    KotlinModifierTrait {
 
     internal typealias Block = KotlinVariableScope.() -> Unit
 
@@ -22,7 +22,7 @@ class KotlinVariableScope private constructor(
     private var initializer: KotlinCodeRef? = null
 
     internal val modifierContainer = KotlinModifierContainerInternal { modifiers += it }
-    internal val annotationContainer = KotlinAnnotationContainerInternal { annotations += it }
+    internal val annotationContainer = KotlinAnnotationContainer { annotations += it }
 
     fun mutable(mutable: Boolean = true) {
         isMutable = mutable

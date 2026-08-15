@@ -10,8 +10,8 @@ class JavaVariableScope private constructor(
     val name: String,
     private val type: XTypeName?,
 ) : PoetesseJavaScope,
-    JavaAnnotationContainer,
-    JavaModifierContainer {
+    JavaAnnotationTrait,
+    JavaModifierTrait {
 
     internal typealias Block = JavaVariableScope.() -> Unit
 
@@ -21,7 +21,7 @@ class JavaVariableScope private constructor(
     private var initializer: JavaCodeRef? = null
 
     internal val modifierContainer = JavaModifierContainerInternal { modifiers += it }
-    internal val annotationContainer = JavaAnnotationContainerInternal { annotations += it }
+    internal val annotationContainer = JavaAnnotationContainer { annotations += it }
 
     fun final() = modifier(JPModifier.FINAL)
 

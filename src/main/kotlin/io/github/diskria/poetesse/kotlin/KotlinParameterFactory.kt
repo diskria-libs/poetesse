@@ -11,7 +11,7 @@ fun KotlinParameterFactory.parameter(name: String, type: XTypeName, block: Kotli
     KotlinParameterRef(name) { KotlinParameterScope.of(name, type).apply(block).build() }
 
 fun KotlinParameterFactory.parameter(type: XTypeName, block: KotlinParameterScope.Block = {}) =
-    LazyDelegate { name -> parameter(name, type, block) }
+    LazyDelegate { parameter(it, type, block) }
 
 fun KotlinParameterFactory.parameter(
     name: String, type: KClass<*>, nullable: Boolean = false, block: KotlinParameterScope.Block = {}
@@ -19,7 +19,7 @@ fun KotlinParameterFactory.parameter(
 
 fun KotlinParameterFactory.parameter(
     type: KClass<*>, nullable: Boolean = false, block: KotlinParameterScope.Block = {}
-) = LazyDelegate { name -> parameter(name, type, nullable, block) }
+) = LazyDelegate { parameter(it, type, nullable, block) }
 
 inline fun <reified T> KotlinParameterFactory.parameter(
     name: String, nullable: Boolean = true, noinline block: KotlinParameterScope.Block = {}
@@ -31,7 +31,7 @@ inline fun <reified T : Any> KotlinParameterFactory.parameter(
 
 inline fun <reified T> KotlinParameterFactory.parameter(
     nullable: Boolean = true, noinline block: KotlinParameterScope.Block = {}
-) = LazyDelegate { name -> parameter<T>(name, nullable, block) }
+) = LazyDelegate { parameter<T>(it, nullable, block) }
 
 inline fun <reified T : Any> KotlinParameterFactory.parameter(noinline block: KotlinParameterScope.Block = {}) =
     parameter<T>(nullable = false, block)

@@ -7,35 +7,35 @@ import io.github.diskria.poetesse.interop.XTypeVariableName
 import io.github.diskria.poetesse.interop.XVariance
 import io.github.diskria.poetesse.interop.interopToKotlin
 
-sealed interface KotlinTypeVariableContainer : PoetesseKotlinScope {
+sealed interface KotlinTypeVariableTrait : PoetesseKotlinScope {
     operator fun XTypeVariableName.unaryPlus(): XTypeVariableName {
-        this@KotlinTypeVariableContainer.internal.append(interopToKotlin())
+        this@KotlinTypeVariableTrait.internal.append(interopToKotlin())
         return this
     }
 }
 
-fun KotlinTypeVariableContainer.typeVariable(
+fun KotlinTypeVariableTrait.typeVariable(
     name: String, bounds: Iterable<XTypeName> = emptyList(), variance: XVariance? = null, reified: Boolean = false,
     nullable: Boolean = false,
 ) = +XTypeVariableName.of(name, bounds.toList(), variance, reified, nullable)
 
-fun KotlinTypeVariableContainer.typeVariable(
+fun KotlinTypeVariableTrait.typeVariable(
     name: String, vararg bounds: XTypeName, variance: XVariance? = null, reified: Boolean = false,
     nullable: Boolean = false,
 ) = typeVariable(name, bounds.asIterable(), variance, reified, nullable)
 
-fun KotlinTypeVariableContainer.typeVariable(
+fun KotlinTypeVariableTrait.typeVariable(
     bounds: Iterable<XTypeName> = emptyList(), variance: XVariance? = null, reified: Boolean = false,
     nullable: Boolean = false,
-) = EagerDelegate { name -> typeVariable(name.capitalized(), bounds, variance, reified, nullable) }
+) = EagerDelegate { typeVariable(it.capitalized(), bounds, variance, reified, nullable) }
 
-fun KotlinTypeVariableContainer.typeVariable(
+fun KotlinTypeVariableTrait.typeVariable(
     vararg bounds: XTypeName, variance: XVariance? = null, reified: Boolean = false, nullable: Boolean = false,
-) = EagerDelegate { name -> typeVariable(name.capitalized(), bounds.asIterable(), variance, reified, nullable) }
+) = EagerDelegate { typeVariable(it.capitalized(), bounds.asIterable(), variance, reified, nullable) }
 
 internal class KotlinTypeVariableContainerInternal(val append: (typeVariable: KPTypeVariableName) -> Unit)
 
-private val KotlinTypeVariableContainer.internal: KotlinTypeVariableContainerInternal
+private val KotlinTypeVariableTrait.internal: KotlinTypeVariableContainerInternal
     get() = when (this) {
         is KotlinTypeScope -> typeVariableContainer
         is KotlinTypeAliasScope -> typeVariableContainer

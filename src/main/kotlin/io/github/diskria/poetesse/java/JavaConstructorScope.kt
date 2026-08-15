@@ -7,17 +7,17 @@ class JavaConstructorScope private constructor(
     override val config: Poetesse.Config,
     private val builder: JPMethodBuilder,
 ) : PoetesseJavaScope,
-    JavaParameterContainer,
-    JavaAnnotationContainer,
-    JavaModifierContainer.WithVisibility,
-    JavaBodyContainer {
+    JavaParameterTrait,
+    JavaAnnotationTrait,
+    JavaModifierTrait.WithVisibility,
+    JavaBodyTrait {
 
     internal typealias Block = JavaConstructorScope.() -> Unit
 
-    internal val parameterContainer = JavaParameterContainerInternal { builder.addParameter(it) }
-    internal val annotationContainer = JavaAnnotationContainerInternal { builder.addAnnotation(it) }
-    internal val modifierContainer = JavaModifierContainerInternal { builder.addModifiers(it) }
-    internal val statementContainer = JavaBodyContainerInternal { builder.addStatement(it) }
+    internal val parameterContainer = JavaParameterContainer(builder::addParameter)
+    internal val annotationContainer = JavaAnnotationContainer(builder::addAnnotation)
+    internal val modifierContainer = JavaModifierContainerInternal(builder::addModifiers)
+    internal val statementContainer = JavaBodyContainerInternal(builder::addStatement)
 
     internal fun build() = builder.build()
 

@@ -7,11 +7,11 @@ import io.github.diskria.poetesse.interop.PoetesseScope
 class KotlinCodeBlockScope private constructor(
     override val config: Poetesse.Config,
     private val builder: KPCodeBlockBuilder = KPCodeBlock.builder(),
-) : KotlinCodeBlockContainer {
+) : KotlinCodeBlockTrait {
 
     internal typealias Block = KotlinCodeBlockScope.() -> Unit
 
-    internal val codeBlockContainer = KotlinCodeBlockContainerInternal { builder.addStatement(it) }
+    internal val codeBlockContainer = KotlinCodeBlockContainerInternal(builder::addStatement)
 
     internal fun build() = builder.build()
 
@@ -24,7 +24,7 @@ class KotlinCodeBlockScope private constructor(
 class KotlinEmbeddableCodeBlockScope private constructor(
     override val config: Poetesse.Config,
     internal val statements: MutableList<KPCodeBlock> = mutableListOf()
-) : KotlinCodeBlockContainer {
+) : KotlinCodeBlockTrait {
 
     internal typealias Block = KotlinEmbeddableCodeBlockScope.() -> Unit
 

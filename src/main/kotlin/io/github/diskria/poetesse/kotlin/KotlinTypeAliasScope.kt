@@ -9,15 +9,17 @@ class KotlinTypeAliasScope private constructor(
     override val config: Poetesse.Config,
     private val builder: KPTypeAliasBuilder,
 ) : PoetesseKotlinScope,
-    KotlinTypeVariableContainer,
-    KotlinAnnotationContainer,
-    KotlinModifierContainer.WithVisibility {
+    KotlinTypeVariableTrait,
+    KotlinAnnotationTrait,
+    KotlinModifierTrait.WithVisibility {
 
     internal typealias Block = KotlinTypeAliasScope.() -> Unit
 
-    internal val typeVariableContainer = KotlinTypeVariableContainerInternal { builder.addTypeVariable(it) }
-    internal val annotationContainer = KotlinAnnotationContainerInternal { builder.addAnnotation(it) }
-    internal val modifierContainer = KotlinModifierContainerInternal { builder.addModifiers(it) }
+    internal val typeVariableContainer = KotlinTypeVariableContainerInternal(builder::addTypeVariable)
+    internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
+    internal val modifierContainer = KotlinModifierContainerInternal(builder::addModifiers)
+
+    fun actual() = modifier(KPModifier.ACTUAL)
 
     internal fun build() = builder.build()
 

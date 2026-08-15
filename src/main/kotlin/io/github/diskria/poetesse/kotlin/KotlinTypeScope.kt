@@ -9,30 +9,28 @@ class KotlinTypeScope private constructor(
     private val className: XClassName,
     private val builder: KPTypeBuilder,
 ) : PoetesseKotlinScope,
-    KotlinTypeVariableContainer,
-    KotlinTypeContainer,
-    KotlinPropertyContainer,
-    KotlinConstructorContainer,
-    KotlinFunctionContainer,
-    KotlinAnnotationContainer,
-    KotlinModifierContainer.WithVisibility {
+    KotlinTypeVariableTrait,
+    KotlinTypeTrait,
+    KotlinTypeAliasTrait,
+    KotlinPropertyTrait,
+    KotlinConstructorTrait,
+    KotlinFunctionTrait,
+    KotlinAnnotationTrait,
+    KotlinModifierTrait.WithVisibility {
 
     internal typealias Block = KotlinTypeScope.(className: XClassName) -> Unit
 
-    internal val typeVariableContainer = KotlinTypeVariableContainerInternal { builder.addTypeVariable(it) }
-    internal val typeContainer = KotlinTypeContainerInternal(
-        appendType = { builder.addType(it) },
-        appendTypeAlias = { builder.addTypeAlias(it) },
-        nestedClassName = { name -> className.nested(name) },
-    )
-    internal val propertyContainer = KotlinPropertyContainerInternal { builder.addProperty(it) }
-    internal val constructorContainer = KotlinConstructorContainerInternal(builder) { constructor, isPrimary ->
+    internal val typeVariableContainer = KotlinTypeVariableContainerInternal(builder::addTypeVariable)
+    internal val typeContainer = KotlinTypeContainer(className::nested, builder::addType)
+    internal val typeAliasContainer = KotlinTypeAliasContainer(className::nested, builder::addTypeAlias)
+    internal val propertyContainer = KotlinPropertyContainer(builder::addProperty)
+    internal val constructorContainer = KotlinConstructorContainer(builder) { constructor, isPrimary ->
         if (isPrimary) builder.primaryConstructor(constructor)
         else builder.addFunction(constructor)
     }
-    internal val functionContainer = KotlinFunctionContainerInternal { builder.addFunction(it) }
-    internal val modifierContainer = KotlinModifierContainerInternal { builder.addModifiers(it) }
-    internal val annotationContainer = KotlinAnnotationContainerInternal { builder.addAnnotation(it) }
+    internal val functionContainer = KotlinFunctionContainer(builder::addFunction)
+    internal val modifierContainer = KotlinModifierContainerInternal(builder::addModifiers)
+    internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
 
     fun expect() = modifier(KPModifier.EXPECT)
     fun actual() = modifier(KPModifier.ACTUAL)
@@ -76,13 +74,13 @@ class KotlinTypeScope private constructor(
 
     inner class SuperclassConstructorScope(
         override val config: Poetesse.Config
-    ) : KotlinArgumentsContainer {
+    ) : KotlinArgumentTrait {
 
         internal typealias Block = SuperclassConstructorScope.() -> Unit
 
-        internal val argumentsContainer = KotlinArgumentsContainerInternal {
-            this@KotlinTypeScope.builder.addSuperclassConstructorParameter(it)
-        }
+        internal val argumentsContainer = KotlinArgumentsContainerInternal(
+            this@KotlinTypeScope.builder::addSuperclassConstructorParameter
+        )
     }
 
     internal companion object {

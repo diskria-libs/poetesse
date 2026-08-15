@@ -18,8 +18,8 @@ fun XTypeVariableFactory.xTypeVariable(
 fun XTypeVariableFactory.xTypeVariable(
     bounds: Iterable<XTypeName> = emptyList(), variance: XVariance? = null, reified: Boolean = false,
     nullable: Boolean = false,
-) = EagerDelegate { name -> xTypeVariable(name.capitalized(), bounds, variance, reified, nullable) }
+) = EagerDelegate { xTypeVariable(it.capitalized(), bounds, variance, reified, nullable) }
 
 fun XTypeVariableFactory.xTypeVariable(
     vararg bounds: XTypeName, variance: XVariance? = null, reified: Boolean = false, nullable: Boolean = false,
-) = EagerDelegate { name -> xTypeVariable(name.capitalized(), bounds.asIterable(), variance, reified, nullable) }
+) = EagerDelegate { xTypeVariable(it.capitalized(), bounds.asIterable(), variance, reified, nullable) }
