@@ -1,15 +1,12 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.interop.XClassName
-import io.github.diskria.poetesse.interop.XTypeName
-import io.github.diskria.poetesse.interop.interopToJava
-import io.github.diskria.poetesse.xClass
+import io.github.diskria.poetesse.interop.*
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 
-class JavaAnnotationScope<A : Annotation> internal constructor(
-    override val settings: Poetesse.Settings,
+class JavaAnnotationScope<A : Annotation> private constructor(
+    override val config: Poetesse.Config,
     private val specBuilder: JPAnnotationBuilder,
 ) : PoetesseJavaScope {
 
@@ -26,8 +23,8 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
         member(name, value.codeBlock)
     }
 
-    fun argument(name: String, value: JavaCodeBuilder) {
-        argument(name, JavaCodeScope.of(settings, value))
+    fun argument(name: String, block: JavaCodeScope.Block) {
+        argument(name, JavaCodeScope.of(block))
     }
 
     @JvmName("stringArgument")
@@ -146,7 +143,7 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
         noinline block: Block<Nested> = {}
     ) {
         argument(property, JavaTypedAnnotationRef {
-            of<Nested>(settings, xClass<Nested>()).apply(block).build()
+            of<Nested>(xClass<Nested>()).apply(block).build()
         })
     }
 
@@ -169,12 +166,14 @@ class JavaAnnotationScope<A : Annotation> internal constructor(
     }
 
     @PublishedApi
-    internal fun build(): JPAnnotation =
-        specBuilder.build()
+    internal fun build() = specBuilder.build()
 
     @PublishedApi
     internal companion object {
-        fun <A : Annotation> of(settings: Poetesse.Settings, className: XClassName) =
-            JavaAnnotationScope<A>(settings, JPAnnotation.builder(className.interopToJava(resolveNullability = false)))
+        context(scope: PoetesseXScope)
+        fun <A : Annotation> of(className: XClassName) = JavaAnnotationScope<A>(
+            config = scope.config,
+            specBuilder = JPAnnotation.builder(className.interopToJava(resolveNullability = false)),
+        )
     }
 }

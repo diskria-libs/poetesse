@@ -2,10 +2,11 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.extensions.joinWithTrailing
+import io.github.diskria.poetesse.interop.PoetesseXScope
 import io.github.diskria.poetesse.interop.XTypeName
 
-class JavaVariableScope internal constructor(
-    override val settings: Poetesse.Settings,
+class JavaVariableScope private constructor(
+    override val config: Poetesse.Config,
     val name: String,
     private val type: XTypeName?,
 ) : PoetesseJavaScope,
@@ -26,15 +27,13 @@ class JavaVariableScope internal constructor(
         append = { annotations += it },
     )
 
-    fun final() {
-        modifiers(JPModifier.FINAL)
+    fun final() = modifier(JPModifier.FINAL)
+
+    fun initializer(block: JavaCodeScope.Block) {
+        initializer = JavaCodeScope.of(block)
     }
 
-    fun initializer(block: JavaCodeBuilder) {
-        initializer = JavaCodeScope.of(settings, block)
-    }
-
-    internal fun build(): JavaCodeBuilder {
+    internal fun build(): JavaCodeScope.Block {
         val annotations = this@JavaVariableScope.annotations
         val modifiers = this@JavaVariableScope.modifiers
         val type = this@JavaVariableScope.type
@@ -47,5 +46,10 @@ class JavaVariableScope internal constructor(
             val initializer = initializer?.takeIf { !it.codeBlock.isEmpty }?.let { " = ${L(it)}" }.orEmpty()
             "$annotations$modifiers$type $name$initializer"
         }
+    }
+
+    internal companion object {
+        context(scope: PoetesseXScope)
+        fun of(name: String, type: XTypeName?) = JavaVariableScope(scope.config, name, type)
     }
 }

@@ -2,27 +2,26 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.EagerDelegate
 import io.github.diskria.poetesse.interop.XTypeName
-import io.github.diskria.poetesse.xType
+import io.github.diskria.poetesse.interop.xType
 import kotlin.reflect.KClass
 
 sealed interface JavaCodeBlockContainer : JavaCodeBlockFactory {
-
     operator fun JavaCodeBlockRef.unaryPlus() {
         statements.forEach { +it }
     }
 
-    fun line(build: JavaCodeBuilder) {
-        +code(build).codeBlock
-    }
-
-    private operator fun JPCodeBlock.unaryPlus() {
+    operator fun JPCodeBlock.unaryPlus() {
         if (isEmpty) return
         internal.append(this)
     }
 }
 
+fun JavaCodeBlockContainer.line(block: JavaCodeScope.Block) {
+    +code(block).codeBlock
+}
+
 fun JavaCodeBlockContainer.variable(name: String, type: XTypeName?, block: JavaVariableScope.Block = {}): String {
-    line(JavaVariableScope(settings, name, type).apply(block).build())
+    line(JavaVariableScope.of(name, type).apply(block).build())
     return name
 }
 

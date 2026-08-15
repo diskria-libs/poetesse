@@ -4,7 +4,6 @@ import io.github.diskria.poetesse.interop.XClassName
 import kotlin.reflect.KClass
 
 sealed interface KotlinAnnotationContainer : KotlinAnnotationFactory {
-
     operator fun KotlinAnnotationRef.unaryPlus() {
         internal.append(spec)
     }

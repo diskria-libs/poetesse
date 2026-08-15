@@ -7,7 +7,6 @@ import io.github.diskria.poetesse.interop.XTypeVariableName
 import io.github.diskria.poetesse.interop.interopToJava
 
 sealed interface JavaTypeVariableContainer : PoetesseJavaScope {
-
     operator fun XTypeVariableName.unaryPlus(): XTypeVariableName {
         this@JavaTypeVariableContainer.internal.append(interopToJava())
         return this
@@ -16,7 +15,7 @@ sealed interface JavaTypeVariableContainer : PoetesseJavaScope {
 
 fun JavaTypeVariableContainer.typeVariable(
     name: String, bounds: Iterable<XTypeName> = emptyList(), nullable: Boolean = false
-) = +XTypeVariableName(settings, name, bounds.toList(), null, false, nullable)
+) = +XTypeVariableName.of(name, bounds.toList(), null, false, nullable)
 
 fun JavaTypeVariableContainer.typeVariable(name: String, vararg bounds: XTypeName, nullable: Boolean = false) =
     typeVariable(name, bounds.asIterable(), nullable)

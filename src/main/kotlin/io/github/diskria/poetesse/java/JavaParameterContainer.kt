@@ -7,7 +7,6 @@ import io.github.diskria.poetesse.interop.asXParameter
 import kotlin.reflect.KClass
 
 sealed interface JavaParameterContainer : JavaParameterFactory {
-
     operator fun JavaParameterRef.unaryPlus(): XParameter {
         internal.append(spec)
         return spec.asXParameter()

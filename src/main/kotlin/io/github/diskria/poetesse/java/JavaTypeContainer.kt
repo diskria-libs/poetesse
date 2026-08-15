@@ -3,31 +3,30 @@ package io.github.diskria.poetesse.java
 import io.github.diskria.poetesse.interop.XClassName
 
 sealed interface JavaTypeContainer : JavaTypeFactory {
-
     operator fun JavaTypeRef.unaryPlus(): XClassName {
         val className = internal.nestedClassName(name)
         internal.append(build(className))
         return className
     }
-
-    fun type(kind: JPTypeKind, name: String, block: JavaTypeScope.Block = {}) =
-        +factory.type(kind, name, block)
-
-    fun class_(name: String, block: JavaTypeScope.Block = {}) =
-        +factory.class_(name, block)
-
-    fun record_(name: String, block: JavaTypeScope.Block = {}) =
-        +factory.record_(name, block)
-
-    fun interface_(name: String, block: JavaTypeScope.Block = {}) =
-        +factory.interface_(name, block)
-
-    fun enum_(name: String, block: JavaTypeScope.Block = {}) =
-        +factory.enum_(name, block)
-
-    fun annotation_(name: String, block: JavaTypeScope.Block = {}) =
-        +factory.annotation_(name, block)
 }
+
+fun JavaTypeContainer.type(kind: JPTypeKind, name: String, block: JavaTypeScope.Block = {}) =
+    +factory.type(kind, name, block)
+
+fun JavaTypeContainer.class_(name: String, block: JavaTypeScope.Block = {}) =
+    +factory.class_(name, block)
+
+fun JavaTypeContainer.record_(name: String, block: JavaTypeScope.Block = {}) =
+    +factory.record_(name, block)
+
+fun JavaTypeContainer.interface_(name: String, block: JavaTypeScope.Block = {}) =
+    +factory.interface_(name, block)
+
+fun JavaTypeContainer.enum_(name: String, block: JavaTypeScope.Block = {}) =
+    +factory.enum_(name, block)
+
+fun JavaTypeContainer.annotation_(name: String, block: JavaTypeScope.Block = {}) =
+    +factory.annotation_(name, block)
 
 internal interface JavaTypeContainerInternal {
 
@@ -45,7 +44,8 @@ internal interface JavaTypeContainerInternal {
     }
 }
 
-private val JavaTypeContainer.factory: JavaTypeFactory
+@PublishedApi
+internal val JavaTypeContainer.factory: JavaTypeFactory
     get() = this as JavaTypeFactory
 
 private val JavaTypeContainer.internal: JavaTypeContainerInternal

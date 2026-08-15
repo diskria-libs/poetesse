@@ -1,14 +1,13 @@
 package io.github.diskria.poetesse.kotlin
 
 sealed interface KotlinConstructorContainer : KotlinConstructorFactory {
-
     operator fun KotlinConstructorRef.unaryPlus() {
         internal.append(spec, isPrimary)
     }
-
-    fun constructor(primary: Boolean = false, block: KotlinConstructorScope.Block = {}) =
-        +factory.constructor(primary, block)
 }
+
+fun KotlinConstructorContainer.constructor(primary: Boolean = false, block: KotlinConstructorScope.Block = {}) =
+    +factory.constructor(primary, block)
 
 internal interface KotlinConstructorContainerInternal {
 
@@ -23,7 +22,8 @@ internal interface KotlinConstructorContainerInternal {
     }
 }
 
-private val KotlinConstructorContainer.factory: KotlinConstructorFactory
+@PublishedApi
+internal val KotlinConstructorContainer.factory: KotlinConstructorFactory
     get() = this as KotlinConstructorFactory
 
 private val KotlinConstructorContainer.internal: KotlinConstructorContainerInternal

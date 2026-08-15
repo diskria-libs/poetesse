@@ -1,10 +1,11 @@
 package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.xClass
+import io.github.diskria.poetesse.interop.PoetesseXScope
+import io.github.diskria.poetesse.interop.xClass
 
 class KotlinFileScope private constructor(
-    override val settings: Poetesse.Settings,
+    override val config: Poetesse.Config,
     private val packageName: String?,
     val fileName: String,
     private val specBuilder: KPFileBuilder,
@@ -26,16 +27,17 @@ class KotlinFileScope private constructor(
         append = { specBuilder.addFunction(it) }
     )
 
-    internal fun build(settings: Poetesse.Settings): KotlinFileRef {
+    internal fun build(): KotlinFileRef {
         val file = specBuilder.apply {
-            indent(settings.indent)
-            settings.comment?.let { addFileComment(it) }
+            indent(config.indent)
+            config.comment?.let { addFileComment(it) }
         }.build()
         return KotlinFileRef(file)
     }
 
     internal companion object {
-        fun of(settings: Poetesse.Settings, packageName: String?, fileName: String) =
-            KotlinFileScope(settings, packageName, fileName, KPFile.builder(packageName.orEmpty(), fileName))
+        context(scope: PoetesseXScope)
+        fun of(packageName: String?, fileName: String) =
+            KotlinFileScope(scope.config, packageName, fileName, KPFile.builder(packageName.orEmpty(), fileName))
     }
 }

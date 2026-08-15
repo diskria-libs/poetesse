@@ -1,11 +1,12 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
+import io.github.diskria.poetesse.interop.PoetesseXScope
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.interopToJava
 
 class JavaFieldScope private constructor(
-    override val settings: Poetesse.Settings,
+    override val config: Poetesse.Config,
     private val specBuilder: JPFieldBuilder,
 ) : PoetesseJavaScope,
     JavaAnnotationContainer,
@@ -17,18 +18,18 @@ class JavaFieldScope private constructor(
         append = { specBuilder.addAnnotation(it) },
     )
     internal val modifierContainer = JavaModifierContainerInternal.of(
-        append = { specBuilder.addModifiers(*it) }
+        append = { specBuilder.addModifiers(it) }
     )
 
-    fun initializer(block: JavaCodeBuilder) {
-        specBuilder.initializer(JavaCodeScope.of(settings, block).codeBlock)
+    fun initializer(block: JavaCodeScope.Block) {
+        specBuilder.initializer(JavaCodeScope.of(block).codeBlock)
     }
 
-    internal fun build(): JPField =
-        specBuilder.build()
+    internal fun build() = specBuilder.build()
 
     internal companion object {
-        fun of(settings: Poetesse.Settings, name: String, type: XTypeName) =
-            JavaFieldScope(settings, JPField.builder(type.interopToJava(), name))
+        context(scope: PoetesseXScope)
+        fun of(name: String, type: XTypeName) =
+            JavaFieldScope(scope.config, JPField.builder(type.interopToJava(), name))
     }
 }

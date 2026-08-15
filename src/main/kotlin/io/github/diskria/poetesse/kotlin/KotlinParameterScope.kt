@@ -1,11 +1,12 @@
 package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
+import io.github.diskria.poetesse.interop.PoetesseXScope
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.interopToKotlin
 
 class KotlinParameterScope private constructor(
-    override val settings: Poetesse.Settings,
+    override val config: Poetesse.Config,
     private val specBuilder: KPParameterBuilder,
 ) : PoetesseKotlinScope,
     KotlinAnnotationContainer,
@@ -17,26 +18,18 @@ class KotlinParameterScope private constructor(
         append = { specBuilder.addAnnotation(it) },
     )
     internal val modifierContainer = KotlinModifierContainerInternal.of(
-        append = { specBuilder.addModifiers(*it) }
+        append = { specBuilder.addModifiers(it) }
     )
 
-    fun vararg() {
-        modifiers(KPModifier.VARARG)
-    }
+    fun vararg() = modifier(KPModifier.VARARG)
+    fun noinline() = modifier(KPModifier.NOINLINE)
+    fun crossinline() = modifier(KPModifier.CROSSINLINE)
 
-    fun noinline() {
-        modifiers(KPModifier.NOINLINE)
-    }
-
-    fun crossinline() {
-        modifiers(KPModifier.CROSSINLINE)
-    }
-
-    internal fun build(): KPParameter =
-        specBuilder.build()
+    internal fun build() = specBuilder.build()
 
     internal companion object {
-        fun of(settings: Poetesse.Settings, name: String, type: XTypeName) =
-            KotlinParameterScope(settings, KPParameter.builder(name, type.interopToKotlin()))
+        context(scope: PoetesseXScope)
+        fun of(name: String, type: XTypeName) =
+            KotlinParameterScope(scope.config, KPParameter.builder(name, type.interopToKotlin()))
     }
 }

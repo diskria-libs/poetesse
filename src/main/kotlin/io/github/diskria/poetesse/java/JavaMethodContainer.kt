@@ -3,18 +3,17 @@ package io.github.diskria.poetesse.java
 import io.github.diskria.poetesse.EagerDelegate
 
 sealed interface JavaMethodContainer : JavaMethodFactory {
-
     operator fun JavaMethodRef.unaryPlus(): String {
         internal.append(spec)
         return name
     }
-
-    fun method(name: String, block: JavaMethodScope.Block = {}) =
-        +factory.method(name, block)
-
-    fun method(block: JavaMethodScope.Block = {}) =
-        EagerDelegate { name -> method(name, block) }
 }
+
+fun JavaMethodContainer.method(name: String, block: JavaMethodScope.Block = {}) =
+    +factory.method(name, block)
+
+fun JavaMethodContainer.method(block: JavaMethodScope.Block = {}) =
+    EagerDelegate { name -> method(name, block) }
 
 internal interface JavaMethodContainerInternal {
 
@@ -29,7 +28,8 @@ internal interface JavaMethodContainerInternal {
     }
 }
 
-private val JavaMethodContainer.factory: JavaMethodFactory
+@PublishedApi
+internal val JavaMethodContainer.factory: JavaMethodFactory
     get() = this as JavaMethodFactory
 
 private val JavaMethodContainer.internal: JavaMethodContainerInternal

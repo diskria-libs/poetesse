@@ -2,13 +2,13 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.LazyDelegate
 import io.github.diskria.poetesse.interop.XTypeName
-import io.github.diskria.poetesse.xType
+import io.github.diskria.poetesse.interop.xType
 import kotlin.reflect.KClass
 
 interface JavaFieldFactory : PoetesseJavaScope
 
 fun JavaFieldFactory.field(name: String, type: XTypeName, block: JavaFieldScope.Block = {}) =
-    JavaFieldRef(name) { JavaFieldScope.of(settings, name, type).apply(block).build() }
+    JavaFieldRef(name) { JavaFieldScope.of(name, type).apply(block).build() }
 
 fun JavaFieldFactory.field(type: XTypeName, block: JavaFieldScope.Block = {}) =
     LazyDelegate { name -> field(name, type, block) }

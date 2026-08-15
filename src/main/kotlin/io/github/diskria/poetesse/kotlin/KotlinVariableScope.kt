@@ -2,10 +2,11 @@ package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.extensions.joinWithTrailing
+import io.github.diskria.poetesse.interop.PoetesseXScope
 import io.github.diskria.poetesse.interop.XTypeName
 
-class KotlinVariableScope internal constructor(
-    override val settings: Poetesse.Settings,
+class KotlinVariableScope private constructor(
+    override val config: Poetesse.Config,
     val name: String,
     private val type: XTypeName?,
 ) : PoetesseKotlinScope,
@@ -31,11 +32,11 @@ class KotlinVariableScope internal constructor(
         isMutable = mutable
     }
 
-    fun initializer(block: KotlinCodeBuilder) {
-        initializer = KotlinCodeScope.of(settings, block)
+    fun initializer(block: KotlinCodeScope.Block) {
+        initializer = KotlinCodeScope.of(block)
     }
 
-    internal fun build(): KotlinCodeBuilder {
+    internal fun build(): KotlinCodeScope.Block {
         val annotations = this@KotlinVariableScope.annotations
         val modifiers = this@KotlinVariableScope.modifiers
         val isMutable = this@KotlinVariableScope.isMutable
@@ -50,5 +51,10 @@ class KotlinVariableScope internal constructor(
             val initializer = initializer?.takeIf { it.codeBlock.isNotEmpty() }?.let { " = ${L(it)}" }.orEmpty()
             "$annotations$modifiers$keyword $name$type$initializer"
         }
+    }
+
+    internal companion object {
+        context(scope: PoetesseXScope)
+        fun of(name: String, type: XTypeName?) = KotlinVariableScope(scope.config, name, type)
     }
 }

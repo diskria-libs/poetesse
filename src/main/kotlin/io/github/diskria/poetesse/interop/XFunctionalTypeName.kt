@@ -2,19 +2,18 @@ package io.github.diskria.poetesse.interop
 
 import com.squareup.kotlinpoet.ExperimentalKotlinPoetApi
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.PoetesseScope
 import io.github.diskria.poetesse.java.JPClassName
 import io.github.diskria.poetesse.java.JPParameterizedTypeName
 import io.github.diskria.poetesse.kotlin.KPFunctionalTypeName
 
-class XFunctionalTypeName internal constructor(
-    override val settings: Poetesse.Settings,
+class XFunctionalTypeName private constructor(
+    config: Poetesse.Config,
     val contextParameters: List<XTypeName>,
     val receiver: XTypeName?,
     val parameters: List<XParameter>,
     val returnType: XTypeName,
     override val isNullable: Boolean,
-) : XTypedTypeName<KPFunctionalTypeName, JPParameterizedTypeName>() {
+) : XTypedTypeName<KPFunctionalTypeName, JPParameterizedTypeName>(config) {
 
     @OptIn(ExperimentalKotlinPoetApi::class)
     override fun interopToKotlinInternal(): KPFunctionalTypeName =
@@ -39,23 +38,31 @@ class XFunctionalTypeName internal constructor(
         val typeArguments = (allArguments + returnType.interopToJava()).toTypedArray()
         return JPParameterizedTypeName.get(functionClass, *typeArguments)
     }
+
+    internal companion object {
+        context(scope: PoetesseXScope)
+        fun of(
+            contextParameters: List<XTypeName>, receiver: XTypeName?, parameters: List<XParameter>,
+            returnType: XTypeName, isNullable: Boolean
+        ) = XFunctionalTypeName(scope.config, contextParameters, receiver, parameters, returnType, isNullable)
+    }
 }
 
 @OptIn(ExperimentalKotlinPoetApi::class)
 @PublishedApi
-context(scope: PoetesseScope)
-internal fun KPFunctionalTypeName.asXFunctionalTypeName(): XFunctionalTypeName =
-    XFunctionalTypeName(
-        scope.settings,
-        contextParameters = contextParameters.map { it.toXType() },
-        receiver = receiver?.toXType(),
+context(scope: PoetesseXScope)
+internal fun KPFunctionalTypeName.asXFunctionalTypeName() = with(scope) {
+    XFunctionalTypeName.of(
+        contextParameters = contextParameters.map { xType(it) },
+        receiver = receiver?.let { xType(it) },
         parameters = parameters.map { it.asXParameter() },
-        returnType = returnType.toXType(),
+        returnType = xType(returnType),
         isNullable = isNullable,
     )
+}
 
 @PublishedApi
-context(scope: PoetesseScope)
+context(scope: PoetesseXScope)
 internal fun JPParameterizedTypeName.asXFunctionalTypeNameOrNull(nullable: Boolean = false): XFunctionalTypeName? {
     val rawType = rawType()
     if (rawType.packageName() != "kotlin.jvm.functions" || !rawType.simpleName().startsWith("Function")) {
@@ -68,23 +75,21 @@ internal fun JPParameterizedTypeName.asXFunctionalTypeNameOrNull(nullable: Boole
     }
     val parameterTypes = typeArguments.dropLast(1)
     val returnType = typeArguments.last()
-    return XFunctionalTypeName(
-        settings = scope.settings,
-        contextParameters = emptyList(),
-        receiver = null,
-        parameters = parameterTypes.map { XParameter(type = it.toXType()) },
-        returnType = returnType.toXType(),
-        isNullable = nullable,
-    )
+    return with(scope) {
+        XFunctionalTypeName.of(
+            contextParameters = emptyList(),
+            receiver = null,
+            parameters = parameterTypes.map { XParameter(type = xType(it)) },
+            returnType = xType(returnType),
+            isNullable = nullable,
+        )
+    }
 }
 
 fun XTypeName.lambda(
-    parameters: Iterable<XParameter> = emptyList(),
-    receiver: XTypeName? = null,
-    contextParameters: Iterable<XTypeName> = emptyList(),
-    nullable: Boolean = false,
-): XFunctionalTypeName = XFunctionalTypeName(
-    settings = settings,
+    parameters: Iterable<XParameter> = emptyList(), receiver: XTypeName? = null,
+    contextParameters: Iterable<XTypeName> = emptyList(), nullable: Boolean = false,
+) = XFunctionalTypeName.of(
     contextParameters = contextParameters.toList(),
     receiver = receiver,
     parameters = parameters.toList(),
@@ -94,17 +99,13 @@ fun XTypeName.lambda(
 
 @JvmName("lambdaWithParameterTypes")
 fun XTypeName.lambda(
-    parameters: Iterable<XTypeName> = emptyList(),
-    receiver: XTypeName? = null,
-    contextParameters: Iterable<XTypeName> = emptyList(),
-    nullable: Boolean = false,
-): XFunctionalTypeName = lambda(parameters.map { XParameter(type = it) }, receiver, contextParameters, nullable)
+    parameters: Iterable<XTypeName> = emptyList(), receiver: XTypeName? = null,
+    contextParameters: Iterable<XTypeName> = emptyList(), nullable: Boolean = false,
+) = lambda(parameters.map { XParameter(type = it) }, receiver, contextParameters, nullable)
 
 fun XTypeName.lambda(
-    receiver: XTypeName? = null,
-    contextParameters: Iterable<XTypeName> = emptyList(),
-    nullable: Boolean = false,
-): XFunctionalTypeName = lambda(emptyList<XTypeName>(), receiver, contextParameters, nullable)
+    receiver: XTypeName? = null, contextParameters: Iterable<XTypeName> = emptyList(), nullable: Boolean = false,
+) = lambda(emptyList<XTypeName>(), receiver, contextParameters, nullable)
 
-fun XTypeName.lambda(vararg parameters: XTypeName, nullable: Boolean = false): XFunctionalTypeName =
+fun XTypeName.lambda(vararg parameters: XTypeName, nullable: Boolean = false) =
     lambda(parameters = parameters.asIterable(), nullable = nullable)

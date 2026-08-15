@@ -2,15 +2,12 @@ package io.github.diskria.poetesse.kotlin
 
 import com.squareup.kotlinpoet.AnnotationSpec
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.interop.XClassName
-import io.github.diskria.poetesse.interop.XTypeName
-import io.github.diskria.poetesse.interop.interopToKotlin
-import io.github.diskria.poetesse.xClass
+import io.github.diskria.poetesse.interop.*
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 
-class KotlinAnnotationScope<A : Annotation> internal constructor(
-    override val settings: Poetesse.Settings,
+class KotlinAnnotationScope<A : Annotation> private constructor(
+    override val config: Poetesse.Config,
     private val specBuilder: KPAnnotationBuilder,
 ) : PoetesseKotlinScope {
 
@@ -20,7 +17,7 @@ class KotlinAnnotationScope<A : Annotation> internal constructor(
     private typealias ArrayArgumentProperty<A, E> = ArgumentProperty<A, Array<out E>>
 
     fun member(name: String? = null, value: KPCodeBlock) {
-        specBuilder.addMember(KotlinCodeScope.of(settings) {
+        specBuilder.addMember(KotlinCodeScope.of {
             buildString {
                 name?.let { append("$it = ") }
                 append(L(value))
@@ -32,8 +29,8 @@ class KotlinAnnotationScope<A : Annotation> internal constructor(
         member(name, value.codeBlock)
     }
 
-    fun argument(name: String, value: KotlinCodeBuilder) {
-        argument(name, KotlinCodeScope.of(settings, value))
+    fun argument(name: String, block: KotlinCodeScope.Block) {
+        argument(name, KotlinCodeScope.of(block))
     }
 
     @JvmName("stringArgument")
@@ -152,7 +149,7 @@ class KotlinAnnotationScope<A : Annotation> internal constructor(
         noinline block: Block<Nested> = {}
     ) {
         argument(property, KotlinTypedAnnotationRef {
-            of<Nested>(settings, xClass<Nested>()).apply(block).build()
+            of<Nested>(xClass<Nested>()).apply(block).build()
         })
     }
 
@@ -175,17 +172,14 @@ class KotlinAnnotationScope<A : Annotation> internal constructor(
     }
 
     @PublishedApi
-    internal fun build(): KPAnnotation =
-        specBuilder.build()
+    internal fun build() = specBuilder.build()
 
     @PublishedApi
     internal companion object {
-        fun <A : Annotation> of(
-            settings: Poetesse.Settings,
-            className: XClassName,
-            useSiteTarget: UseSite? = null,
-        ) = KotlinAnnotationScope<A>(
-            settings, KPAnnotation.builder(className.interopToKotlin()).useSiteTarget(useSiteTarget)
+        context(scope: PoetesseXScope)
+        fun <A : Annotation> of(className: XClassName, useSiteTarget: UseSite? = null) = KotlinAnnotationScope<A>(
+            config = scope.config,
+            specBuilder = KPAnnotation.builder(className.interopToKotlin()).useSiteTarget(useSiteTarget),
         )
     }
 }

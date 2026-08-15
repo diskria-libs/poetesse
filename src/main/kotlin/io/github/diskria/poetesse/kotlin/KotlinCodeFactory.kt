@@ -2,6 +2,6 @@ package io.github.diskria.poetesse.kotlin
 
 interface KotlinCodeFactory : PoetesseKotlinScope {
 
-    fun code(build: KotlinCodeBuilder): KotlinCodeRef =
-        KotlinCodeScope.of(settings, build)
+    fun code(block: KotlinCodeScope.Block): KotlinCodeRef =
+        KotlinCodeScope.of(block)
 }

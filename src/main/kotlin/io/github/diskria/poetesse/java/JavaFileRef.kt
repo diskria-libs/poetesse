@@ -2,6 +2,7 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseFile
+import io.github.diskria.poetesse.interop.PoetesseXScope
 import java.nio.file.Path
 import javax.annotation.processing.Filer
 import kotlin.io.path.createDirectories
@@ -49,7 +50,7 @@ class MultiClassJavaFileRef private constructor(
     override val packageName: String?,
     override val fileName: String,
     private val types: List<JPType>,
-    private val settings: Poetesse.Settings,
+    private val config: Poetesse.Config,
 ) : JavaFileRef() {
 
     private val staticImports: MutableSet<String> = mutableSetOf()
@@ -57,7 +58,7 @@ class MultiClassJavaFileRef private constructor(
     private val typeSections: MutableList<String> = mutableListOf()
 
     override fun writeTo(out: Appendable) {
-        settings.comment?.let {
+        config.comment?.let {
             out.appendLine("// $it")
         }
         packageName?.let {
@@ -102,16 +103,12 @@ class MultiClassJavaFileRef private constructor(
     }
 
     internal companion object {
-        fun mergeFrom(
-            packageName: String?,
-            fileName: String,
-            types: List<JPType>,
-            settings: Poetesse.Settings,
-        ): MultiClassJavaFileRef {
-            val file = MultiClassJavaFileRef(packageName, fileName, types, settings)
+        context(scope: PoetesseXScope)
+        fun mergeFrom(packageName: String?, fileName: String, types: List<JPType>): MultiClassJavaFileRef {
+            val file = MultiClassJavaFileRef(packageName, fileName, types, scope.config)
             types.forEach { typeSpec ->
                 val source = JPFile.builder(packageName.orEmpty(), typeSpec)
-                    .indent(settings.indent)
+                    .indent(scope.config.indent)
                     .build()
                     .toString()
                 file.collectType(source)

@@ -5,7 +5,7 @@ import io.github.diskria.poetesse.LazyDelegate
 interface JavaMethodFactory : PoetesseJavaScope
 
 fun JavaMethodFactory.method(name: String, block: JavaMethodScope.Block = {}) =
-    JavaMethodRef(name) { JavaMethodScope.of(settings, name).apply(block).build() }
+    JavaMethodRef(name) { JavaMethodScope.of(name).apply(block).build() }
 
 fun JavaMethodFactory.method(block: JavaMethodScope.Block = {}) =
     LazyDelegate { name -> method(name, block) }

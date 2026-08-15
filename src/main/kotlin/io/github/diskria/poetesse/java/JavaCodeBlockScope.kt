@@ -1,9 +1,10 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
+import io.github.diskria.poetesse.interop.PoetesseXScope
 
-class JavaCodeBlockScope internal constructor(
-    override val settings: Poetesse.Settings,
+class JavaCodeBlockScope private constructor(
+    override val config: Poetesse.Config,
     private val builder: JPCodeBlockBuilder = JPCodeBlock.builder(),
 ) : JavaCodeBlockContainer {
 
@@ -13,16 +14,16 @@ class JavaCodeBlockScope internal constructor(
         append = { builder.addStatement(it) }
     )
 
-    internal fun build(): JPCodeBlock =
-        builder.build()
+    internal fun build() = builder.build()
 
     internal companion object {
-        fun of(settings: Poetesse.Settings, block: Block) = JavaCodeBlockScope(settings).apply(block)
+        context(scope: PoetesseXScope)
+        fun of(block: Block) = JavaCodeBlockScope(scope.config).apply(block)
     }
 }
 
-class JavaEmbeddableCodeBlockScope internal constructor(
-    override val settings: Poetesse.Settings,
+class JavaEmbeddableCodeBlockScope private constructor(
+    override val config: Poetesse.Config,
     internal val statements: MutableList<JPCodeBlock> = mutableListOf()
 ) : JavaCodeBlockContainer {
 
@@ -31,4 +32,9 @@ class JavaEmbeddableCodeBlockScope internal constructor(
     internal val codeBlockContainer = JavaCodeBlockContainerInternal.of(
         append = { statements += it }
     )
+
+    internal companion object {
+        context(scope: PoetesseXScope)
+        fun of() = JavaEmbeddableCodeBlockScope(scope.config)
+    }
 }

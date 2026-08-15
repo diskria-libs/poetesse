@@ -2,9 +2,10 @@ package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.extensions.addStatement
+import io.github.diskria.poetesse.interop.PoetesseXScope
 
 class KotlinConstructorScope private constructor(
-    override val settings: Poetesse.Settings,
+    override val config: Poetesse.Config,
     private val specBuilder: KPFunctionBuilder,
 ) : PoetesseKotlinScope,
     KotlinParameterContainer,
@@ -21,24 +22,19 @@ class KotlinConstructorScope private constructor(
         append = { specBuilder.addAnnotation(it) },
     )
     internal val modifierContainer = KotlinModifierContainerInternal.of(
-        append = { specBuilder.addModifiers(*it) }
+        append = { specBuilder.addModifiers(it) }
     )
     internal val statementContainer = KotlinBodyContainerInternal.of(
         append = { specBuilder.addStatement(it) },
     )
 
-    fun expect() {
-        modifiers(KPModifier.EXPECT)
-    }
+    fun expect() = modifier(KPModifier.EXPECT)
+    fun actual() = modifier(KPModifier.ACTUAL)
 
-    fun actual() {
-        modifiers(KPModifier.ACTUAL)
-    }
-
-    internal fun build(): KPFunction =
-        specBuilder.build()
+    internal fun build() = specBuilder.build()
 
     internal companion object {
-        fun of(settings: Poetesse.Settings) = KotlinConstructorScope(settings, KPFunction.constructorBuilder())
+        context(scope: PoetesseXScope)
+        fun of() = KotlinConstructorScope(scope.config, KPFunction.constructorBuilder())
     }
 }

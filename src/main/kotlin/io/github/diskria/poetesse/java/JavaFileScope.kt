@@ -1,10 +1,11 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.xClass
+import io.github.diskria.poetesse.interop.PoetesseXScope
+import io.github.diskria.poetesse.interop.xClass
 
 class JavaFileScope private constructor(
-    override val settings: Poetesse.Settings,
+    override val config: Poetesse.Config,
     private val packageName: String?,
     val fileName: String,
 ) : JavaTypeContainer {
@@ -18,22 +19,23 @@ class JavaFileScope private constructor(
         nestedClassName = { name -> xClass(packageName, name) },
     )
 
-    internal fun build(settings: Poetesse.Settings): JavaFileRef {
+    internal fun build(): JavaFileRef {
         val primaryType = requireNotNull(types.find { it.name() == fileName }) {
             "File '$fileName' cannot be built because primary type was not configured."
         }
         if (types.size > 1) {
-            return MultiClassJavaFileRef.mergeFrom(packageName, fileName, types, settings)
+            return MultiClassJavaFileRef.mergeFrom(packageName, fileName, types)
         }
         val javaFile = JPFile.builder(packageName.orEmpty(), primaryType).apply {
-            indent(settings.indent)
-            settings.comment?.let { addFileComment(it) }
+            indent(config.indent)
+            config.comment?.let { addFileComment(it) }
         }.build()
         return SingleClassJavaFileRef(packageName, fileName, javaFile)
     }
 
     internal companion object {
-        fun of(settings: Poetesse.Settings, packageName: String?, fileName: String) =
-            JavaFileScope(settings, packageName, fileName)
+        context(scope: PoetesseXScope)
+        fun of(packageName: String?, fileName: String) =
+            JavaFileScope(scope.config, packageName, fileName)
     }
 }

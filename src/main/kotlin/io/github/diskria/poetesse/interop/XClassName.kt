@@ -2,7 +2,6 @@ package io.github.diskria.poetesse.interop
 
 import com.squareup.kotlinpoet.asClassName
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.PoetesseScope
 import io.github.diskria.poetesse.extensions.asJPClassName
 import io.github.diskria.poetesse.extensions.asKPClassName
 import io.github.diskria.poetesse.extensions.setNullable
@@ -10,12 +9,12 @@ import io.github.diskria.poetesse.java.JPClassName
 import io.github.diskria.poetesse.kotlin.KPClassName
 import kotlin.reflect.KClass
 
-class XClassName internal constructor(
-    override val settings: Poetesse.Settings,
+class XClassName private constructor(
+    config: Poetesse.Config,
     val packageName: String?,
     val simpleNames: List<String>,
     override val isNullable: Boolean,
-) : XTypedTypeName<KPClassName, JPClassName>() {
+) : XTypedTypeName<KPClassName, JPClassName>(config) {
 
     val simpleName: String = simpleNames.last()
     val nestedName: String = simpleNames.joinToString(".")
@@ -28,16 +27,16 @@ class XClassName internal constructor(
         JPClassName.get(packageName.orEmpty(), simpleNames.first(), *simpleNames.drop(1).toTypedArray())
 
     internal fun nested(name: String): XClassName =
-        XClassName(settings, packageName, (simpleNames + name), false)
+        XClassName(config, packageName, (simpleNames + name), false)
 
     override fun interopToKotlinInternal(): KPClassName =
-        J2K[rawJava] ?: rawKotlin
+        javaToKotlin[rawJava] ?: rawKotlin
 
     override fun interopToJavaInternal(): JPClassName =
-        K2J[rawKotlin] ?: rawJava
+        kotlinToJava[rawKotlin] ?: rawJava
 
-    companion object {
-        private val K2J: Map<KPClassName, JPClassName> = buildMap {
+    internal companion object {
+        private val kotlinToJava = buildMap {
             // Order and structure reflect org.jetbrains.kotlin.metadata.jvm.deserialization.ClassMapperLite,
             // adapted for Poet classes instead of JVM descriptors.
             sequenceOf(
@@ -116,24 +115,26 @@ class XClassName internal constructor(
                 }
             }
         }
+        private val javaToKotlin = kotlinToJava.entries.associate { (k, j) -> j to k }
 
-        private val J2K: Map<JPClassName, KPClassName> =
-            K2J.entries.associate { (k, j) -> j to k }
+        context(scope: PoetesseXScope)
+        fun of(packageName: String?, simpleNames: List<String>, isNullable: Boolean) =
+            XClassName(scope.config, packageName, simpleNames, isNullable)
     }
 }
 
 @PublishedApi
-context(scope: PoetesseScope)
-internal fun KPClassName.asXClassName(): XClassName =
-    XClassName(scope.settings, packageName.takeIf { it.isNotEmpty() }, simpleNames, isNullable)
+context(scope: PoetesseXScope)
+internal fun KPClassName.asXClassName() =
+    XClassName.of(packageName.takeIf { it.isNotEmpty() }, simpleNames, isNullable)
 
 @PublishedApi
-context(scope: PoetesseScope)
-internal fun JPClassName.asXClassName(nullable: Boolean = false): XClassName =
-    XClassName(scope.settings, packageName(), simpleNames(), nullable)
+context(scope: PoetesseXScope)
+internal fun JPClassName.asXClassName(nullable: Boolean = false) =
+    XClassName.of(packageName().takeIf { it.isNotEmpty() }, simpleNames(), nullable)
 
 @PublishedApi
-context(scope: PoetesseScope)
+context(scope: PoetesseXScope)
 internal fun KClass<*>.toXClass(nullable: Boolean = false): XClassName {
     require(this != Array::class && !java.isArray) {
         val className = simpleName ?: this.toString()

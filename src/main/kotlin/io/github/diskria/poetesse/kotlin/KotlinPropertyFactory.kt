@@ -2,13 +2,13 @@ package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.LazyDelegate
 import io.github.diskria.poetesse.interop.XTypeName
-import io.github.diskria.poetesse.xType
+import io.github.diskria.poetesse.interop.xType
 import kotlin.reflect.KClass
 
 interface KotlinPropertyFactory : PoetesseKotlinScope
 
 fun KotlinPropertyFactory.property(name: String, type: XTypeName, block: KotlinPropertyScope.Block = {}) =
-    KotlinPropertyRef(name) { KotlinPropertyScope.of(settings, name, type).apply(block).build() }
+    KotlinPropertyRef(name) { KotlinPropertyScope.of(name, type).apply(block).build() }
 
 fun KotlinPropertyFactory.property(type: XTypeName, block: KotlinPropertyScope.Block = {}) =
     LazyDelegate { name -> property(name, type, block) }

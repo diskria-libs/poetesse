@@ -1,18 +1,19 @@
 package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
+import io.github.diskria.poetesse.interop.PoetesseXScope
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.interopToKotlin
-import io.github.diskria.poetesse.xType
+import io.github.diskria.poetesse.interop.xType
 import kotlin.reflect.KClass
 
-typealias KotlinCodeBuilder = KotlinCodeScope.() -> String
-
-class KotlinCodeScope internal constructor(
-    override val settings: Poetesse.Settings,
-    private val block: KotlinCodeBuilder,
+class KotlinCodeScope private constructor(
+    override val config: Poetesse.Config,
+    private val block: Block,
     private val arguments: MutableList<Any?> = mutableListOf(),
 ) : KotlinCodeFactory {
+
+    internal typealias Block = KotlinCodeScope.() -> String
 
     val expression: ExpressionScope by lazy { ExpressionScope() }
 
@@ -37,7 +38,7 @@ class KotlinCodeScope internal constructor(
 
     fun L(codeBlock: KPCodeBlock) = argument('L', codeBlock)
     fun L(code: KotlinCodeRef) = L(code.codeBlock)
-    fun L(build: KotlinCodeBuilder) = L(code(build))
+    fun L(block: Block) = L(code(block))
 
     inner class ExpressionScope {
         fun classLiteral(type: XTypeName): String =
@@ -59,12 +60,12 @@ class KotlinCodeScope internal constructor(
             elements.joinToString(separator = " + ")
     }
 
-    internal fun build(): KPCodeBlock =
-        KPCodeBlock.of(block(), *arguments.toTypedArray())
+    internal fun build() = KPCodeBlock.of(block(), *arguments.toTypedArray())
 
     internal companion object {
-        fun of(settings: Poetesse.Settings, block: KotlinCodeBuilder) = KotlinCodeRef {
-            KotlinCodeScope(settings, block).build()
+        context(scope: PoetesseXScope)
+        fun of(block: Block) = KotlinCodeRef {
+            KotlinCodeScope(scope.config, block).build()
         }
     }
 }

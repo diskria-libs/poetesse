@@ -8,7 +8,6 @@ import io.github.diskria.poetesse.interop.XVariance
 import io.github.diskria.poetesse.interop.interopToKotlin
 
 sealed interface KotlinTypeVariableContainer : PoetesseKotlinScope {
-
     operator fun XTypeVariableName.unaryPlus(): XTypeVariableName {
         this@KotlinTypeVariableContainer.internal.append(interopToKotlin())
         return this
@@ -18,7 +17,7 @@ sealed interface KotlinTypeVariableContainer : PoetesseKotlinScope {
 fun KotlinTypeVariableContainer.typeVariable(
     name: String, bounds: Iterable<XTypeName> = emptyList(), variance: XVariance? = null, reified: Boolean = false,
     nullable: Boolean = false,
-) = +XTypeVariableName(settings, name, bounds.toList(), variance, reified, nullable)
+) = +XTypeVariableName.of(name, bounds.toList(), variance, reified, nullable)
 
 fun KotlinTypeVariableContainer.typeVariable(
     name: String, vararg bounds: XTypeName, variance: XVariance? = null, reified: Boolean = false,

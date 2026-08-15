@@ -1,11 +1,12 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
+import io.github.diskria.poetesse.interop.PoetesseXScope
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.interopToJava
 
 class JavaParameterScope private constructor(
-    override val settings: Poetesse.Settings,
+    override val config: Poetesse.Config,
     private val specBuilder: JPParameterBuilder,
 ) : PoetesseJavaScope,
     JavaAnnotationContainer,
@@ -17,18 +18,16 @@ class JavaParameterScope private constructor(
         append = { specBuilder.addAnnotation(it) },
     )
     internal val modifierContainer = JavaModifierContainerInternal.of(
-        append = { specBuilder.addModifiers(*it) }
+        append = { specBuilder.addModifiers(it) }
     )
 
-    fun final() {
-        modifiers(JPModifier.FINAL)
-    }
+    fun final() = modifier(JPModifier.FINAL)
 
-    internal fun build(): JPParameter =
-        specBuilder.build()
+    internal fun build() = specBuilder.build()
 
     internal companion object {
-        fun of(settings: Poetesse.Settings, name: String, type: XTypeName) =
-            JavaParameterScope(settings, JPParameter.builder(type.interopToJava(), name))
+        context(scope: PoetesseXScope)
+        fun of(name: String, type: XTypeName) =
+            JavaParameterScope(scope.config, JPParameter.builder(type.interopToJava(), name))
     }
 }

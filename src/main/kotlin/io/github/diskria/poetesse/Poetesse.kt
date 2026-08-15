@@ -1,20 +1,24 @@
 package io.github.diskria.poetesse
 
-import io.github.diskria.poetesse.java.*
+import io.github.diskria.poetesse.interop.XTypeVariableFactory
+import io.github.diskria.poetesse.java.JPAnnotation
+import io.github.diskria.poetesse.java.JPClassName
+import io.github.diskria.poetesse.java.JPTypeName
+import io.github.diskria.poetesse.java.JavaFactory
 import io.github.diskria.poetesse.kotlin.KotlinFactory
-import io.github.diskria.poetesse.kotlin.PoetesseKotlinScope
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
 
-class Poetesse private constructor(override val settings: Settings) : PoetesseKotlinScope, PoetesseJavaScope {
+class Poetesse private constructor(
+    override val config: Config
+) : XTypeVariableFactory {
 
-    val kotlin: KotlinFactory get() = KotlinFactory(settings)
-    val java: JavaFactory get() = JavaFactory(settings)
+    val kotlin: KotlinFactory get() = KotlinFactory(config)
+    val java: JavaFactory get() = JavaFactory(config)
 
-    inline operator fun <T> invoke(block: Poetesse.() -> T): T =
-        block()
+    inline operator fun <T> invoke(block: Poetesse.() -> T): T = block()
 
-    class Settings(
+    class Config(
         val indent: String = " ".repeat(4),
         val comment: String? = null,
         val javaNullabilityResolver: JavaNullabilityResolver = JavaNullabilityResolver.Default,
@@ -35,7 +39,6 @@ class Poetesse private constructor(override val settings: Settings) : PoetesseKo
                 override fun isNullable(typeName: JPTypeName): Boolean =
                     typeName.annotations().any { it.type() == nullableAnnotationType }
 
-                @Suppress("UNCHECKED_CAST")
                 override fun setNullable(typeName: JPTypeName, isNullable: Boolean): JPTypeName {
                     val annotationType = if (isNullable) nullableAnnotationType else notNullAnnotationType
                     return typeName.annotated(JPAnnotation.builder(annotationType).build())
@@ -45,16 +48,15 @@ class Poetesse private constructor(override val settings: Settings) : PoetesseKo
     }
 
     class Builder {
-        var indent: String = Default.settings.indent
-        var commentHeader: String? = Default.settings.comment
-        var javaNullabilityResolver: JavaNullabilityResolver = Default.settings.javaNullabilityResolver
+        var indent: String = Default.config.indent
+        var commentHeader: String? = Default.config.comment
+        var javaNullabilityResolver: JavaNullabilityResolver = Default.config.javaNullabilityResolver
 
-        internal fun build(): Poetesse =
-            Poetesse(Settings(indent, commentHeader, javaNullabilityResolver))
+        internal fun build() = Poetesse(Config(indent, commentHeader, javaNullabilityResolver))
     }
 
     companion object {
-        val Default: Poetesse = Poetesse(Settings())
+        val Default: Poetesse = Poetesse(Config())
 
         operator fun invoke(action: Builder.() -> Unit = {}): Poetesse =
             Builder().apply(action).build()

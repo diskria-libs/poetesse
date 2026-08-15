@@ -2,9 +2,10 @@ package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.extensions.addStatement
+import io.github.diskria.poetesse.interop.PoetesseXScope
 
 class KotlinPropertySetterScope private constructor(
-    override val settings: Poetesse.Settings,
+    override val config: Poetesse.Config,
     internal val specBuilder: KPFunctionBuilder,
 ) : PoetesseKotlinScope,
     KotlinParameterContainer,
@@ -21,28 +22,20 @@ class KotlinPropertySetterScope private constructor(
         append = { specBuilder.addAnnotation(it) },
     )
     internal val modifierContainer = KotlinModifierContainerInternal.of(
-        append = { specBuilder.addModifiers(*it) }
+        append = { specBuilder.addModifiers(it) }
     )
     internal val statementContainer = KotlinBodyContainerInternal.of(
         append = { specBuilder.addStatement(it) },
     )
 
-    fun expect() {
-        modifiers(KPModifier.EXPECT)
-    }
+    fun expect() = modifier(KPModifier.EXPECT)
+    fun actual() = modifier(KPModifier.ACTUAL)
+    fun inline() = modifier(KPModifier.INLINE)
 
-    fun actual() {
-        modifiers(KPModifier.ACTUAL)
-    }
-
-    fun inline() {
-        modifiers(KPModifier.INLINE)
-    }
-
-    internal fun build(): KPFunction =
-        specBuilder.build()
+    internal fun build() = specBuilder.build()
 
     internal companion object {
-        fun of(settings: Poetesse.Settings) = KotlinPropertySetterScope(settings, KPFunction.setterBuilder())
+        context(scope: PoetesseXScope)
+        fun of() = KotlinPropertySetterScope(scope.config, KPFunction.setterBuilder())
     }
 }

@@ -2,13 +2,13 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.LazyDelegate
 import io.github.diskria.poetesse.interop.XTypeName
-import io.github.diskria.poetesse.xType
+import io.github.diskria.poetesse.interop.xType
 import kotlin.reflect.KClass
 
 interface JavaParameterFactory : PoetesseJavaScope
 
 fun JavaParameterFactory.parameter(name: String, type: XTypeName, block: JavaParameterScope.Block = {}) =
-    JavaParameterRef(name) { JavaParameterScope.of(settings, name, type).apply(block).build() }
+    JavaParameterRef(name) { JavaParameterScope.of(name, type).apply(block).build() }
 
 fun JavaParameterFactory.parameter(type: XTypeName, block: JavaParameterScope.Block = {}) =
     LazyDelegate { name -> parameter(name, type, block) }

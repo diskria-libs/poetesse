@@ -3,7 +3,7 @@ package io.github.diskria.poetesse.java
 interface JavaTypeFactory : PoetesseJavaScope
 
 fun JavaTypeFactory.type(kind: JPTypeKind, name: String, block: JavaTypeScope.Block = {}) =
-    JavaTypeRef(name) { JavaTypeScope.of(settings, kind, name, it).apply { block(it) }.build() }
+    JavaTypeRef(name) { JavaTypeScope.of(kind, name, it).apply { block(it) }.build() }
 
 fun JavaTypeFactory.class_(name: String, block: JavaTypeScope.Block = {}) =
     type(JPTypeKind.CLASS, name, block)

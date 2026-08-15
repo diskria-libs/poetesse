@@ -1,12 +1,13 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
+import io.github.diskria.poetesse.interop.PoetesseXScope
 import io.github.diskria.poetesse.interop.XClassName
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.interopToJava
 
 class JavaTypeScope private constructor(
-    override val settings: Poetesse.Settings,
+    override val config: Poetesse.Config,
     private val className: XClassName,
     private val specBuilder: JPTypeBuilder,
 ) : PoetesseJavaScope,
@@ -40,59 +41,44 @@ class JavaTypeScope private constructor(
         append = { specBuilder.addAnnotation(it) },
     )
     internal val modifierContainer = JavaModifierContainerInternal.of(
-        append = { specBuilder.addModifiers(*it) }
+        append = { specBuilder.addModifiers(it) }
     )
 
-    fun abstract() {
-        modifiers(JPModifier.ABSTRACT)
-    }
-
-    fun static() {
-        modifiers(JPModifier.STATIC)
-    }
+    fun abstract() = modifier(JPModifier.ABSTRACT)
+    fun static() = modifier(JPModifier.STATIC)
+    fun nonSealed() = modifier(JPModifier.NON_SEALED)
+    fun strictfp() = modifier(JPModifier.STRICTFP)
 
     fun sealed(permits: Iterable<XTypeName>) {
-        modifiers(JPModifier.SEALED)
+        modifier(JPModifier.SEALED)
         permits.forEach {
             specBuilder.addPermittedSubclass(it.interopToJava())
         }
     }
 
-    fun sealed(vararg permits: XTypeName) {
-        sealed(permits.asIterable())
-    }
-
-    fun nonSealed() {
-        modifiers(JPModifier.NON_SEALED)
-    }
-
-    fun strictfp() {
-        modifiers(JPModifier.STRICTFP)
-    }
+    fun sealed(vararg permits: XTypeName) = sealed(permits.asIterable())
 
     fun initializerBlock(block: JavaCodeBlockScope.Block = {}) {
-        specBuilder.addInitializerBlock(JavaCodeBlockScope.of(settings, block).build())
+        specBuilder.addInitializerBlock(JavaCodeBlockScope.of(block).build())
     }
 
     fun staticBlock(block: JavaCodeBlockScope.Block = {}) {
-        specBuilder.addStaticBlock(JavaCodeBlockScope.of(settings, block).build())
+        specBuilder.addStaticBlock(JavaCodeBlockScope.of(block).build())
     }
 
-    internal fun build(): JPType =
-        specBuilder.build()
+    internal fun build() = specBuilder.build()
 
     internal companion object {
-        fun of(settings: Poetesse.Settings, kind: JPTypeKind, name: String, className: XClassName) =
-            JavaTypeScope(
-                settings,
-                className,
-                when (kind) {
-                    JPTypeKind.CLASS -> JPType.classBuilder(name)
-                    JPTypeKind.RECORD -> JPType.recordBuilder(name)
-                    JPTypeKind.INTERFACE -> JPType.interfaceBuilder(name)
-                    JPTypeKind.ENUM -> JPType.enumBuilder(name)
-                    JPTypeKind.ANNOTATION -> JPType.annotationBuilder(name)
-                }
-            )
+        context(scope: PoetesseXScope)
+        fun of(kind: JPTypeKind, name: String, className: XClassName): JavaTypeScope {
+            val specBuilder = when (kind) {
+                JPTypeKind.CLASS -> JPType.classBuilder(name)
+                JPTypeKind.RECORD -> JPType.recordBuilder(name)
+                JPTypeKind.INTERFACE -> JPType.interfaceBuilder(name)
+                JPTypeKind.ENUM -> JPType.enumBuilder(name)
+                JPTypeKind.ANNOTATION -> JPType.annotationBuilder(name)
+            }
+            return JavaTypeScope(scope.config, className, specBuilder)
+        }
     }
 }

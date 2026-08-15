@@ -5,7 +5,6 @@ import io.github.diskria.poetesse.interop.XTypeName
 import kotlin.reflect.KClass
 
 sealed interface KotlinPropertyContainer : KotlinPropertyFactory {
-
     operator fun KotlinPropertyRef.unaryPlus(): String {
         internal.append(spec)
         return name

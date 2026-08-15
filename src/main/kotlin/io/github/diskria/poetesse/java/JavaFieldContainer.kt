@@ -5,7 +5,6 @@ import io.github.diskria.poetesse.interop.XTypeName
 import kotlin.reflect.KClass
 
 sealed interface JavaFieldContainer : JavaFieldFactory {
-
     operator fun JavaFieldRef.unaryPlus(): String {
         internal.append(spec)
         return name

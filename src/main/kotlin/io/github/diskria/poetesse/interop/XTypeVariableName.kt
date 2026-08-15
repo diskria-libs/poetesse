@@ -1,58 +1,52 @@
 package io.github.diskria.poetesse.interop
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.PoetesseScope
 import io.github.diskria.poetesse.java.JPTypeVariableName
 import io.github.diskria.poetesse.kotlin.KPModifier
 import io.github.diskria.poetesse.kotlin.KPTypeVariableName
 
-class XTypeVariableName internal constructor(
-    override val settings: Poetesse.Settings,
+class XTypeVariableName private constructor(
+    config: Poetesse.Config,
     val name: String,
     val bounds: List<XTypeName>,
     val variance: XVariance?,
     val isReified: Boolean,
     override val isNullable: Boolean,
-) : XTypedTypeName<KPTypeVariableName, JPTypeVariableName>() {
+) : XTypedTypeName<KPTypeVariableName, JPTypeVariableName>(config) {
 
     override fun interopToKotlinInternal(): KPTypeVariableName =
-        KPTypeVariableName(
-            name,
-            bounds.map { it.interopToKotlin() },
-            variance?.toKPModifier()
-        ).copy(reified = isReified)
+        KPTypeVariableName(name, bounds.map { it.interopToKotlin() }, variance?.modifier).copy(reified = isReified)
 
     override fun interopToJavaInternal(): JPTypeVariableName {
         if (variance != null) error("Java type variables doesn't support variance")
         if (isReified) error("Java type variables doesn't support reified")
         return JPTypeVariableName.get(name, *bounds.map { it.box().interopToJava() }.toTypedArray())
     }
+
+    internal companion object {
+        context(scope: PoetesseXScope)
+        fun of(name: String, bounds: List<XTypeName>, variance: XVariance?, isReified: Boolean, isNullable: Boolean) =
+            XTypeVariableName(scope.config, name, bounds, variance, isReified, isNullable)
+    }
 }
 
-private fun XVariance.toKPModifier(): KPModifier? =
-    when (this) {
-        XVariance.IN -> KPModifier.IN
-        XVariance.OUT -> KPModifier.OUT
+enum class XVariance(internal val modifier: KPModifier) {
+
+    IN(KPModifier.IN),
+    OUT(KPModifier.OUT);
+
+    internal companion object {
+        fun of(modifier: KPModifier?): XVariance? =
+            XVariance.entries.find { it.modifier == modifier }
     }
-
-private fun KPModifier?.toKVariance(): XVariance? =
-    when (this) {
-        KPModifier.IN -> XVariance.IN
-        KPModifier.OUT -> XVariance.OUT
-        else -> null
-    }
-
-@PublishedApi
-context(scope: PoetesseScope)
-internal fun KPTypeVariableName.asXTypeVariableName(): XTypeVariableName =
-    XTypeVariableName(scope.settings, name, bounds.map { it.toXType() }, variance.toKVariance(), isReified, isNullable)
-
-@PublishedApi
-context(scope: PoetesseScope)
-internal fun JPTypeVariableName.asXTypeVariableName(nullable: Boolean = false): XTypeVariableName =
-    XTypeVariableName(scope.settings, name(), bounds().map { it.toXType() }, null, false, nullable)
-
-enum class XVariance {
-    IN,
-    OUT,
 }
+
+@PublishedApi
+context(scope: PoetesseXScope)
+internal fun KPTypeVariableName.asXTypeVariableName() =
+    XTypeVariableName.of(name, bounds.map { scope.xType(it) }, XVariance.of(variance), isReified, isNullable)
+
+@PublishedApi
+context(scope: PoetesseXScope)
+internal fun JPTypeVariableName.asXTypeVariableName(nullable: Boolean = false) =
+    XTypeVariableName.of(name(), bounds().map { scope.xType(it) }, variance = null, isReified = false, nullable)

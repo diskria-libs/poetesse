@@ -1,27 +1,26 @@
 package io.github.diskria.poetesse.interop
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.PoetesseScope
 import io.github.diskria.poetesse.extensions.setBoxed
 import io.github.diskria.poetesse.extensions.setNullable
 import io.github.diskria.poetesse.extensions.withoutAnnotations
-import io.github.diskria.poetesse.interop.XPrimitiveTypeName.Companion.J2KIND
-import io.github.diskria.poetesse.interop.XPrimitiveTypeName.Companion.K2KIND
+import io.github.diskria.poetesse.interop.XPrimitiveTypeName.Companion.javaToKind
+import io.github.diskria.poetesse.interop.XPrimitiveTypeName.Companion.kotlinToKind
 import io.github.diskria.poetesse.java.*
 import io.github.diskria.poetesse.kotlin.*
 
-class XPrimitiveTypeName internal constructor(
-    override val settings: Poetesse.Settings,
+class XPrimitiveTypeName private constructor(
+    config: Poetesse.Config,
     internal val kind: Kind,
     override val isBoxed: Boolean,
     override val isNullable: Boolean,
-) : XTypedTypeName<KPClassName, JPTypeName>() {
+) : XTypedTypeName<KPClassName, JPTypeName>(config) {
 
     override fun interopToKotlinInternal(): KPClassName = kind.kotlin
 
     override fun interopToJavaInternal(): JPTypeName = kind.java.setBoxed(isBoxed)
 
-    override fun boxInternal(): XPrimitiveTypeName = XPrimitiveTypeName(settings, kind, true, isNullable)
+    override fun boxInternal() = of(kind, isBoxed = true, isNullable)
 
     enum class Kind(
         @PublishedApi internal val kotlin: KPClassName,
@@ -37,26 +36,29 @@ class XPrimitiveTypeName internal constructor(
         DOUBLE(KPDouble, JPDouble);
 
         @PublishedApi
-        internal val kotlinArray: KPClassName =
-            KPClassName(kotlin.packageName, kotlin.simpleName + "Array")
+        internal val kotlinArray = KPClassName(kotlin.packageName, kotlin.simpleName + "Array")
     }
 
     internal companion object {
-        val K2KIND: Map<KPClassName, Kind> = Kind.entries.associateBy { it.kotlin }
-        val J2KIND: Map<JPTypeName, Kind> = Kind.entries.associateBy { it.java }
+        val kotlinToKind: Map<KPClassName, Kind> = Kind.entries.associateBy { it.kotlin }
+        val javaToKind: Map<JPTypeName, Kind> = Kind.entries.associateBy { it.java }
+
+        context(scope: PoetesseXScope)
+        fun of(kind: Kind, isBoxed: Boolean, isNullable: Boolean) =
+            XPrimitiveTypeName(scope.config, kind, isBoxed, isNullable)
     }
 }
 
 @PublishedApi
-context(scope: PoetesseScope)
+context(scope: PoetesseXScope)
 internal fun KPTypeName.asXPrimitiveTypeNameOrNull(boxed: Boolean = isNullable): XPrimitiveTypeName? {
-    val kind = K2KIND[setNullable(false).withoutAnnotations()] ?: return null
-    return XPrimitiveTypeName(scope.settings, kind, isNullable || boxed, isNullable)
+    val kind = kotlinToKind[setNullable(false).withoutAnnotations()] ?: return null
+    return XPrimitiveTypeName.of(kind, isNullable || boxed, isNullable)
 }
 
 @PublishedApi
-context(scope: PoetesseScope)
+context(scope: PoetesseXScope)
 internal fun JPTypeName.asXPrimitiveTypeNameOrNull(nullable: Boolean = false): XPrimitiveTypeName? {
-    val kind = J2KIND[setBoxed(false).withoutAnnotations()] ?: return null
-    return XPrimitiveTypeName(scope.settings, kind, nullable || isBoxedPrimitive, nullable)
+    val kind = javaToKind[setBoxed(false).withoutAnnotations()] ?: return null
+    return XPrimitiveTypeName.of(kind, nullable || isBoxedPrimitive, nullable)
 }

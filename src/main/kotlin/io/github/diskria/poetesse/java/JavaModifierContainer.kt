@@ -1,51 +1,27 @@
 package io.github.diskria.poetesse.java
 
 sealed interface JavaModifierContainer : PoetesseJavaScope {
-
-    fun modifiers(vararg modifiers: JPModifier) {
-        internal.append(*modifiers)
-    }
-
     sealed interface WithVisibility : JavaModifierContainer {
-
-        fun visibility(visibility: JavaVisibility) {
-            if (visibility == JavaVisibility.PACKAGE_PRIVATE) return
-            modifiers(
-                when (visibility) {
-                    JavaVisibility.PUBLIC -> JPModifier.PUBLIC
-                    JavaVisibility.PROTECTED -> JPModifier.PROTECTED
-                    JavaVisibility.PRIVATE -> JPModifier.PRIVATE
-                }
-            )
-        }
-
-        fun public() {
-            visibility(JavaVisibility.PUBLIC)
-        }
-
-        fun protected() {
-            visibility(JavaVisibility.PROTECTED)
-        }
-
-        fun packagePrivate() {
-            visibility(JavaVisibility.PACKAGE_PRIVATE)
-        }
-
-        fun private() {
-            visibility(JavaVisibility.PRIVATE)
-        }
+        fun public() = modifier(JPModifier.PUBLIC)
+        fun protected() = modifier(JPModifier.PROTECTED)
+        fun packagePrivate() {}
+        fun private() = modifier(JPModifier.PRIVATE)
     }
+}
+
+fun JavaModifierContainer.modifier(modifier: JPModifier) {
+    internal.append(modifier)
 }
 
 internal interface JavaModifierContainerInternal {
 
-    fun append(vararg modifiers: JPModifier)
+    fun append(modifier: JPModifier)
 
     companion object {
         fun of(
-            append: (modifiers: Array<out JPModifier>) -> Unit,
+            append: (modifier: JPModifier) -> Unit,
         ): JavaModifierContainerInternal = object : JavaModifierContainerInternal {
-            override fun append(vararg modifiers: JPModifier) = append(modifiers)
+            override fun append(modifier: JPModifier) = append(modifier)
         }
     }
 }
@@ -59,10 +35,3 @@ private val JavaModifierContainer.internal: JavaModifierContainerInternal
         is JavaParameterScope -> modifierContainer
         is JavaVariableScope -> modifierContainer
     }
-
-enum class JavaVisibility {
-    PUBLIC,
-    PROTECTED,
-    PACKAGE_PRIVATE,
-    PRIVATE,
-}

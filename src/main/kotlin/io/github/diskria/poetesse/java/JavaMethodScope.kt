@@ -1,13 +1,14 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
+import io.github.diskria.poetesse.interop.PoetesseXScope
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.interopToJava
-import io.github.diskria.poetesse.xType
+import io.github.diskria.poetesse.interop.xType
 import kotlin.reflect.KClass
 
 class JavaMethodScope private constructor(
-    override val settings: Poetesse.Settings,
+    override val config: Poetesse.Config,
     private val specBuilder: JPMethodBuilder,
 ) : PoetesseJavaScope,
     JavaTypeVariableContainer,
@@ -28,31 +29,17 @@ class JavaMethodScope private constructor(
         append = { specBuilder.addAnnotation(it) },
     )
     internal val modifierContainer = JavaModifierContainerInternal.of(
-        append = { specBuilder.addModifiers(*it) }
+        append = { specBuilder.addModifiers(it) }
     )
     internal val statementContainer = JavaBodyContainerInternal.of(
         append = { specBuilder.addStatement(it) }
     )
 
-    fun abstract() {
-        modifiers(JPModifier.ABSTRACT)
-    }
-
-    fun static() {
-        modifiers(JPModifier.STATIC)
-    }
-
-    fun synchronized() {
-        modifiers(JPModifier.SYNCHRONIZED)
-    }
-
-    fun native() {
-        modifiers(JPModifier.NATIVE)
-    }
-
-    fun strictfp() {
-        modifiers(JPModifier.STRICTFP)
-    }
+    fun abstract() = modifier(JPModifier.ABSTRACT)
+    fun static() = modifier(JPModifier.STATIC)
+    fun synchronized() = modifier(JPModifier.SYNCHRONIZED)
+    fun native() = modifier(JPModifier.NATIVE)
+    fun strictfp() = modifier(JPModifier.STRICTFP)
 
     fun returns(type: XTypeName) {
         specBuilder.returns(type.interopToJava())
@@ -67,10 +54,10 @@ class JavaMethodScope private constructor(
     inline fun <reified T : Any> returns() =
         returns<T>(nullable = false)
 
-    internal fun build(): JPMethod =
-        specBuilder.build()
+    internal fun build() = specBuilder.build()
 
     internal companion object {
-        fun of(settings: Poetesse.Settings, name: String) = JavaMethodScope(settings, JPMethod.methodBuilder(name))
+        context(scope: PoetesseXScope)
+        fun of(name: String) = JavaMethodScope(scope.config, JPMethod.methodBuilder(name))
     }
 }

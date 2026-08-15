@@ -2,27 +2,26 @@ package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.EagerDelegate
 import io.github.diskria.poetesse.interop.XTypeName
-import io.github.diskria.poetesse.xType
+import io.github.diskria.poetesse.interop.xType
 import kotlin.reflect.KClass
 
 sealed interface KotlinCodeBlockContainer : KotlinCodeBlockFactory {
-
     operator fun KotlinCodeBlockRef.unaryPlus() {
         statements.forEach { +it }
     }
 
-    fun line(build: KotlinCodeBuilder) {
-        +code(build).codeBlock
-    }
-
-    private operator fun KPCodeBlock.unaryPlus() {
+    operator fun KPCodeBlock.unaryPlus() {
         if (isEmpty()) return
         internal.append(this)
     }
 }
 
+fun KotlinCodeBlockContainer.line(block: KotlinCodeScope.Block) {
+    +code(block).codeBlock
+}
+
 fun KotlinCodeBlockContainer.variable(name: String, type: XTypeName?, block: KotlinVariableScope.Block = {}): String {
-    line(KotlinVariableScope(settings, name, type).apply(block).build())
+    line(KotlinVariableScope.of(name, type).apply(block).build())
     return name
 }
 

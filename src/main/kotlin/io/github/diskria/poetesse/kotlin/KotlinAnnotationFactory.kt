@@ -1,14 +1,14 @@
 package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.interop.XClassName
-import io.github.diskria.poetesse.xClass
+import io.github.diskria.poetesse.interop.xClass
 import kotlin.reflect.KClass
 
 interface KotlinAnnotationFactory : PoetesseKotlinScope
 
 fun <A : Annotation> KotlinAnnotationFactory.annotation(
     className: XClassName, target: UseSite? = null, block: KotlinAnnotationScope.Block<A> = {}
-) = KotlinTypedAnnotationRef<A> { KotlinAnnotationScope.of<A>(settings, className, target).apply(block).build() }
+) = KotlinTypedAnnotationRef<A> { KotlinAnnotationScope.of<A>(className, target).apply(block).build() }
 
 fun <A : Annotation> KotlinAnnotationFactory.annotation(
     type: KClass<out A>, target: UseSite? = null, block: KotlinAnnotationScope.Block<A> = {}

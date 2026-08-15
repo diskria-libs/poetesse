@@ -1,14 +1,13 @@
 package io.github.diskria.poetesse.java
 
 sealed interface JavaConstructorContainer : JavaConstructorFactory {
-
     operator fun JavaConstructorRef.unaryPlus() {
         internal.append(spec)
     }
-
-    fun constructor(block: JavaConstructorScope.Block = {}) =
-        +factory.constructor(block)
 }
+
+fun JavaConstructorContainer.constructor(block: JavaConstructorScope.Block = {}) =
+    +factory.constructor(block)
 
 internal interface JavaConstructorContainerInternal {
 
@@ -23,7 +22,8 @@ internal interface JavaConstructorContainerInternal {
     }
 }
 
-private val JavaConstructorContainer.factory: JavaConstructorFactory
+@PublishedApi
+internal val JavaConstructorContainer.factory: JavaConstructorFactory
     get() = this as JavaConstructorFactory
 
 private val JavaConstructorContainer.internal: JavaConstructorContainerInternal

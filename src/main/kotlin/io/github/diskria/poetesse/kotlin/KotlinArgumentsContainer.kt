@@ -12,27 +12,27 @@ sealed interface KotlinArgumentsContainer : PoetesseKotlinScope {
         } else {
             ""
         }
-        argument(KotlinCodeScope.of(settings) { prefix + L(value) }.codeBlock)
+        argument(KotlinCodeScope.of { prefix + L(value) }.codeBlock)
     }
 
     fun argument(name: String, value: KotlinCodeRef) {
         argument(name, false, value)
     }
 
-    fun argument(name: String, nameAsComment: Boolean, value: KotlinCodeBuilder) {
-        argument(name, nameAsComment, KotlinCodeScope.of(settings, value))
+    fun argument(name: String, nameAsComment: Boolean, block: KotlinCodeScope.Block) {
+        argument(name, nameAsComment, KotlinCodeScope.of(block))
     }
 
-    fun argument(name: String, value: KotlinCodeBuilder) {
-        argument(name, false, value)
+    fun argument(name: String, block: KotlinCodeScope.Block) {
+        argument(name, false, block)
     }
 
     fun argument(value: KotlinCodeRef) {
         argument("", false, value)
     }
 
-    fun argument(value: KotlinCodeBuilder) {
-        argument("", false, value)
+    fun argument(block: KotlinCodeScope.Block) {
+        argument("", false, block)
     }
 }
 

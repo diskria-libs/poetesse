@@ -1,9 +1,7 @@
 package io.github.diskria.poetesse.interop
 
-import io.github.diskria.poetesse.PoetesseScope
 import io.github.diskria.poetesse.java.JPParameter
 import io.github.diskria.poetesse.kotlin.KPParameter
-import io.github.diskria.poetesse.xType
 
 class XParameter(val name: String = "", val type: XTypeName) {
 
@@ -14,10 +12,10 @@ class XParameter(val name: String = "", val type: XTypeName) {
         JPParameter.builder(type.interopToJava(), name.ifEmpty { fallbackName }).build()
 }
 
-context(scope: PoetesseScope)
+context(scope: PoetesseXScope)
 fun KPParameter.asXParameter(): XParameter =
     XParameter(name, scope.xType(type))
 
-context(scope: PoetesseScope)
+context(scope: PoetesseXScope)
 fun JPParameter.asXParameter(): XParameter =
     XParameter(name(), scope.xType(type()))
