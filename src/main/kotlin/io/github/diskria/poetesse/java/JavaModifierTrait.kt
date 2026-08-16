@@ -1,6 +1,7 @@
 package io.github.diskria.poetesse.java
 
 sealed interface JavaModifierTrait : PoetesseJavaScope {
+
     sealed interface WithVisibility : JavaModifierTrait {
         fun public() = modifier(JPModifier.PUBLIC)
         fun protected() = modifier(JPModifier.PROTECTED)

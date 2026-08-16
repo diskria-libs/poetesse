@@ -53,16 +53,17 @@ class KotlinTypeScope private constructor(
         superclass(T::class, block)
     }
 
-    fun superinterface(type: XTypeName) {
-        builder.addSuperinterface(type.interopToKotlin())
+    fun superinterface(type: XTypeName, by: KotlinCodeScope.Block? = null) {
+        val kp = type.interopToKotlin()
+        by?.let { builder.addSuperinterface(kp, KotlinCodeScope.of(by).codeBlock) } ?: builder.addSuperinterface(kp)
     }
 
-    fun superinterface(type: KClass<*>) {
-        superinterface(xType(type))
+    fun superinterface(type: KClass<*>, by: KotlinCodeScope.Block? = null) {
+        superinterface(xType(type), by)
     }
 
-    inline fun <reified T : Any> superinterface() {
-        superinterface(T::class)
+    inline fun <reified T : Any> superinterface(noinline by: KotlinCodeScope.Block? = null) {
+        superinterface(T::class, by)
     }
 
     fun initializerBlock(block: KotlinCodeBlockScope.Block = {}) {

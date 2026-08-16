@@ -34,8 +34,9 @@ class KotlinPropertyScope private constructor(
     fun override() = modifier(KPModifier.OVERRIDE)
     fun lateinit() = modifier(KPModifier.LATEINIT)
 
-    fun initializer(block: KotlinCodeScope.Block) {
-        builder.initializer(KotlinCodeScope.of(block).codeBlock)
+    fun initializer(by: Boolean = false, block: KotlinCodeScope.Block) {
+        val codeBlock = KotlinCodeScope.of(block).codeBlock
+        if (by) builder.delegate(codeBlock) else builder.initializer(codeBlock)
     }
 
     fun mutable(mutable: Boolean = true) {
