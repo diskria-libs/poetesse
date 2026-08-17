@@ -12,6 +12,7 @@ class KotlinPropertyScope private constructor(
     private val builder: KPPropertyBuilder,
 ) : PoetesseKotlinScope,
     KotlinContextParameterTrait,
+    KotlinExtensionReceiverTrait,
     KotlinTypeVariableTrait,
     KotlinAnnotationTrait,
     KotlinModifierTrait.WithVisibility {
@@ -20,6 +21,7 @@ class KotlinPropertyScope private constructor(
 
     @OptIn(ExperimentalKotlinPoetApi::class)
     internal val contextParameterContainer = KotlinContextParameterContainer(builder::contextParameter)
+    internal val extensionReceiverContainer = KotlinExtensionReceiverContainer(builder::receiver)
     internal val typeVariableContainer = KotlinTypeVariableContainer(builder::addTypeVariable)
     internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
     internal val modifierContainer = KotlinModifierContainer(builder::addModifiers)

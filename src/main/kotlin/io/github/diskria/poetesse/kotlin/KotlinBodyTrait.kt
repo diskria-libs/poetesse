@@ -13,7 +13,7 @@ fun KotlinBodyTrait.expression(block: KotlinCodeScope.Block) {
     body { line { "return ${L(block)}" } }
 }
 
-internal class KotlinBodyContainer(val append: (statement: KPCodeBlock) -> Unit)
+internal class KotlinBodyContainer(val append: (body: KPCodeBlock) -> Unit)
 
 class KotlinBodyScope private constructor(
     override val config: Poetesse.Config,

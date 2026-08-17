@@ -14,6 +14,7 @@ class KotlinFunctionScope private constructor(
     private val builder: KPFunctionBuilder,
 ) : PoetesseKotlinScope,
     KotlinContextParameterTrait,
+    KotlinExtensionReceiverTrait,
     KotlinTypeVariableTrait,
     KotlinParameterTrait,
     KotlinAnnotationTrait,
@@ -24,6 +25,7 @@ class KotlinFunctionScope private constructor(
 
     @OptIn(ExperimentalKotlinPoetApi::class)
     internal val contextParameterContainer = KotlinContextParameterContainer(builder::contextParameter)
+    internal val extensionReceiverContainer = KotlinExtensionReceiverContainer(builder::receiver)
     internal val typeVariableContainer = KotlinTypeVariableContainer(builder::addTypeVariable)
     internal val parameterContainer = KotlinParameterContainer(builder::addParameter)
     internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
