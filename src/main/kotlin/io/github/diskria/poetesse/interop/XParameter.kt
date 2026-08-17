@@ -1,6 +1,7 @@
 package io.github.diskria.poetesse.interop
 
 import io.github.diskria.poetesse.java.JPParameter
+import io.github.diskria.poetesse.kotlin.KPContextParameter
 import io.github.diskria.poetesse.kotlin.KPParameter
 
 class XParameter(val name: String = "", val type: XTypeName) {
@@ -14,6 +15,11 @@ class XParameter(val name: String = "", val type: XTypeName) {
 
 context(poetesse: PoetesseScope)
 fun KPParameter.asXParameter(): XParameter = with(poetesse) {
+    XParameter(name, xType(type))
+}
+
+context(poetesse: PoetesseScope)
+fun KPContextParameter.asXParameter(): XParameter = with(poetesse) {
     XParameter(name, xType(type))
 }
 

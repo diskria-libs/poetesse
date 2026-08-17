@@ -1,5 +1,6 @@
 package io.github.diskria.poetesse.kotlin
 
+import com.squareup.kotlinpoet.ExperimentalKotlinPoetApi
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.interop.PoetesseScope
 import io.github.diskria.poetesse.interop.XTypeName
@@ -10,12 +11,15 @@ class KotlinPropertyScope private constructor(
     private val type: XTypeName,
     private val builder: KPPropertyBuilder,
 ) : PoetesseKotlinScope,
+    KotlinContextParameterTrait,
     KotlinTypeVariableTrait,
     KotlinAnnotationTrait,
     KotlinModifierTrait.WithVisibility {
 
     internal typealias Block = KotlinPropertyScope.() -> Unit
 
+    @OptIn(ExperimentalKotlinPoetApi::class)
+    internal val contextParameterContainer = KotlinContextParameterContainer(builder::contextParameter)
     internal val typeVariableContainer = KotlinTypeVariableContainer(builder::addTypeVariable)
     internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
     internal val modifierContainer = KotlinModifierContainer(builder::addModifiers)

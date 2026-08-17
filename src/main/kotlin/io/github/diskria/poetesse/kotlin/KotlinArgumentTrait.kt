@@ -3,7 +3,7 @@ package io.github.diskria.poetesse.kotlin
 sealed interface KotlinArgumentTrait : PoetesseKotlinScope {
 
     fun argument(codeBlock: KPCodeBlock) {
-        internal.append(codeBlock)
+        container.append(codeBlock)
     }
 
     fun argument(name: String, nameAsComment: Boolean, value: KotlinCodeRef) {
@@ -38,7 +38,7 @@ sealed interface KotlinArgumentTrait : PoetesseKotlinScope {
 
 internal class KotlinArgumentContainer(val append: (codeBlock: KPCodeBlock) -> Unit)
 
-private val KotlinArgumentTrait.internal: KotlinArgumentContainer
+private val KotlinArgumentTrait.container: KotlinArgumentContainer
     get() = when (this) {
         is KotlinTypeScope.SuperclassConstructorScope -> argumentsContainer
     }

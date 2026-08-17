@@ -12,7 +12,7 @@ sealed interface JavaCodeBlockTrait : JavaCodeBlockFactory {
 
     operator fun JPCodeBlock.unaryPlus() {
         if (isEmpty) return
-        internal.append(this)
+        container.append(this)
     }
 }
 
@@ -60,7 +60,7 @@ inline fun <reified T : Any> JavaCodeBlockTrait.variable(noinline block: JavaVar
 
 internal class JavaCodeBlockContainer(val append: (codeBlock: JPCodeBlock) -> Unit)
 
-private val JavaCodeBlockTrait.internal: JavaCodeBlockContainer
+private val JavaCodeBlockTrait.container: JavaCodeBlockContainer
     get() = when (this) {
         is JavaBodyScope -> codeBlockContainer
         is JavaEmbeddableCodeBlockScope -> codeBlockContainer

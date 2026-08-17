@@ -10,6 +10,7 @@ class KotlinFactory(
     KotlinPropertyFactory,
     KotlinConstructorFactory,
     KotlinFunctionFactory,
+    KotlinContextParameterFactory,
     KotlinParameterFactory,
     KotlinAnnotationFactory,
     KotlinCodeBlockFactory

@@ -1,6 +1,9 @@
 package io.github.diskria.poetesse.kotlin
 
 sealed interface KotlinModifierTrait : PoetesseKotlinScope {
+    operator fun KPModifier.unaryPlus() {
+        container.append(this)
+    }
 
     sealed interface WithVisibility : KotlinModifierTrait {
         fun public() = modifier(KPModifier.PUBLIC)
@@ -11,12 +14,12 @@ sealed interface KotlinModifierTrait : PoetesseKotlinScope {
 }
 
 fun KotlinModifierTrait.modifier(modifier: KPModifier) {
-    internal.append(modifier)
+    +modifier
 }
 
 internal class KotlinModifierContainer(val append: (modifier: KPModifier) -> Unit)
 
-private val KotlinModifierTrait.internal: KotlinModifierContainer
+private val KotlinModifierTrait.container: KotlinModifierContainer
     get() = when (this) {
         is KotlinTypeScope -> modifierContainer
         is KotlinTypeAliasScope -> modifierContainer

@@ -9,7 +9,7 @@ import io.github.diskria.poetesse.interop.interopToKotlin
 
 sealed interface KotlinTypeVariableTrait : PoetesseKotlinScope {
     operator fun XTypeVariableName.unaryPlus(): XTypeVariableName {
-        this@KotlinTypeVariableTrait.internal.append(interopToKotlin())
+        this@KotlinTypeVariableTrait.container.append(interopToKotlin())
         return this
     }
 }
@@ -35,7 +35,7 @@ fun KotlinTypeVariableTrait.typeVariable(
 
 internal class KotlinTypeVariableContainer(val append: (typeVariable: KPTypeVariableName) -> Unit)
 
-private val KotlinTypeVariableTrait.internal: KotlinTypeVariableContainer
+private val KotlinTypeVariableTrait.container: KotlinTypeVariableContainer
     get() = when (this) {
         is KotlinTypeScope -> typeVariableContainer
         is KotlinTypeAliasScope -> typeVariableContainer

@@ -1,6 +1,9 @@
 package io.github.diskria.poetesse.java
 
 sealed interface JavaModifierTrait : PoetesseJavaScope {
+    operator fun JPModifier.unaryPlus() {
+        container.append(this)
+    }
 
     sealed interface WithVisibility : JavaModifierTrait {
         fun public() = modifier(JPModifier.PUBLIC)
@@ -11,12 +14,12 @@ sealed interface JavaModifierTrait : PoetesseJavaScope {
 }
 
 fun JavaModifierTrait.modifier(modifier: JPModifier) {
-    internal.append(modifier)
+    +modifier
 }
 
 internal class JavaModifierContainer(val append: (modifier: JPModifier) -> Unit)
 
-private val JavaModifierTrait.internal: JavaModifierContainer
+private val JavaModifierTrait.container: JavaModifierContainer
     get() = when (this) {
         is JavaTypeScope -> modifierContainer
         is JavaFieldScope -> modifierContainer

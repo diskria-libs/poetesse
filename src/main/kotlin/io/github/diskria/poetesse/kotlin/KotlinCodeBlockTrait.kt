@@ -12,7 +12,7 @@ sealed interface KotlinCodeBlockTrait : KotlinCodeBlockFactory {
 
     operator fun KPCodeBlock.unaryPlus() {
         if (isEmpty()) return
-        internal.append(this)
+        container.append(this)
     }
 }
 
@@ -61,7 +61,7 @@ inline fun <reified T : Any> KotlinCodeBlockTrait.variable(noinline block: Kotli
 
 internal class KotlinCodeBlockContainer(val append: (codeBlock: KPCodeBlock) -> Unit)
 
-private val KotlinCodeBlockTrait.internal: KotlinCodeBlockContainer
+private val KotlinCodeBlockTrait.container: KotlinCodeBlockContainer
     get() = when (this) {
         is KotlinBodyScope -> codeBlockContainer
         is KotlinEmbeddableCodeBlockScope -> codeBlockContainer

@@ -14,6 +14,7 @@ projekt {
         jvmTarget = JvmTarget.JVM_17
     }
 }
+
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.compilerOptions {
     freeCompilerArgs.set(listOf("-XXLanguage:+ContextParameters"))

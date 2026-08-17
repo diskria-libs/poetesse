@@ -6,7 +6,7 @@ import io.github.diskria.poetesse.interop.PoetesseScope
 sealed interface JavaBodyTrait : PoetesseJavaScope
 
 fun JavaBodyTrait.body(block: JavaBodyScope.Block = {}) {
-    JavaBodyScope.of(internal.append).apply(block)
+    JavaBodyScope.of(container.append).apply(block)
 }
 
 internal class JavaBodyContainer(val append: (statement: JPCodeBlock) -> Unit)
@@ -25,7 +25,7 @@ class JavaBodyScope private constructor(
     }
 }
 
-private val JavaBodyTrait.internal: JavaBodyContainer
+private val JavaBodyTrait.container: JavaBodyContainer
     get() = when (this) {
         is JavaConstructorScope -> statementContainer
         is JavaMethodScope -> statementContainer

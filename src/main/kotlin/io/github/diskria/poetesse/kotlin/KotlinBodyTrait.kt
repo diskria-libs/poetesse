@@ -6,7 +6,7 @@ import io.github.diskria.poetesse.interop.PoetesseScope
 sealed interface KotlinBodyTrait : PoetesseKotlinScope
 
 fun KotlinBodyTrait.body(block: KotlinBodyScope.Block = {}) {
-    KotlinBodyScope.of(internal.append).apply(block)
+    KotlinBodyScope.of(container.append).apply(block)
 }
 
 fun KotlinBodyTrait.expression(block: KotlinCodeScope.Block) {
@@ -29,7 +29,7 @@ class KotlinBodyScope private constructor(
     }
 }
 
-private val KotlinBodyTrait.internal: KotlinBodyContainer
+private val KotlinBodyTrait.container: KotlinBodyContainer
     get() = when (this) {
         is KotlinPropertyGetterScope -> statementContainer
         is KotlinPropertySetterScope -> statementContainer

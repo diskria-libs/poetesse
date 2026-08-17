@@ -1,5 +1,6 @@
 package io.github.diskria.poetesse.kotlin
 
+import com.squareup.kotlinpoet.ExperimentalKotlinPoetApi
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.extensions.addStatement
 import io.github.diskria.poetesse.interop.PoetesseScope
@@ -12,6 +13,7 @@ class KotlinFunctionScope private constructor(
     override val config: Poetesse.Config,
     private val builder: KPFunctionBuilder,
 ) : PoetesseKotlinScope,
+    KotlinContextParameterTrait,
     KotlinTypeVariableTrait,
     KotlinParameterTrait,
     KotlinAnnotationTrait,
@@ -20,6 +22,8 @@ class KotlinFunctionScope private constructor(
 
     internal typealias Block = KotlinFunctionScope.() -> Unit
 
+    @OptIn(ExperimentalKotlinPoetApi::class)
+    internal val contextParameterContainer = KotlinContextParameterContainer(builder::contextParameter)
     internal val typeVariableContainer = KotlinTypeVariableContainer(builder::addTypeVariable)
     internal val parameterContainer = KotlinParameterContainer(builder::addParameter)
     internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)

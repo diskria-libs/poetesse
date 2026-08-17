@@ -20,6 +20,7 @@ typealias KPFunction = FunSpec
 
 typealias KPParameterBuilder = ParameterSpec.Builder
 typealias KPParameter = ParameterSpec
+typealias KPContextParameter = ContextParameter
 
 typealias KPAnnotationBuilder = AnnotationSpec.Builder
 typealias KPAnnotation = AnnotationSpec

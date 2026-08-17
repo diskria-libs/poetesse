@@ -8,7 +8,7 @@ import io.github.diskria.poetesse.interop.interopToJava
 
 sealed interface JavaTypeVariableTrait : PoetesseJavaScope {
     operator fun XTypeVariableName.unaryPlus(): XTypeVariableName {
-        this@JavaTypeVariableTrait.internal.append(interopToJava())
+        this@JavaTypeVariableTrait.container.append(interopToJava())
         return this
     }
 }
@@ -28,7 +28,7 @@ fun JavaTypeVariableTrait.typeVariable(vararg bounds: XTypeName, nullable: Boole
 
 internal class JavaTypeVariableContainer(val append: (typeVariable: JPTypeVariableName) -> Unit)
 
-private val JavaTypeVariableTrait.internal: JavaTypeVariableContainer
+private val JavaTypeVariableTrait.container: JavaTypeVariableContainer
     get() = when (this) {
         is JavaTypeScope -> typeVariableContainer
         is JavaMethodScope -> typeVariableContainer
