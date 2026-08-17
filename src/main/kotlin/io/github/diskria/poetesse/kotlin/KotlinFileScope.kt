@@ -12,7 +12,8 @@ class KotlinFileScope private constructor(
 ) : KotlinTypeTrait,
     KotlinTypeAliasTrait,
     KotlinPropertyTrait,
-    KotlinFunctionTrait {
+    KotlinFunctionTrait,
+    KotlinAnnotationTrait {
 
     internal typealias Block = KotlinFileScope.() -> Unit
 
@@ -20,6 +21,7 @@ class KotlinFileScope private constructor(
     internal val typeAliasContainer = KotlinTypeAliasContainer({ xClass(packageName, it) }, builder::addTypeAlias)
     internal val propertyContainer = KotlinPropertyContainer(builder::addProperty)
     internal val functionContainer = KotlinFunctionContainer(builder::addFunction)
+    internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
 
     internal fun build(): PoetesseKotlinFile {
         val file = builder.apply {
