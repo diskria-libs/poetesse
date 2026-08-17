@@ -107,11 +107,12 @@ class MultiClassJavaFile private constructor(
         fun mergeFrom(packageName: String?, fileName: String, types: List<JPType>): MultiClassJavaFile {
             val file = MultiClassJavaFile(packageName, fileName, types, poetesse.config)
             types.forEach { typeSpec ->
-                val source = JPFile.builder(packageName.orEmpty(), typeSpec)
-                    .indent(poetesse.config.indent)
-                    .build()
-                    .toString()
-                file.collectType(source)
+                file.collectType(
+                    JPFile.builder(packageName.orEmpty(), typeSpec).apply {
+                        indent(poetesse.config.indent)
+                        skipJavaLangImports(poetesse.config.skipLangDefaultImports)
+                    }.build().toString()
+                )
             }
             return file
         }

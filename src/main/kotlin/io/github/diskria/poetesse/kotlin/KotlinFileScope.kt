@@ -27,6 +27,11 @@ class KotlinFileScope private constructor(
         val file = builder.apply {
             indent(config.indent)
             config.comment?.let { addFileComment(it) }
+            if (config.skipLangDefaultImports) {
+                addKotlinDefaultImports(includeJvm = true, includeJs = false)
+                addDefaultPackageImport("kotlin.math")
+                addDefaultPackageImport("kotlin.jvm")
+            }
         }.build()
         return PoetesseKotlinFile(file)
     }

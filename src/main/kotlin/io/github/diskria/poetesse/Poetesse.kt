@@ -21,6 +21,7 @@ class Poetesse private constructor(
     class Config(
         val indent: String = " ".repeat(4),
         val comment: String? = null,
+        val skipLangDefaultImports: Boolean = true,
         val javaNullabilityResolver: JavaNullabilityResolver = JavaNullabilityResolver.Default,
     )
 
@@ -50,9 +51,10 @@ class Poetesse private constructor(
     class Builder {
         var indent: String = Default.config.indent
         var commentHeader: String? = Default.config.comment
+        var skipLangDefaultImports: Boolean = Default.config.skipLangDefaultImports
         var javaNullabilityResolver: JavaNullabilityResolver = Default.config.javaNullabilityResolver
 
-        internal fun build() = Poetesse(Config(indent, commentHeader, javaNullabilityResolver))
+        internal fun build() = Poetesse(Config(indent, commentHeader, skipLangDefaultImports, javaNullabilityResolver))
 
         internal typealias Block = Builder.() -> Unit
     }
