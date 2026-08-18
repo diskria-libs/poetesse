@@ -42,8 +42,11 @@ class XFunctionalTypeName private constructor(
     internal companion object {
         context(poetesse: PoetesseScope)
         fun of(
-            contextParameters: List<XTypeName>, receiver: XTypeName?, parameters: List<XParameter>,
-            returnType: XTypeName, isNullable: Boolean
+            contextParameters: List<XTypeName>,
+            receiver: XTypeName?,
+            parameters: List<XParameter>,
+            returnType: XTypeName,
+            isNullable: Boolean,
         ) = XFunctionalTypeName(poetesse.config, contextParameters, receiver, parameters, returnType, isNullable)
     }
 }

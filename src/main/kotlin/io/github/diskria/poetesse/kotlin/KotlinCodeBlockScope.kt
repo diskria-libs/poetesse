@@ -7,7 +7,8 @@ import io.github.diskria.poetesse.interop.PoetesseScope
 class KotlinCodeBlockScope private constructor(
     override val config: Poetesse.Config,
     private val builder: KPCodeBlockBuilder = KPCodeBlock.builder(),
-) : KotlinCodeBlockTrait {
+) : PoetesseKotlinScope,
+    KotlinCodeBlockTrait {
 
     internal typealias Block = KotlinCodeBlockScope.() -> Unit
 

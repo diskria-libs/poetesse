@@ -42,7 +42,7 @@ class KotlinTypeScope private constructor(
 
     fun superclass(type: XTypeName, block: SuperclassConstructorScope.Block = {}) {
         builder.superclass(type.interopToKotlin())
-        SuperclassConstructorScope(config).block()
+        SuperclassConstructorScope().block()
     }
 
     fun superclass(type: KClass<*>, block: SuperclassConstructorScope.Block = {}) {
@@ -72,9 +72,9 @@ class KotlinTypeScope private constructor(
 
     internal fun build() = builder.build()
 
-    inner class SuperclassConstructorScope(
-        override val config: Poetesse.Config
-    ) : KotlinArgumentTrait {
+    inner class SuperclassConstructorScope internal constructor() : KotlinArgumentTrait {
+
+        override val config: Poetesse.Config = this@KotlinTypeScope.config
 
         internal typealias Block = SuperclassConstructorScope.() -> Unit
 

@@ -83,11 +83,9 @@ internal fun KClass<*>.toXType(nullable: Boolean = false, boxed: Boolean = nulla
         buildString {
             appendLine("Cannot create XTypeName directly from parameterized class '$className'.")
             appendLine()
-            appendLine("To construct generic types, use:")
-            appendLine("  For List<String>: xClass<List<*>>().generic(xType<String>())")
-            appendLine()
-            appendLine("To construct lambda types, use:")
-            appendLine("  For (Int) -> String: xType<String>().lambda(xType<Int>())")
+            appendLine("Expected factory methods:")
+            appendLine("  xClass<List<*>>().generic(xType<String>())  => List<String>")
+            appendLine("  xType<String>().lambda(xType<Int>())        => (Int) -> String")
         }
     }
     val kp = asClassName().setNullable(nullable)

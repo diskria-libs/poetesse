@@ -2,6 +2,7 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseFile
+import io.github.diskria.poetesse.extensions.joinWithTrailing
 import io.github.diskria.poetesse.interop.PoetesseScope
 import java.nio.file.Path
 import javax.annotation.processing.Filer
@@ -10,52 +11,36 @@ import kotlin.io.path.isDirectory
 import kotlin.io.path.notExists
 import kotlin.io.path.outputStream
 
-abstract class PoetesseJavaFile : PoetesseFile {
-
-    override val extensionName: String = "java"
-
-    override val relativePath: String
-        get() = buildString {
-            packageName?.let { append(it.replace('.', '/') + "/") }
-            append("$fileName.$extensionName")
-        }
-
-    override fun writeTo(directory: Path): Path {
-        require(directory.notExists() || directory.isDirectory()) {
-            "path '$directory' exists but is not a directory."
-        }
-        val outputPath = directory.resolve(relativePath)
-        outputPath.parent.createDirectories()
-        outputPath.outputStream().bufferedWriter().use(::writeTo)
-        return outputPath
-    }
-}
-
-class SingleClassJavaFile internal constructor(
-    override val packageName: String?,
-    override val fileName: String,
-    private val file: JPFile,
-) : PoetesseJavaFile() {
-
-    override fun writeTo(out: Appendable) {
-        file.writeTo(out)
-    }
-
-    override fun writeTo(filer: Filer) {
-        file.writeTo(filer)
-    }
-}
-
-class MultiClassJavaFile private constructor(
+class PoetesseJavaFile private constructor(
+    private val config: Poetesse.Config,
     override val packageName: String?,
     override val fileName: String,
     private val types: List<JPType>,
-    private val config: Poetesse.Config,
-) : PoetesseJavaFile() {
+    extraImports: Set<String> = emptySet(),
+    extraStaticImports: Set<String> = emptySet(),
+) : PoetesseFile {
 
-    private val staticImports: MutableSet<String> = mutableSetOf()
-    private val imports: MutableSet<String> = mutableSetOf()
+    override val extensionName: String = "java"
+
+    override val relativePath: String = buildString {
+        packageName?.split('.')?.joinWithTrailing("/")?.let(::append)
+        append("$fileName.$extensionName")
+    }
+
+    private val staticImports: MutableSet<String> = extraStaticImports.toMutableSet()
+    private val imports: MutableSet<String> = extraImports.toMutableSet()
     private val typeSections: MutableList<String> = mutableListOf()
+
+    init {
+        types.forEach { typeSpec ->
+            collectType(
+                JPFile.builder(packageName.orEmpty(), typeSpec).apply {
+                    indent(config.indent)
+                    skipJavaLangImports(config.skipLangDefaultImports)
+                }.build().toString()
+            )
+        }
+    }
 
     override fun writeTo(out: Appendable) {
         config.comment?.let {
@@ -66,20 +51,33 @@ class MultiClassJavaFile private constructor(
             out.appendLine()
         }
         if (staticImports.isNotEmpty()) {
-            staticImports.forEach(out::appendLine)
+            staticImports.forEach { out.appendLine("import static $it;") }
             out.appendLine()
         }
         if (imports.isNotEmpty()) {
-            imports.forEach(out::appendLine)
+            imports.forEach { out.appendLine("import $it;") }
             out.appendLine()
         }
         out.append(typeSections.joinToString("\n\n"))
         out.appendLine()
     }
 
+    override fun writeTo(directory: Path): Path {
+        require(directory.notExists() || directory.isDirectory()) {
+            "path '$directory' exists but is not a directory."
+        }
+        val outputPath = directory.resolve(relativePath)
+        outputPath.parent.createDirectories()
+        outputPath.outputStream().bufferedWriter().use(::writeTo)
+        return outputPath
+    }
+
     override fun writeTo(filer: Filer) {
         val sourceFile = filer.createSourceFile(
-            listOfNotNull(packageName, fileName).joinToString("."),
+            buildString {
+                packageName?.let { append("$it.") }
+                append(fileName)
+            },
             *types.flatMap { it.originatingElements() }.toTypedArray()
         )
         runCatching { sourceFile.openWriter().use(::writeTo) }
@@ -91,30 +89,31 @@ class MultiClassJavaFile private constructor(
         val typeLines = StringBuilder()
         code.lineSequence().forEach { line ->
             when {
-                line.startsWith("package ") -> Unit
-                line.startsWith("import static ") -> staticImports += line
-                line.startsWith("import ") -> imports += line
+                line.startsWith("package ") -> {}
+                line.startsWith("import static ") -> {
+                    staticImports += line.removePrefix("import static ").removeSuffix(";")
+                }
+
+                line.startsWith("import ") -> {
+                    imports += line.removePrefix("import ").removeSuffix(";")
+                }
+
                 else -> typeLines.appendLine(line)
             }
         }
-        typeLines.toString().trim().takeIf { it.isNotEmpty() }?.let {
+        typeLines.toString().trim().ifEmpty { null }?.let {
             typeSections += it
         }
     }
 
     internal companion object {
         context(poetesse: PoetesseScope)
-        fun mergeFrom(packageName: String?, fileName: String, types: List<JPType>): MultiClassJavaFile {
-            val file = MultiClassJavaFile(packageName, fileName, types, poetesse.config)
-            types.forEach { typeSpec ->
-                file.collectType(
-                    JPFile.builder(packageName.orEmpty(), typeSpec).apply {
-                        indent(poetesse.config.indent)
-                        skipJavaLangImports(poetesse.config.skipLangDefaultImports)
-                    }.build().toString()
-                )
-            }
-            return file
-        }
+        fun of(
+            packageName: String?,
+            fileName: String,
+            types: List<JPType>,
+            extraImports: Set<String>,
+            extraStaticImports: Set<String>,
+        ) = PoetesseJavaFile(poetesse.config, packageName, fileName, types, extraImports, extraStaticImports)
     }
 }

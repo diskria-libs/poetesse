@@ -6,7 +6,8 @@ import io.github.diskria.poetesse.interop.PoetesseScope
 class JavaCodeBlockScope private constructor(
     override val config: Poetesse.Config,
     private val builder: JPCodeBlockBuilder = JPCodeBlock.builder(),
-) : JavaCodeBlockTrait {
+) : PoetesseJavaScope,
+    JavaCodeBlockTrait {
 
     internal typealias Block = JavaCodeBlockScope.() -> Unit
 

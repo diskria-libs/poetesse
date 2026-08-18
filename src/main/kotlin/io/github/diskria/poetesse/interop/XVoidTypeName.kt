@@ -21,7 +21,7 @@ class XVoidTypeName private constructor(
 
     override fun interopToJavaInternal(): JPTypeName = if (isBoxed) JPBoxedVoid else JPVoid
 
-    override fun boxInternal(): XVoidTypeName = XVoidTypeName(config, true, isNullable)
+    override fun boxInternal() = of(isBoxed = true, isNullable)
 
     internal companion object {
         context(poetesse: PoetesseScope)

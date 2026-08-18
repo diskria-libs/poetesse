@@ -14,6 +14,12 @@ fun JPTypeName.setBoxed(boxed: Boolean): JPTypeName {
     return if (boxed) box() else unbox()
 }
 
+val JPClassName.binaryName: String get() = reflectionName()
+
+val JPClassName.internalName: String get() = binaryName.replace('.', '/')
+
+val JPClassName.qualifiedName: String get() = canonicalName()
+
 fun JPTypeName.wrapToArray(): JPArrayTypeName =
     JPArrayTypeName.of(this)
 

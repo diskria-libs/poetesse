@@ -41,4 +41,5 @@ fun PoetesseScope.xClass(packageName: String?, vararg simpleNames: String, nulla
 fun PoetesseScope.xClass(type: KClass<*>, nullable: Boolean = false) = type.toXClass(nullable)
 
 inline fun <reified T> PoetesseScope.xClass(nullable: Boolean = true) = xClass(T::class, nullable)
+
 inline fun <reified T : Any> PoetesseScope.xClass() = xClass<T>(nullable = false)

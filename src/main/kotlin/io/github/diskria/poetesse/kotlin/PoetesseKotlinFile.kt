@@ -6,7 +6,7 @@ import javax.annotation.processing.Filer
 
 class PoetesseKotlinFile internal constructor(private val spec: KPFile) : PoetesseFile {
 
-    override val packageName: String? = spec.packageName.takeIf { it.isNotEmpty() }
+    override val packageName: String? = spec.packageName.ifEmpty { null }
     override val fileName: String = spec.name
     override val extensionName: String = "kt"
     override val relativePath: String = spec.relativePath

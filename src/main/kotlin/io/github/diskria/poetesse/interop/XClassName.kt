@@ -18,7 +18,10 @@ class XClassName private constructor(
 
     val simpleName: String = simpleNames.last()
     val nestedName: String = simpleNames.joinToString(".")
-    val qualifiedName: String = listOfNotNull(packageName, nestedName).joinToString(".")
+    val qualifiedName: String = buildString {
+        packageName?.let { append("$it.") }
+        append(nestedName)
+    }
 
     private val rawKotlin: KPClassName =
         KPClassName(packageName.orEmpty(), simpleNames)
@@ -26,14 +29,14 @@ class XClassName private constructor(
     private val rawJava: JPClassName =
         JPClassName.get(packageName.orEmpty(), simpleNames.first(), *simpleNames.drop(1).toTypedArray())
 
-    internal fun nested(name: String): XClassName =
-        XClassName(config, packageName, (simpleNames + name), false)
-
     override fun interopToKotlinInternal(): KPClassName =
         javaToKotlin[rawJava] ?: rawKotlin
 
     override fun interopToJavaInternal(): JPClassName =
         kotlinToJava[rawKotlin] ?: rawJava
+
+    internal fun nested(name: String): XClassName =
+        of(packageName, (simpleNames + name), false)
 
     internal companion object {
         private val kotlinToJava = buildMap {
@@ -119,19 +122,19 @@ class XClassName private constructor(
 
         context(poetesse: PoetesseScope)
         fun of(packageName: String?, simpleNames: List<String>, isNullable: Boolean) =
-            XClassName(poetesse.config, packageName, simpleNames, isNullable)
+            XClassName(poetesse.config, packageName?.ifEmpty { null }, simpleNames, isNullable)
     }
 }
 
 @PublishedApi
 context(poetesse: PoetesseScope)
 internal fun KPClassName.asXClassName() =
-    XClassName.of(packageName.takeIf { it.isNotEmpty() }, simpleNames, isNullable)
+    XClassName.of(packageName.ifEmpty { null }, simpleNames, isNullable)
 
 @PublishedApi
 context(poetesse: PoetesseScope)
 internal fun JPClassName.asXClassName(nullable: Boolean = false) =
-    XClassName.of(packageName().takeIf { it.isNotEmpty() }, simpleNames(), nullable)
+    XClassName.of(packageName().ifEmpty { null }, simpleNames(), nullable)
 
 @PublishedApi
 context(poetesse: PoetesseScope)
@@ -141,8 +144,10 @@ internal fun KClass<*>.toXClass(nullable: Boolean = false): XClassName {
         buildString {
             appendLine("Cannot create XClassName directly for array type '$className'.")
             appendLine()
-            appendLine("To construct array types, use:")
-            appendLine("  For IntArray: xType<Int>().array()")
+            appendLine("Expected factory methods for array types:")
+            appendLine("  xType<Int>().array()                 => IntArray / int[]")
+            appendLine("  xType<Int>(boxed = true).array()     => Array<Int> / Integer[]")
+            appendLine("  xType<Int>(nullable = true).array()  => Array<Int?> / @Nullable Integer[]")
         }
     }
     return asClassName().setNullable(nullable).asX<XClassName>()
