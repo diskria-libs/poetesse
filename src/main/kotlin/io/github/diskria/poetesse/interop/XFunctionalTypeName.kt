@@ -46,8 +46,15 @@ class XFunctionalTypeName private constructor(
             receiver: XTypeName?,
             parameters: List<XParameter>,
             returnType: XTypeName,
-            isNullable: Boolean,
-        ) = XFunctionalTypeName(poetesse.config, contextParameters, receiver, parameters, returnType, isNullable)
+            isNullable: Boolean = false,
+        ) = XFunctionalTypeName(
+            poetesse.config,
+            contextParameters.map { it.box() },
+            receiver?.box(),
+            parameters.map { XParameter(it.name, it.type.box()) },
+            returnType.box(),
+            isNullable,
+        )
     }
 }
 

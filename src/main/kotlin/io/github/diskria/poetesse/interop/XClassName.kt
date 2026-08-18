@@ -121,7 +121,7 @@ class XClassName private constructor(
         private val javaToKotlin = kotlinToJava.entries.associate { (k, j) -> j to k }
 
         context(poetesse: PoetesseScope)
-        fun of(packageName: String?, simpleNames: List<String>, isNullable: Boolean) =
+        fun of(packageName: String?, simpleNames: List<String>, isNullable: Boolean = false) =
             XClassName(poetesse.config, packageName?.ifEmpty { null }, simpleNames, isNullable)
     }
 }
@@ -147,7 +147,7 @@ internal fun KClass<*>.toXClass(nullable: Boolean = false): XClassName {
             appendLine("Expected factory methods for array types:")
             appendLine("  xType<Int>().array()                 => IntArray / int[]")
             appendLine("  xType<Int>(boxed = true).array()     => Array<Int> / Integer[]")
-            appendLine("  xType<Int>(nullable = true).array()  => Array<Int?> / @Nullable Integer[]")
+            appendLine("  xType<Int?>().array()  => Array<Int?> / @Nullable Integer[]")
         }
     }
     return asClassName().setNullable(nullable).asX<XClassName>()

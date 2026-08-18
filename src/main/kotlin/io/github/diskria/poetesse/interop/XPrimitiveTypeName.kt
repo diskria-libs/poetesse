@@ -44,7 +44,7 @@ class XPrimitiveTypeName private constructor(
         val javaToKind: Map<JPTypeName, Kind> = Kind.entries.associateBy { it.java }
 
         context(poetesse: PoetesseScope)
-        fun of(kind: Kind, isBoxed: Boolean, isNullable: Boolean) =
+        fun of(kind: Kind, isBoxed: Boolean, isNullable: Boolean = false) =
             XPrimitiveTypeName(poetesse.config, kind, isBoxed, isNullable)
     }
 }

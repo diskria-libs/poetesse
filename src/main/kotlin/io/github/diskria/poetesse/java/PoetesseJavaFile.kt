@@ -16,8 +16,8 @@ class PoetesseJavaFile private constructor(
     override val packageName: String?,
     override val fileName: String,
     private val types: List<JPType>,
-    extraImports: Set<String> = emptySet(),
-    extraStaticImports: Set<String> = emptySet(),
+    extraImports: Set<String>,
+    extraStaticImports: Set<String>,
 ) : PoetesseFile {
 
     override val extensionName: String = "java"
@@ -32,9 +32,9 @@ class PoetesseJavaFile private constructor(
     private val typeSections: MutableList<String> = mutableListOf()
 
     init {
-        types.forEach { typeSpec ->
+        types.forEach { spec ->
             collectType(
-                JPFile.builder(packageName.orEmpty(), typeSpec).apply {
+                JPFile.builder(packageName.orEmpty(), spec).apply {
                     indent(config.indent)
                     skipJavaLangImports(config.skipLangDefaultImports)
                 }.build().toString()

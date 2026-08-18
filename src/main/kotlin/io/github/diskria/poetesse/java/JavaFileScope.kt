@@ -25,43 +25,81 @@ class JavaFileScope private constructor(
     private val extraStaticImports: MutableSet<String> = mutableSetOf()
     private val types: MutableList<JPType> = mutableListOf()
 
-    fun import(className: XClassName, memberName: String? = null) {
-        require(memberName != "*") { "Wildcard imports are not allowed" }
-        val qualifiedName = className.interopToJava(resolveNullability = false).qualifiedName
-        if (memberName != null) {
-            extraStaticImports += "$qualifiedName.$memberName"
-        } else {
-            extraImports += qualifiedName
-        }
+    fun import(className: XClassName) {
+        extraImports += className.interopToJava(resolveNullability = false).qualifiedName
     }
 
-    fun import(klass: KClass<*>, memberName: String? = null) {
-        import(xClass(klass), memberName)
+    fun import(klass: KClass<*>) {
+        import(xClass(klass))
     }
 
-    inline fun <reified T : Any> import(memberName: String? = null) {
-        import(T::class, memberName)
+    inline fun <reified T : Any> import() {
+        import(T::class)
     }
 
-    fun import(className: XClassName, memberNames: Iterable<String>) {
-        memberNames.forEach { import(className, it) }
+    fun import(packageName: String?, name: String) {
+        import(XClassName.of(packageName, name.split('.')))
     }
 
-    fun import(klass: KClass<*>, memberNames: Iterable<String>) {
-        import(xClass(klass), memberNames)
+    fun import(packageName: String?, names: Iterable<String>) {
+        names.forEach { import(packageName, it) }
     }
 
-    fun import(enum: Enum<*>) {
+    fun import(packageName: String?, vararg names: String) {
+        import(packageName, names.asIterable())
+    }
+
+    fun memberImport(owner: XClassName, name: String) {
+        require(name != "*") { "Wildcard imports are not allowed" }
+        extraStaticImports += "${owner.interopToJava(resolveNullability = false).qualifiedName}.$name"
+    }
+
+    fun memberImport(className: XClassName, names: Iterable<String>) {
+        names.forEach { memberImport(className, it) }
+    }
+
+    fun memberImport(className: XClassName, vararg names: String) {
+        memberImport(className, names.asIterable())
+    }
+
+    fun memberImport(owner: KClass<*>, name: String) {
+        memberImport(xClass(owner), name)
+    }
+
+    fun memberImport(owner: KClass<*>, names: Iterable<String>) {
+        names.forEach { memberImport(owner, it) }
+    }
+
+    fun memberImport(owner: KClass<*>, vararg names: String) {
+        memberImport(owner, names.asIterable())
+    }
+
+    inline fun <reified Owner : Any> memberImport(name: String) {
+        memberImport(Owner::class, name)
+    }
+
+    inline fun <reified Owner : Any> memberImport(names: Iterable<String>) {
+        names.forEach { memberImport<Owner>(it) }
+    }
+
+    inline fun <reified Owner : Any> memberImport(vararg names: String) {
+        memberImport<Owner>(names.asIterable())
+    }
+
+    fun memberImport(packageName: String?, name: String) {
+        memberImport(XClassName.of(packageName, name.split('.')))
+    }
+
+    fun memberImport(packageName: String?, names: Iterable<String>) {
+        names.forEach { memberImport(packageName, it) }
+    }
+
+    fun memberImport(packageName: String?, vararg names: String) {
+        memberImport(packageName, names.asIterable())
+    }
+
+    fun memberImport(enum: Enum<*>) {
         extraStaticImports += "${enum.declaringJavaClass.canonicalName}.${enum.name}"
-    }
-
-    fun import(packageName: String?, className: String) {
-        require(className != "*") { "Wildcard imports are not allowed" }
-        extraImports += listOfNotNull(packageName?.ifEmpty { null }, className).joinToString(".")
-    }
-
-    fun import(packageName: String?, classNames: Iterable<String>) {
-        classNames.forEach { import(packageName, it) }
     }
 
     internal fun build(): PoetesseJavaFile {

@@ -23,7 +23,7 @@ class XParameterizedTypeName private constructor(
 
     internal companion object {
         context(poetesse: PoetesseScope)
-        fun of(rawType: XClassName, typeArguments: List<XTypeName>, isNullable: Boolean) =
+        fun of(rawType: XClassName, typeArguments: List<XTypeName>, isNullable: Boolean = false) =
             XParameterizedTypeName(poetesse.config, rawType, typeArguments, isNullable)
     }
 }

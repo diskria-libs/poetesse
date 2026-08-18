@@ -1,9 +1,9 @@
 package io.github.diskria.poetesse.extensions
 
-import io.github.diskria.poetesse.kotlin.KPCodeBlock
-import io.github.diskria.poetesse.kotlin.KPCodeBlockBuilder
-import io.github.diskria.poetesse.kotlin.KPFunctionBuilder
-import io.github.diskria.poetesse.kotlin.KPTypeName
+import io.github.diskria.poetesse.kotlin.*
+
+val KPClassName.qualifiedName: String
+    get() = canonicalName
 
 @Suppress("UNCHECKED_CAST")
 fun <T : KPTypeName> T.setNullable(nullable: Boolean): T =

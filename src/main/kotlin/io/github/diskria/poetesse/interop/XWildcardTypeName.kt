@@ -35,7 +35,7 @@ class XWildcardTypeName private constructor(
 
     internal companion object {
         context(poetesse: PoetesseScope)
-        fun of(inType: XTypeName?, outType: XTypeName?, isNullable: Boolean) =
+        fun of(inType: XTypeName?, outType: XTypeName?, isNullable: Boolean = false) =
             XWildcardTypeName(poetesse.config, inType, outType, isNullable)
     }
 }

@@ -25,8 +25,13 @@ class XTypeVariableName private constructor(
 
     internal companion object {
         context(poetesse: PoetesseScope)
-        fun of(name: String, bounds: List<XTypeName>, variance: XVariance?, isReified: Boolean, isNullable: Boolean) =
-            XTypeVariableName(poetesse.config, name, bounds, variance, isReified, isNullable)
+        fun of(
+            name: String,
+            bounds: List<XTypeName>,
+            variance: XVariance?,
+            isReified: Boolean,
+            isNullable: Boolean = false
+        ) = XTypeVariableName(poetesse.config, name, bounds, variance, isReified, isNullable)
     }
 }
 

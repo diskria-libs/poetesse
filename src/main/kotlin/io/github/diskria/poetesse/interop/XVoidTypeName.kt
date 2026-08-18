@@ -25,7 +25,7 @@ class XVoidTypeName private constructor(
 
     internal companion object {
         context(poetesse: PoetesseScope)
-        fun of(isBoxed: Boolean, isNullable: Boolean) =
+        fun of(isBoxed: Boolean, isNullable: Boolean = false) =
             XVoidTypeName(poetesse.config, isBoxed, isNullable)
     }
 }

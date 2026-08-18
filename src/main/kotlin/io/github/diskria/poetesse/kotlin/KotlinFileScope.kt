@@ -1,6 +1,7 @@
 package io.github.diskria.poetesse.kotlin
 
 import com.squareup.kotlinpoet.MemberName
+import com.squareup.kotlinpoet.MemberName.Companion.member
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.interop.PoetesseScope
 import io.github.diskria.poetesse.interop.XClassName
@@ -30,57 +31,96 @@ class KotlinFileScope private constructor(
     internal val functionContainer = KotlinFunctionContainer(builder::addFunction)
     internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
 
-    fun import(className: XClassName, memberName: String? = null, block: ImportScope.Block = {}) {
-        require(memberName != "*") { "Wildcard imports are not allowed" }
+    fun import(className: XClassName, block: ImportScope.Block = {}) {
         val alias = ImportScope().apply(block).alias
         val kp = className.interopToKotlin()
         if (alias != null) {
-            if (memberName != null) {
-                builder.addAliasedImport(kp, memberName, alias)
-            } else {
-                builder.addAliasedImport(kp, alias)
-            }
+            builder.addAliasedImport(kp, alias)
         } else {
-            builder.addRawImport(buildString {
-                append(kp.canonicalName)
-                memberName?.let { append(".$it") }
-            })
+            builder.addImport(kp.packageName, kp.simpleNames.joinToString("."))
         }
     }
 
-    fun import(klass: KClass<*>, memberName: String? = null, block: ImportScope.Block = {}) {
-        import(xClass(klass), memberName, block)
+    fun import(klass: KClass<*>, block: ImportScope.Block = {}) {
+        import(xClass(klass), block)
     }
 
-    inline fun <reified T : Any> import(memberName: String? = null, noinline block: ImportScope.Block = {}) {
-        import(T::class, memberName, block)
+    inline fun <reified T : Any> import(noinline block: ImportScope.Block = {}) {
+        import(T::class, block)
     }
 
-    fun import(className: XClassName, memberNames: Iterable<String>) {
-        memberNames.forEach { import(className, it) }
+    fun import(packageName: String?, name: String, block: ImportScope.Block = {}) {
+        import(XClassName.of(packageName, name.split('.')), block)
     }
 
-    fun import(klass: KClass<*>, memberNames: Iterable<String>) {
-        import(xClass(klass), memberNames)
+    fun import(packageName: String?, names: Iterable<String>) {
+        names.forEach { import(packageName, it) }
     }
 
-    fun import(enum: Enum<*>) {
+    fun import(packageName: String?, vararg names: String) {
+        import(packageName, names.asIterable())
+    }
+
+    fun memberImport(owner: XClassName, name: String, block: ImportScope.Block = {}) {
+        addMemberImport(owner.interopToKotlin().member(name), block)
+    }
+
+    fun memberImport(className: XClassName, names: Iterable<String>) {
+        names.forEach { memberImport(className, it) }
+    }
+
+    fun memberImport(className: XClassName, vararg names: String) {
+        memberImport(className, names.asIterable())
+    }
+
+    fun memberImport(owner: KClass<*>, name: String, block: ImportScope.Block = {}) {
+        memberImport(xClass(owner), name, block)
+    }
+
+    fun memberImport(owner: KClass<*>, names: Iterable<String>) {
+        names.forEach { memberImport(owner, it) }
+    }
+
+    fun memberImport(owner: KClass<*>, vararg names: String) {
+        memberImport(owner, names.asIterable())
+    }
+
+    inline fun <reified Owner : Any> memberImport(name: String, noinline block: ImportScope.Block = {}) {
+        memberImport(Owner::class, name, block)
+    }
+
+    inline fun <reified Owner : Any> memberImport(names: Iterable<String>) {
+        names.forEach { memberImport<Owner>(it) }
+    }
+
+    inline fun <reified Owner : Any> memberImport(vararg names: String) {
+        memberImport<Owner>(names.asIterable())
+    }
+
+    fun memberImport(packageName: String?, name: String, block: ImportScope.Block = {}) {
+        addMemberImport(MemberName(packageName.orEmpty(), name), block)
+    }
+
+    fun memberImport(packageName: String?, names: Iterable<String>) {
+        names.forEach { memberImport(packageName, it) }
+    }
+
+    fun memberImport(packageName: String?, vararg names: String) {
+        memberImport(packageName, names.asIterable())
+    }
+
+    fun memberImport(enum: Enum<*>) {
         builder.addImport(enum)
     }
 
-    fun import(packageName: String?, memberName: String, block: ImportScope.Block = {}) {
-        require(memberName != "*") { "Wildcard imports are not allowed" }
+    private fun addMemberImport(name: MemberName, block: ImportScope.Block = {}) {
+        require(name.simpleName != "*") { "Wildcard imports are not allowed" }
         val alias = ImportScope().apply(block).alias
-        val memberName = MemberName(packageName.orEmpty(), memberName)
         if (alias != null) {
-            builder.addAliasedImport(memberName, alias)
+            builder.addAliasedImport(name, alias)
         } else {
-            builder.addImport(memberName)
+            builder.addImport(name)
         }
-    }
-
-    fun import(packageName: String?, memberNames: Iterable<String>) {
-        memberNames.forEach { import(packageName, it) }
     }
 
     inner class ImportScope internal constructor() : PoetesseKotlinScope {
@@ -114,8 +154,4 @@ class KotlinFileScope private constructor(
         fun of(packageName: String?, fileName: String) =
             KotlinFileScope(poetesse.config, packageName, fileName, KPFile.builder(packageName.orEmpty(), fileName))
     }
-}
-
-private fun KPFileBuilder.addRawImport(import: String) {
-    addImport(MemberName("", import))
 }

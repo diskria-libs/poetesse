@@ -32,7 +32,7 @@ class XArrayTypeName private constructor(
             XPrimitiveTypeName.Kind.entries.associate { it.kotlinArray to it.kotlin }
 
         context(poetesse: PoetesseScope)
-        fun of(componentType: XTypeName, isNullable: Boolean) =
+        fun of(componentType: XTypeName, isNullable: Boolean = false) =
             XArrayTypeName(poetesse.config, componentType, isNullable)
     }
 }
