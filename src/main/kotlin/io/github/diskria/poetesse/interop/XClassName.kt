@@ -123,6 +123,10 @@ class XClassName private constructor(
         context(poetesse: PoetesseScope)
         fun of(packageName: String?, simpleNames: List<String>, isNullable: Boolean = false) =
             XClassName(poetesse.config, packageName?.ifEmpty { null }, simpleNames, isNullable)
+
+        context(poetesse: PoetesseScope)
+        fun of(packageName: String?, simpleName: String, isNullable: Boolean = false) =
+            of(packageName, listOf(simpleName), isNullable)
     }
 }
 
@@ -142,12 +146,12 @@ internal fun KClass<*>.toXClass(nullable: Boolean = false): XClassName {
     require(this != Array::class && !java.isArray) {
         val className = simpleName ?: this.toString()
         buildString {
-            appendLine("Cannot create XClassName directly for array type '$className'.")
+            appendLine("Cannot create XClassName directly from array type '$className'.")
             appendLine()
-            appendLine("Expected factory methods for array types:")
-            appendLine("  xType<Int>().array()                 => IntArray / int[]")
-            appendLine("  xType<Int>(boxed = true).array()     => Array<Int> / Integer[]")
-            appendLine("  xType<Int?>().array()  => Array<Int?> / @Nullable Integer[]")
+            appendLine("Expected factory methods:")
+            appendLine("  xType<Int>().array()              => IntArray / int[]")
+            appendLine("  xType<Int>(boxed = true).array()  => Array<Int> / Integer[]")
+            appendLine("  xType<Int?>().array()             => Array<Int?> / @Nullable Integer[]")
         }
     }
     return asClassName().setNullable(nullable).asX<XClassName>()

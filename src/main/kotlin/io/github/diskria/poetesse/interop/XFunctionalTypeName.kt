@@ -2,7 +2,6 @@ package io.github.diskria.poetesse.interop
 
 import com.squareup.kotlinpoet.ExperimentalKotlinPoetApi
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.java.JPClassName
 import io.github.diskria.poetesse.java.JPParameterizedTypeName
 import io.github.diskria.poetesse.kotlin.KPFunctionalTypeName
 
@@ -26,17 +25,16 @@ class XFunctionalTypeName private constructor(
 
     override fun interopToJavaInternal(): JPParameterizedTypeName {
         val allArguments = buildList {
-            contextParameters.forEach { add(it.interopToJava()) }
-            receiver?.let { add(it.interopToJava()) }
-            parameters.forEach { add(it.type.interopToJava()) }
+            contextParameters.forEach { add(it) }
+            receiver?.let { add(it) }
+            parameters.forEach { add(it.type) }
         }
         val arity = allArguments.size
         if (arity > 22) {
             error("Function arity $arity exceeds max supported JVM function arity of 22")
         }
-        val functionClass = JPClassName.get("kotlin.jvm.functions", "Function$arity")
-        val typeArguments = (allArguments + returnType.interopToJava()).toTypedArray()
-        return JPParameterizedTypeName.get(functionClass, *typeArguments)
+        val functionClass = XClassName.of("kotlin.jvm.functions", "Function$arity")
+        return XParameterizedTypeName.of(functionClass, allArguments + returnType).interopToJava()
     }
 
     internal companion object {
@@ -47,14 +45,7 @@ class XFunctionalTypeName private constructor(
             parameters: List<XParameter>,
             returnType: XTypeName,
             isNullable: Boolean = false,
-        ) = XFunctionalTypeName(
-            poetesse.config,
-            contextParameters.map { it.box() },
-            receiver?.box(),
-            parameters.map { XParameter(it.name, it.type.box()) },
-            returnType.box(),
-            isNullable,
-        )
+        ) = XFunctionalTypeName(poetesse.config, contextParameters, receiver, parameters, returnType, isNullable)
     }
 }
 
