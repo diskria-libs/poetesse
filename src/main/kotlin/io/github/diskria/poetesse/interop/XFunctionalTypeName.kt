@@ -2,8 +2,10 @@ package io.github.diskria.poetesse.interop
 
 import com.squareup.kotlinpoet.ExperimentalKotlinPoetApi
 import io.github.diskria.poetesse.Poetesse
+import io.github.diskria.poetesse.extensions.qualifiedName
 import io.github.diskria.poetesse.java.JPParameterizedTypeName
 import io.github.diskria.poetesse.kotlin.KPFunctionalTypeName
+import io.github.diskria.poetesse.utils.StringAffix
 
 class XFunctionalTypeName private constructor(
     config: Poetesse.Config,
@@ -24,17 +26,17 @@ class XFunctionalTypeName private constructor(
         )
 
     override fun interopToJavaInternal(): JPParameterizedTypeName {
-        val allArguments = buildList {
+        val typeArguments = buildList {
             contextParameters.forEach { add(it) }
             receiver?.let { add(it) }
             parameters.forEach { add(it.type) }
         }
-        val arity = allArguments.size
+        val arity = typeArguments.size
         if (arity > 22) {
             error("Function arity $arity exceeds max supported JVM function arity of 22")
         }
-        val functionClass = XClassName.of("kotlin.jvm.functions", "Function$arity")
-        return XParameterizedTypeName.of(functionClass, allArguments + returnType).interopToJava()
+        val functionClassName = xClass(jvmFunctionAffix.wrap(arity.toString()))
+        return XParameterizedTypeName.of(functionClassName, typeArguments + returnType).interopToJava()
     }
 
     internal companion object {
@@ -48,6 +50,8 @@ class XFunctionalTypeName private constructor(
         ) = XFunctionalTypeName(poetesse.config, contextParameters, receiver, parameters, returnType, isNullable)
     }
 }
+
+private val jvmFunctionAffix = StringAffix(prefix = "kotlin.jvm.functions.Function")
 
 @OptIn(ExperimentalKotlinPoetApi::class)
 @PublishedApi
@@ -65,16 +69,12 @@ internal fun KPFunctionalTypeName.asXFunctionalTypeName() = with(poetesse) {
 @PublishedApi
 context(poetesse: PoetesseScope)
 internal fun JPParameterizedTypeName.asXFunctionalTypeNameOrNull(nullable: Boolean = false): XFunctionalTypeName? {
-    val rawType = rawType()
-    if (rawType.packageName() != "kotlin.jvm.functions" || !rawType.simpleName().startsWith("Function")) {
-        return null
-    }
-    val arity = rawType.simpleName().removePrefix("Function").toIntOrNull() ?: return null
     val typeArguments = typeArguments()
+    val arity = jvmFunctionAffix.unwrapOrNull(rawType().qualifiedName)?.toIntOrNull() ?: return null
     if (typeArguments.size != arity + 1) {
         return null
     }
-    val parameterTypes = typeArguments.dropLast(1)
+    val parameterTypes = typeArguments.take(arity)
     val returnType = typeArguments.last()
     return with(poetesse) {
         XFunctionalTypeName.of(

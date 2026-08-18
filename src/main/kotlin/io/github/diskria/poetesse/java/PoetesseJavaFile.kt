@@ -4,6 +4,7 @@ import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseFile
 import io.github.diskria.poetesse.extensions.joinWithTrailing
 import io.github.diskria.poetesse.interop.PoetesseScope
+import io.github.diskria.poetesse.utils.StringAffix
 import java.nio.file.Path
 import javax.annotation.processing.Filer
 import kotlin.io.path.createDirectories
@@ -112,17 +113,4 @@ class PoetesseJavaFile private constructor(
             extraStaticImports: Set<String>,
         ) = PoetesseJavaFile(poetesse.config, packageName, fileName, types, extraImports, extraStaticImports)
     }
-}
-
-private class StringAffix(val prefix: String = "", val suffix: String = "") {
-
-    fun wrap(value: String): String =
-        "$prefix$value$suffix"
-
-    fun matches(value: String): Boolean =
-        value.startsWith(prefix) && value.endsWith(suffix)
-
-    fun unwrapOrNull(value: String): String? =
-        if (!matches(value)) null
-        else value.removePrefix(prefix).removeSuffix(suffix)
 }
