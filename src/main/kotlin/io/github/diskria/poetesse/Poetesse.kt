@@ -1,13 +1,12 @@
 package io.github.diskria.poetesse
 
+import io.github.diskria.poetesse.extensions.asJPClassName
 import io.github.diskria.poetesse.interop.XTypeVariableFactory
 import io.github.diskria.poetesse.java.JPAnnotation
 import io.github.diskria.poetesse.java.JPClassName
 import io.github.diskria.poetesse.java.JPTypeName
 import io.github.diskria.poetesse.java.JavaFactory
 import io.github.diskria.poetesse.kotlin.KotlinFactory
-import org.jetbrains.annotations.NotNull
-import org.jetbrains.annotations.Nullable
 
 class Poetesse private constructor(
     override val config: Config
@@ -29,21 +28,20 @@ class Poetesse private constructor(
 
         fun isNullable(typeName: JPTypeName): Boolean
 
-        fun setNullable(typeName: JPTypeName, isNullable: Boolean): JPTypeName
+        fun setNullable(typeName: JPTypeName, nullable: Boolean): JPTypeName
 
         companion object {
             val Default: JavaNullabilityResolver = object : JavaNullabilityResolver {
 
-                private val nullableAnnotationType = JPClassName.get(Nullable::class.java)
-                private val notNullAnnotationType = JPClassName.get(NotNull::class.java)
+                private val nullableAnnotationType: JPClassName =
+                    org.jetbrains.annotations.Nullable::class.asJPClassName()
 
                 override fun isNullable(typeName: JPTypeName): Boolean =
                     typeName.annotations().any { it.type() == nullableAnnotationType }
 
-                override fun setNullable(typeName: JPTypeName, isNullable: Boolean): JPTypeName {
-                    val annotationType = if (isNullable) nullableAnnotationType else notNullAnnotationType
-                    return typeName.annotated(JPAnnotation.builder(annotationType).build())
-                }
+                override fun setNullable(typeName: JPTypeName, nullable: Boolean): JPTypeName =
+                    if (!nullable || isNullable(typeName)) typeName
+                    else typeName.annotated(JPAnnotation.builder(nullableAnnotationType).build())
             }
         }
     }
@@ -73,14 +71,14 @@ inline fun <T> poetesse(block: Poetesse.() -> T): T =
 @DslMarker
 @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE)
 @Retention(AnnotationRetention.BINARY)
+annotation class PoetesseX
+
+@DslMarker
+@Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE)
+@Retention(AnnotationRetention.BINARY)
 annotation class PoetesseKotlin
 
 @DslMarker
 @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE)
 @Retention(AnnotationRetention.BINARY)
 annotation class PoetesseJava
-
-@DslMarker
-@Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE)
-@Retention(AnnotationRetention.BINARY)
-annotation class PoetesseX

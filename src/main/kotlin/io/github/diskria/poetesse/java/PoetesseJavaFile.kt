@@ -51,11 +51,11 @@ class PoetesseJavaFile private constructor(
             out.appendLine()
         }
         if (staticImports.isNotEmpty()) {
-            staticImports.forEach { out.appendLine("import static $it;") }
+            staticImports.forEach { out.appendLine(staticImportAffix.wrap(it)) }
             out.appendLine()
         }
         if (imports.isNotEmpty()) {
-            imports.forEach { out.appendLine("import $it;") }
+            imports.forEach { out.appendLine(importAffix.wrap(it)) }
             out.appendLine()
         }
         out.append(typeSections.joinToString("\n\n"))
@@ -88,18 +88,10 @@ class PoetesseJavaFile private constructor(
     private fun collectType(code: String) {
         val typeLines = StringBuilder()
         code.lineSequence().forEach { line ->
-            when {
-                line.startsWith("package ") -> {}
-                line.startsWith("import static ") -> {
-                    staticImports += line.removePrefix("import static ").removeSuffix(";")
-                }
-
-                line.startsWith("import ") -> {
-                    imports += line.removePrefix("import ").removeSuffix(";")
-                }
-
-                else -> typeLines.appendLine(line)
-            }
+            if (packageAffix.matches(line)) return@forEach
+            staticImportAffix.unwrapOrNull(line)?.let { staticImports += it }
+                ?: importAffix.unwrapOrNull(line)?.let { imports += it }
+                ?: typeLines.appendLine(line)
         }
         typeLines.toString().trim().ifEmpty { null }?.let {
             typeSections += it
@@ -107,6 +99,10 @@ class PoetesseJavaFile private constructor(
     }
 
     internal companion object {
+        private val packageAffix = StringAffix(prefix = "package ", suffix = ";")
+        private val staticImportAffix = StringAffix(prefix = "import static ", suffix = ";")
+        private val importAffix = StringAffix(prefix = "import ", suffix = ";")
+
         context(poetesse: PoetesseScope)
         fun of(
             packageName: String?,
@@ -116,4 +112,17 @@ class PoetesseJavaFile private constructor(
             extraStaticImports: Set<String>,
         ) = PoetesseJavaFile(poetesse.config, packageName, fileName, types, extraImports, extraStaticImports)
     }
+}
+
+private class StringAffix(val prefix: String = "", val suffix: String = "") {
+
+    fun wrap(value: String): String =
+        "$prefix$value$suffix"
+
+    fun matches(value: String): Boolean =
+        value.startsWith(prefix) && value.endsWith(suffix)
+
+    fun unwrapOrNull(value: String): String? =
+        if (!matches(value)) null
+        else value.removePrefix(prefix).removeSuffix(suffix)
 }
