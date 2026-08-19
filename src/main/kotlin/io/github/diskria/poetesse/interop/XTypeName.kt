@@ -33,7 +33,7 @@ fun <J : JPTypeName, X : XTypedTypeName<*, J>> X.box(): XTypedTypeName<*, J> =
 @Suppress("UNCHECKED_CAST")
 fun <J : JPTypeName, X : XTypedTypeName<*, J>> X.interopToJava(resolveNullability: Boolean = true): J {
     val jp = interopToJavaInternal()
-    if (resolveNullability && isBoxed) {
+    if (resolveNullability && isBoxed && config.javaNullabilityResolver.isNullable(jp) != isNullable) {
         return config.javaNullabilityResolver.setNullable(jp, isNullable) as J
     }
     return jp

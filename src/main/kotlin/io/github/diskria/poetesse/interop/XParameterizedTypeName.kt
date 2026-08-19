@@ -14,12 +14,10 @@ class XParameterizedTypeName private constructor(
 ) : XTypedTypeName<KPParameterizedTypeName, JPParameterizedTypeName>(config) {
 
     override fun interopToKotlinInternal(): KPParameterizedTypeName =
-        rawType.interopToKotlin()
-            .parameterizedBy(typeArguments.map { it.interopToKotlin() })
+        rawType.interopToKotlin().parameterizedBy(typeArguments.map { it.interopToKotlin() })
 
     override fun interopToJavaInternal(): JPParameterizedTypeName =
-        rawType.interopToJava(resolveNullability = false)
-            .parameterizedBy(typeArguments.map { it.box().interopToJava() })
+        rawType.interopToJava().parameterizedBy(typeArguments.map { it.box().interopToJava() })
 
     internal companion object {
         context(poetesse: PoetesseScope)

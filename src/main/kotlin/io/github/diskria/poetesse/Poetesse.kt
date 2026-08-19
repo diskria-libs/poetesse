@@ -40,7 +40,7 @@ class Poetesse private constructor(
                     typeName.annotations().any { it.type() == nullableAnnotationType }
 
                 override fun setNullable(typeName: JPTypeName, nullable: Boolean): JPTypeName =
-                    if (!nullable || isNullable(typeName)) typeName
+                    if (!nullable) typeName
                     else typeName.annotated(JPAnnotation.builder(nullableAnnotationType).build())
             }
         }
