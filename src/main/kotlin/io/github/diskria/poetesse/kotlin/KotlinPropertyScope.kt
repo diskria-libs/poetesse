@@ -11,6 +11,7 @@ class KotlinPropertyScope private constructor(
     private val type: XTypeName,
     private val builder: KPPropertyBuilder,
 ) : PoetesseKotlinScope,
+    KotlinDocumentationTrait,
     KotlinContextParameterTrait,
     KotlinExtensionReceiverTrait,
     KotlinTypeVariableTrait,
@@ -18,6 +19,8 @@ class KotlinPropertyScope private constructor(
     KotlinModifierTrait.WithVisibility {
 
     internal typealias Block = KotlinPropertyScope.() -> Unit
+
+    internal val documentationContainer = KotlinDocumentationContainer(builder::addKdoc)
 
     @OptIn(ExperimentalKotlinPoetApi::class)
     internal val contextParameterContainer = KotlinContextParameterContainer(builder::contextParameter)

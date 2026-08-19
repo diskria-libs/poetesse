@@ -11,6 +11,7 @@ class JavaTypeScope private constructor(
     private val className: XClassName,
     private val builder: JPTypeBuilder,
 ) : PoetesseJavaScope,
+    JavaDocumentationTrait,
     JavaTypeVariableTrait,
     JavaTypeTrait,
     JavaFieldTrait,
@@ -21,6 +22,7 @@ class JavaTypeScope private constructor(
 
     internal typealias Block = JavaTypeScope.(className: XClassName) -> Unit
 
+    internal val documentationContainer = JavaDocumentationContainer(builder::addJavadoc)
     internal val typeVariableContainer = JavaTypeVariableContainer(builder::addTypeVariable)
     internal val typeContainer = JavaTypeContainer(className::nested, builder::addType)
     internal val fieldContainer = JavaFieldContainer(builder::addField)

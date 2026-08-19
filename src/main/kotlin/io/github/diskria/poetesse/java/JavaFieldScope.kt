@@ -9,11 +9,13 @@ class JavaFieldScope private constructor(
     override val config: Poetesse.Config,
     private val builder: JPFieldBuilder,
 ) : PoetesseJavaScope,
+    JavaDocumentationTrait,
     JavaAnnotationTrait,
     JavaModifierTrait.WithVisibility {
 
     internal typealias Block = JavaFieldScope.() -> Unit
 
+    internal val documentationContainer = JavaDocumentationContainer(builder::addJavadoc)
     internal val annotationContainer = JavaAnnotationContainer(builder::addAnnotation)
     internal val modifierContainer = JavaModifierContainer(builder::addModifiers)
 

@@ -9,11 +9,13 @@ class KotlinParameterScope private constructor(
     override val config: Poetesse.Config,
     private val builder: KPParameterBuilder,
 ) : PoetesseKotlinScope,
+    KotlinDocumentationTrait,
     KotlinAnnotationTrait,
     KotlinModifierTrait {
 
     internal typealias Block = KotlinParameterScope.() -> Unit
 
+    internal val documentationContainer = KotlinDocumentationContainer(builder::addKdoc)
     internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
     internal val modifierContainer = KotlinModifierContainer(builder::addModifiers)
 

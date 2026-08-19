@@ -9,6 +9,7 @@ class KotlinTypeScope private constructor(
     private val className: XClassName,
     private val builder: KPTypeBuilder,
 ) : PoetesseKotlinScope,
+    KotlinDocumentationTrait,
     KotlinTypeVariableTrait,
     KotlinTypeTrait,
     KotlinTypeAliasTrait,
@@ -20,6 +21,7 @@ class KotlinTypeScope private constructor(
 
     internal typealias Block = KotlinTypeScope.(className: XClassName) -> Unit
 
+    internal val documentationContainer = KotlinDocumentationContainer(builder::addKdoc)
     internal val typeVariableContainer = KotlinTypeVariableContainer(builder::addTypeVariable)
     internal val typeContainer = KotlinTypeContainer(className::nested, builder::addType)
     internal val typeAliasContainer = KotlinTypeAliasContainer(className::nested, builder::addTypeAlias)

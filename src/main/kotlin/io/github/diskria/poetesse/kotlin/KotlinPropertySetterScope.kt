@@ -8,6 +8,7 @@ class KotlinPropertySetterScope private constructor(
     override val config: Poetesse.Config,
     internal val builder: KPFunctionBuilder,
 ) : PoetesseKotlinScope,
+    KotlinDocumentationTrait,
     KotlinParameterTrait,
     KotlinAnnotationTrait,
     KotlinModifierTrait.WithVisibility,
@@ -15,6 +16,7 @@ class KotlinPropertySetterScope private constructor(
 
     internal typealias Block = KotlinPropertySetterScope.() -> Unit
 
+    internal val documentationContainer = KotlinDocumentationContainer(builder::addKdoc)
     internal val parameterContainer = KotlinParameterContainer(builder::addParameter)
     internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
     internal val modifierContainer = KotlinModifierContainer(builder::addModifiers)

@@ -64,6 +64,6 @@ internal class KotlinCodeBlockContainer(val append: (codeBlock: KPCodeBlock) -> 
 private val KotlinCodeBlockTrait.container: KotlinCodeBlockContainer
     get() = when (this) {
         is KotlinBodyScope -> codeBlockContainer
-        is KotlinEmbeddableCodeBlockScope -> codeBlockContainer
         is KotlinCodeBlockScope -> codeBlockContainer
+        is KotlinEmbeddableCodeBlockScope -> codeBlockContainer
     }

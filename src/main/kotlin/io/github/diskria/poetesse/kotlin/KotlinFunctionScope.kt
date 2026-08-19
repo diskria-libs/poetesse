@@ -13,6 +13,7 @@ class KotlinFunctionScope private constructor(
     override val config: Poetesse.Config,
     private val builder: KPFunctionBuilder,
 ) : PoetesseKotlinScope,
+    KotlinDocumentationTrait,
     KotlinContextParameterTrait,
     KotlinExtensionReceiverTrait,
     KotlinTypeVariableTrait,
@@ -22,6 +23,8 @@ class KotlinFunctionScope private constructor(
     KotlinBodyTrait {
 
     internal typealias Block = KotlinFunctionScope.() -> Unit
+
+    internal val documentationContainer = KotlinDocumentationContainer(builder::addKdoc)
 
     @OptIn(ExperimentalKotlinPoetApi::class)
     internal val contextParameterContainer = KotlinContextParameterContainer(builder::contextParameter)

@@ -63,6 +63,6 @@ internal class JavaCodeBlockContainer(val append: (codeBlock: JPCodeBlock) -> Un
 private val JavaCodeBlockTrait.container: JavaCodeBlockContainer
     get() = when (this) {
         is JavaBodyScope -> codeBlockContainer
-        is JavaEmbeddableCodeBlockScope -> codeBlockContainer
         is JavaCodeBlockScope -> codeBlockContainer
+        is JavaEmbeddableCodeBlockScope -> codeBlockContainer
     }

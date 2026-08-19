@@ -7,6 +7,7 @@ class JavaConstructorScope private constructor(
     override val config: Poetesse.Config,
     private val builder: JPMethodBuilder,
 ) : PoetesseJavaScope,
+    JavaDocumentationTrait,
     JavaParameterTrait,
     JavaAnnotationTrait,
     JavaModifierTrait.WithVisibility,
@@ -14,6 +15,7 @@ class JavaConstructorScope private constructor(
 
     internal typealias Block = JavaConstructorScope.() -> Unit
 
+    internal val documentationContainer = JavaDocumentationContainer(builder::addJavadoc)
     internal val parameterContainer = JavaParameterContainer(builder::addParameter)
     internal val annotationContainer = JavaAnnotationContainer(builder::addAnnotation)
     internal val modifierContainer = JavaModifierContainer(builder::addModifiers)
