@@ -17,9 +17,10 @@ class PoetesseJavaFile private constructor(
     override val packageName: String?,
     override val fileName: String,
     private val types: List<JPType>,
+    private val commentLines: List<String>,
+    private val defaultImportPackageNames: Set<String>,
     extraImports: Set<String>,
     extraStaticImports: Set<String>,
-    val defaultImportPackageNames: Set<String>,
 ) : PoetesseFile {
 
     override val extensionName: String = "java"
@@ -40,7 +41,7 @@ class PoetesseJavaFile private constructor(
     }
 
     override fun writeTo(out: Appendable) {
-        config.comment?.let {
+        commentLines.forEach {
             out.appendLine("// $it")
         }
         packageName?.let {
@@ -106,11 +107,19 @@ class PoetesseJavaFile private constructor(
             packageName: String?,
             fileName: String,
             types: List<JPType>,
+            commentLines: List<String>,
+            defaultImportPackageNames: Set<String>,
             extraImports: Set<String>,
             extraStaticImports: Set<String>,
-            defaultImportPackageNames: Set<String>,
         ) = PoetesseJavaFile(
-            poetesse.config, packageName, fileName, types, extraImports, extraStaticImports, defaultImportPackageNames,
+            poetesse.config,
+            packageName,
+            fileName,
+            types,
+            commentLines,
+            defaultImportPackageNames,
+            extraImports,
+            extraStaticImports,
         )
     }
 }

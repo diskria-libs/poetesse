@@ -24,7 +24,7 @@ class KotlinCodeBlockScope private constructor(
 
 class KotlinEmbeddableCodeBlockScope private constructor(
     override val config: Poetesse.Config,
-    internal val statements: MutableList<KPCodeBlock> = mutableListOf()
+    internal val statements: MutableList<KPCodeBlock> = mutableListOf(),
 ) : KotlinCodeBlockTrait {
 
     internal typealias Block = KotlinEmbeddableCodeBlockScope.() -> Unit

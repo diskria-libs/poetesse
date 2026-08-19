@@ -21,10 +21,23 @@ class JavaFileScope private constructor(
 
     internal val typeContainer = JavaTypeContainer(nestedClassNameFactory) { types += it }
 
+    private val commentLines: MutableList<String> = mutableListOf()
+    private val defaultImportPackageNames: MutableSet<String> = mutableSetOf()
     private val extraImports: MutableSet<String> = mutableSetOf()
     private val extraStaticImports: MutableSet<String> = mutableSetOf()
-    private val defaultImportPackageNames: MutableSet<String> = mutableSetOf()
     private val types: MutableList<JPType> = mutableListOf()
+
+    fun comment(block: JavaCodeScope.Block) {
+        commentLines += JavaCodeScope.of(block).codeBlock.toString()
+    }
+
+    fun comment(text: String) {
+        comment { text }
+    }
+
+    fun defaultImport(packageName: String) {
+        defaultImportPackageNames += packageName
+    }
 
     fun import(className: XClassName) {
         extraImports += className.interopToJava(resolveNullability = false).qualifiedName
@@ -103,14 +116,11 @@ class JavaFileScope private constructor(
         extraStaticImports += "${enum.declaringJavaClass.canonicalName}.${enum.name}"
     }
 
-    fun defaultImport(packageName: String) {
-        defaultImportPackageNames += packageName
-    }
-
     internal fun build(): PoetesseJavaFile {
         requireNotNull(types.find { it.name() == fileName }) {
             "File '$fileName' cannot be built because primary type was not configured."
         }
+        config.comment?.let { comment(it) }
         if (config.skipLangDefaultImports) {
             defaultImport("java.lang")
         }
@@ -118,9 +128,10 @@ class JavaFileScope private constructor(
             packageName,
             fileName,
             types,
+            commentLines,
+            defaultImportPackageNames,
             extraImports,
             extraStaticImports,
-            defaultImportPackageNames,
         )
     }
 

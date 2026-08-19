@@ -31,6 +31,22 @@ class KotlinFileScope private constructor(
     internal val functionContainer = KotlinFunctionContainer(builder::addFunction)
     internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
 
+    private var isSubsequentComment: Boolean = false
+
+    fun comment(block: KotlinCodeScope.Block) {
+        val text = KotlinCodeScope.of(block).codeBlock.toString()
+        builder.addFileComment(if (isSubsequentComment) "\n" + text else text)
+        isSubsequentComment = true
+    }
+
+    fun comment(text: String) {
+        comment { text }
+    }
+
+    fun defaultImport(packageName: String) {
+        builder.addDefaultPackageImport(packageName)
+    }
+
     fun import(className: XClassName, block: ImportScope.Block = {}) {
         val alias = ImportScope().apply(block).alias
         val kp = className.interopToKotlin()
@@ -113,10 +129,6 @@ class KotlinFileScope private constructor(
         builder.addImport(enum)
     }
 
-    fun defaultImport(packageName: String) {
-        builder.addDefaultPackageImport(packageName)
-    }
-
     private fun addMemberImport(name: MemberName, block: ImportScope.Block = {}) {
         require(name.simpleName != "*") { "Wildcard imports are not allowed" }
         val alias = ImportScope().apply(block).alias
@@ -143,7 +155,7 @@ class KotlinFileScope private constructor(
     internal fun build(): PoetesseKotlinFile {
         val file = builder.apply {
             indent(config.indent)
-            config.comment?.let { addFileComment(it) }
+            config.comment?.let { comment(it) }
             if (config.skipLangDefaultImports) {
                 addKotlinDefaultImports(includeJvm = true, includeJs = false)
                 defaultImport("kotlin.math")
