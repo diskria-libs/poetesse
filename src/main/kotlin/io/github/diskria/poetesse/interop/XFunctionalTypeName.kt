@@ -27,16 +27,14 @@ class XFunctionalTypeName private constructor(
 
     override fun interopToJavaInternal(): JPParameterizedTypeName {
         val typeArguments = buildList {
-            contextParameters.forEach { add(it) }
+            addAll(contextParameters)
             receiver?.let { add(it) }
-            parameters.forEach { add(it.type) }
+            addAll(parameters.map { it.type })
+            add(returnType)
         }
-        val arity = typeArguments.size
-        if (arity > 22) {
-            error("Function arity $arity exceeds max supported JVM function arity of 22")
-        }
-        val functionClassName = xClass(jvmFunctionAffix.wrap(arity.toString()))
-        return XParameterizedTypeName.of(functionClassName, typeArguments + returnType).interopToJava()
+        val arity = countArity(typeArguments)
+        val jvmFunctionClassName = xClass(jvmFunctionAffix.wrap(arity.toString()))
+        return XParameterizedTypeName.of(jvmFunctionClassName, typeArguments).interopToJava()
     }
 
     internal companion object {
@@ -50,8 +48,6 @@ class XFunctionalTypeName private constructor(
         ) = XFunctionalTypeName(poetesse.config, contextParameters, receiver, parameters, returnType, isNullable)
     }
 }
-
-private val jvmFunctionAffix = StringAffix(prefix = "kotlin.jvm.functions.Function")
 
 @OptIn(ExperimentalKotlinPoetApi::class)
 @PublishedApi
@@ -70,26 +66,32 @@ internal fun KPFunctionalTypeName.asXFunctionalTypeName() = with(poetesse) {
 context(poetesse: PoetesseScope)
 internal fun JPParameterizedTypeName.asXFunctionalTypeNameOrNull(nullable: Boolean = false): XFunctionalTypeName? {
     val typeArguments = typeArguments()
-    val arity = jvmFunctionAffix.unwrapOrNull(rawType().qualifiedName)?.toIntOrNull() ?: return null
-    if (typeArguments.size != arity + 1) {
-        return null
-    }
-    val parameterTypes = typeArguments.take(arity)
-    val returnType = typeArguments.last()
+    val arity = countArityOrNull(typeArguments) ?: return null
+    val jvmFunctionArity = jvmFunctionAffix.unwrapOrNull(rawType().qualifiedName)?.toIntOrNull()
+    if (arity != jvmFunctionArity) return null
     return with(poetesse) {
         XFunctionalTypeName.of(
             contextParameters = emptyList(),
             receiver = null,
-            parameters = parameterTypes.map { XParameter(type = xType(it)) },
-            returnType = xType(returnType),
+            parameters = typeArguments.take(arity).map { XParameter(type = xType(it)) },
+            returnType = xType(typeArguments.last()),
             isNullable = nullable,
         )
     }
 }
 
+private val jvmFunctionAffix = StringAffix(prefix = "kotlin.jvm.functions.Function")
+
+private fun countArityOrNull(typeArguments: List<*>): Int? = (typeArguments.size - 1).takeIf { it in 0..22 }
+
+private fun countArity(typeArguments: List<*>): Int =
+    requireNotNull(countArityOrNull(typeArguments)) { "JVM function arity ${typeArguments.size} is not valid" }
+
 fun XTypeName.lambda(
-    parameters: Iterable<XParameter> = emptyList(), receiver: XTypeName? = null,
-    contextParameters: Iterable<XTypeName> = emptyList(), nullable: Boolean = false,
+    parameters: Iterable<XParameter> = emptyList(),
+    receiver: XTypeName? = null,
+    contextParameters: Iterable<XTypeName> = emptyList(),
+    nullable: Boolean = false,
 ) = XFunctionalTypeName.of(
     contextParameters = contextParameters.toList(),
     receiver = receiver,
@@ -100,8 +102,10 @@ fun XTypeName.lambda(
 
 @JvmName("lambdaWithParameterTypes")
 fun XTypeName.lambda(
-    parameters: Iterable<XTypeName> = emptyList(), receiver: XTypeName? = null,
-    contextParameters: Iterable<XTypeName> = emptyList(), nullable: Boolean = false,
+    parameters: Iterable<XTypeName> = emptyList(),
+    receiver: XTypeName? = null,
+    contextParameters: Iterable<XTypeName> = emptyList(),
+    nullable: Boolean = false,
 ) = lambda(parameters.map { XParameter(type = it) }, receiver, contextParameters, nullable)
 
 fun XTypeName.lambda(

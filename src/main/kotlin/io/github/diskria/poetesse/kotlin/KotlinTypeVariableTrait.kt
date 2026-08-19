@@ -15,17 +15,25 @@ sealed interface KotlinTypeVariableTrait : PoetesseKotlinScope {
 }
 
 fun KotlinTypeVariableTrait.typeVariable(
-    name: String, bounds: Iterable<XTypeName> = emptyList(), variance: XVariance? = null, reified: Boolean = false,
+    name: String,
+    bounds: Iterable<XTypeName> = emptyList(),
+    variance: XVariance? = null,
+    reified: Boolean = false,
     nullable: Boolean = false,
 ) = +XTypeVariableName.of(name, bounds.toList(), variance, reified, nullable)
 
 fun KotlinTypeVariableTrait.typeVariable(
-    name: String, vararg bounds: XTypeName, variance: XVariance? = null, reified: Boolean = false,
+    name: String,
+    vararg bounds: XTypeName,
+    variance: XVariance? = null,
+    reified: Boolean = false,
     nullable: Boolean = false,
 ) = typeVariable(name, bounds.asIterable(), variance, reified, nullable)
 
 fun KotlinTypeVariableTrait.typeVariable(
-    bounds: Iterable<XTypeName> = emptyList(), variance: XVariance? = null, reified: Boolean = false,
+    bounds: Iterable<XTypeName> = emptyList(),
+    variance: XVariance? = null,
+    reified: Boolean = false,
     nullable: Boolean = false,
 ) = EagerDelegate { typeVariable(it.capitalized(), bounds, variance, reified, nullable) }
 
