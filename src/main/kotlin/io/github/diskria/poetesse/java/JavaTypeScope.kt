@@ -12,24 +12,24 @@ class JavaTypeScope private constructor(
     private val builder: JPTypeBuilder,
 ) : PoetesseJavaScope,
     JavaDocumentationTrait,
+    JavaAnnotationTrait,
+    JavaModifierTrait.WithVisibility,
     JavaTypeVariableTrait,
-    JavaTypeTrait,
     JavaFieldTrait,
     JavaConstructorTrait,
     JavaMethodTrait,
-    JavaAnnotationTrait,
-    JavaModifierTrait.WithVisibility {
+    JavaTypeTrait {
 
     internal typealias Block = JavaTypeScope.(className: XClassName) -> Unit
 
     internal val documentationContainer = JavaDocumentationContainer(builder::addJavadoc)
+    internal val annotationContainer = JavaAnnotationContainer(builder::addAnnotation)
+    internal val modifierContainer = JavaModifierContainer(builder::addModifiers)
     internal val typeVariableContainer = JavaTypeVariableContainer(builder::addTypeVariable)
-    internal val typeContainer = JavaTypeContainer(className::nested, builder::addType)
     internal val fieldContainer = JavaFieldContainer(builder::addField)
     internal val constructorContainer = JavaConstructorContainer(builder::addMethod)
     internal val methodContainer = JavaMethodContainer(builder::addMethod)
-    internal val annotationContainer = JavaAnnotationContainer(builder::addAnnotation)
-    internal val modifierContainer = JavaModifierContainer(builder::addModifiers)
+    internal val typeContainer = JavaTypeContainer(className::nested, builder::addType)
 
     fun abstract() = modifier(JPModifier.ABSTRACT)
     fun static() = modifier(JPModifier.STATIC)

@@ -15,14 +15,14 @@ class KotlinVariableScope private constructor(
 
     internal typealias Block = KotlinVariableScope.() -> Unit
 
-    private var isMutable: Boolean = false
-    private val modifiers: MutableList<KPModifier> = mutableListOf()
     private val annotations: MutableList<KPAnnotation> = mutableListOf()
+    private val modifiers: MutableList<KPModifier> = mutableListOf()
 
-    private var initializer: KotlinCodeRef? = null
-
-    internal val modifierContainer = KotlinModifierContainer { modifiers += it }
     internal val annotationContainer = KotlinAnnotationContainer { annotations += it }
+    internal val modifierContainer = KotlinModifierContainer { modifiers += it }
+
+    private var isMutable: Boolean = false
+    private var initializer: KotlinCodeRef? = null
 
     fun mutable(mutable: Boolean = true) {
         isMutable = mutable

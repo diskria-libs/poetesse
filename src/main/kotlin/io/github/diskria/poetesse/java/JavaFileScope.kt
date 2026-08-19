@@ -17,15 +17,15 @@ class JavaFileScope private constructor(
 
     internal typealias Block = JavaFileScope.() -> Unit
 
-    private val nestedClassNameFactory: (String) -> XClassName = { name -> xClass(packageName, name) }
-
-    internal val typeContainer = JavaTypeContainer(nestedClassNameFactory) { types += it }
-
     private val commentLines: MutableList<String> = mutableListOf()
-    private val defaultImportPackageNames: MutableSet<String> = mutableSetOf()
-    private val extraImports: MutableSet<String> = mutableSetOf()
     private val extraStaticImports: MutableSet<String> = mutableSetOf()
+    private val extraImports: MutableSet<String> = mutableSetOf()
     private val types: MutableList<JPType> = mutableListOf()
+
+    private val classNameFactory: (String) -> XClassName = { name -> xClass(packageName, name) }
+    internal val typeContainer = JavaTypeContainer(classNameFactory) { types += it }
+
+    private val defaultImportPackageNames: MutableSet<String> = mutableSetOf()
 
     fun comment(block: JavaCodeScope.Block) {
         commentLines += JavaCodeScope.of(block).codeBlock.toString()
@@ -33,34 +33,6 @@ class JavaFileScope private constructor(
 
     fun comment(text: String) {
         comment { text }
-    }
-
-    fun defaultImport(packageName: String) {
-        defaultImportPackageNames += packageName
-    }
-
-    fun import(className: XClassName) {
-        extraImports += className.interopToJava(resolveNullability = false).qualifiedName
-    }
-
-    fun import(klass: KClass<*>) {
-        import(xClass(klass))
-    }
-
-    inline fun <reified T : Any> import() {
-        import(T::class)
-    }
-
-    fun import(packageName: String?, name: String) {
-        import(XClassName.of(packageName, name.split('.')))
-    }
-
-    fun import(packageName: String?, names: Iterable<String>) {
-        names.forEach { import(packageName, it) }
-    }
-
-    fun import(packageName: String?, vararg names: String) {
-        import(packageName, names.asIterable())
     }
 
     fun memberImport(owner: XClassName, name: String) {
@@ -116,6 +88,34 @@ class JavaFileScope private constructor(
         extraStaticImports += "${enum.declaringJavaClass.canonicalName}.${enum.name}"
     }
 
+    fun import(className: XClassName) {
+        extraImports += className.interopToJava(resolveNullability = false).qualifiedName
+    }
+
+    fun import(klass: KClass<*>) {
+        import(xClass(klass))
+    }
+
+    inline fun <reified T : Any> import() {
+        import(T::class)
+    }
+
+    fun import(packageName: String?, name: String) {
+        import(XClassName.of(packageName, name.split('.')))
+    }
+
+    fun import(packageName: String?, names: Iterable<String>) {
+        names.forEach { import(packageName, it) }
+    }
+
+    fun import(packageName: String?, vararg names: String) {
+        import(packageName, names.asIterable())
+    }
+
+    fun defaultImport(packageName: String) {
+        defaultImportPackageNames += packageName
+    }
+
     internal fun build(): PoetesseJavaFile {
         requireNotNull(types.find { it.name() == fileName }) {
             "File '$fileName' cannot be built because primary type was not configured."
@@ -127,11 +127,11 @@ class JavaFileScope private constructor(
         return PoetesseJavaFile.of(
             packageName,
             fileName,
-            types,
-            commentLines,
             defaultImportPackageNames,
-            extraImports,
+            commentLines,
             extraStaticImports,
+            extraImports,
+            types,
         )
     }
 

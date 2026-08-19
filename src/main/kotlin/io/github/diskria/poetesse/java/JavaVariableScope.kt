@@ -15,13 +15,13 @@ class JavaVariableScope private constructor(
 
     internal typealias Block = JavaVariableScope.() -> Unit
 
-    private val modifiers: MutableList<JPModifier> = mutableListOf()
     private val annotations: MutableList<JPAnnotation> = mutableListOf()
+    private val modifiers: MutableList<JPModifier> = mutableListOf()
+
+    internal val annotationContainer = JavaAnnotationContainer { annotations += it }
+    internal val modifierContainer = JavaModifierContainer { modifiers += it }
 
     private var initializer: JavaCodeRef? = null
-
-    internal val modifierContainer = JavaModifierContainer { modifiers += it }
-    internal val annotationContainer = JavaAnnotationContainer { annotations += it }
 
     fun final() = modifier(JPModifier.FINAL)
 

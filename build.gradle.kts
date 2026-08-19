@@ -18,4 +18,5 @@ projekt {
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.compilerOptions {
     freeCompilerArgs.set(listOf("-XXLanguage:+ContextParameters"))
+    optIn.add("com.squareup.kotlinpoet.ExperimentalKotlinPoetApi")
 }

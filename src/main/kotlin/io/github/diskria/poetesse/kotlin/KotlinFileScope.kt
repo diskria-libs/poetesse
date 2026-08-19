@@ -15,21 +15,21 @@ class KotlinFileScope private constructor(
     val fileName: String,
     private val builder: KPFileBuilder,
 ) : PoetesseKotlinScope,
-    KotlinTypeTrait,
-    KotlinTypeAliasTrait,
+    KotlinAnnotationTrait,
     KotlinPropertyTrait,
     KotlinFunctionTrait,
-    KotlinAnnotationTrait {
+    KotlinTypeTrait,
+    KotlinTypeAliasTrait {
 
     internal typealias Block = KotlinFileScope.() -> Unit
 
-    private val nestedClassNameFactory: (String) -> XClassName = { name -> xClass(packageName, name) }
+    private val classNameFactory: (String) -> XClassName = { name -> xClass(packageName, name) }
 
-    internal val typeContainer = KotlinTypeContainer(nestedClassNameFactory, builder::addType)
-    internal val typeAliasContainer = KotlinTypeAliasContainer(nestedClassNameFactory, builder::addTypeAlias)
+    internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
     internal val propertyContainer = KotlinPropertyContainer(builder::addProperty)
     internal val functionContainer = KotlinFunctionContainer(builder::addFunction)
-    internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
+    internal val typeContainer = KotlinTypeContainer(classNameFactory, builder::addType)
+    internal val typeAliasContainer = KotlinTypeAliasContainer(classNameFactory, builder::addTypeAlias)
 
     private var isSubsequentComment: Boolean = false
 

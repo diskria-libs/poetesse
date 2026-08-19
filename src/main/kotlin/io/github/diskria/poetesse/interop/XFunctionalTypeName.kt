@@ -1,6 +1,5 @@
 package io.github.diskria.poetesse.interop
 
-import com.squareup.kotlinpoet.ExperimentalKotlinPoetApi
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.extensions.qualifiedName
 import io.github.diskria.poetesse.java.JPParameterizedTypeName
@@ -16,7 +15,6 @@ class XFunctionalTypeName private constructor(
     override val isNullable: Boolean,
 ) : XTypedTypeName<KPFunctionalTypeName, JPParameterizedTypeName>(config) {
 
-    @OptIn(ExperimentalKotlinPoetApi::class)
     override fun interopToKotlinInternal(): KPFunctionalTypeName =
         KPFunctionalTypeName.get(
             contextParameters = contextParameters.map { it.interopToKotlin() },
@@ -49,7 +47,6 @@ class XFunctionalTypeName private constructor(
     }
 }
 
-@OptIn(ExperimentalKotlinPoetApi::class)
 @PublishedApi
 context(poetesse: PoetesseScope)
 internal fun KPFunctionalTypeName.asXFunctionalTypeName() = with(poetesse) {

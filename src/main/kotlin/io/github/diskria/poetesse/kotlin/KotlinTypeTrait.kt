@@ -4,7 +4,7 @@ import io.github.diskria.poetesse.interop.XClassName
 
 sealed interface KotlinTypeTrait : KotlinTypeFactory {
     operator fun KotlinTypeRef.unaryPlus(): XClassName {
-        val className = container.nestedClassName(name)
+        val className = container.className(name)
         container.append(build(className))
         return className
     }
@@ -41,7 +41,7 @@ fun KotlinTypeTrait.fun_interface_(name: String, block: KotlinTypeScope.Block = 
     +factory.fun_interface_(name, block)
 
 internal class KotlinTypeContainer(
-    val nestedClassName: (name: String) -> XClassName,
+    val className: (name: String) -> XClassName,
     val append: (type: KPType) -> Unit,
 )
 

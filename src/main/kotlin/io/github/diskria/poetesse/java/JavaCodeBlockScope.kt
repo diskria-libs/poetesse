@@ -5,7 +5,7 @@ import io.github.diskria.poetesse.interop.PoetesseScope
 
 class JavaCodeBlockScope private constructor(
     override val config: Poetesse.Config,
-    internal val isDocumentation: Boolean,
+    internal val isComment: Boolean,
     private val builder: JPCodeBlockBuilder = JPCodeBlock.builder(),
 ) : PoetesseJavaScope,
     JavaCodeBlockTrait {
@@ -13,7 +13,7 @@ class JavaCodeBlockScope private constructor(
     internal typealias Block = JavaCodeBlockScope.() -> Unit
 
     internal val codeBlockContainer = JavaCodeBlockContainer {
-        if (isDocumentation) {
+        if (isComment) {
             builder.add("$[")
             builder.add(it)
             builder.add("\n$]")
@@ -26,7 +26,7 @@ class JavaCodeBlockScope private constructor(
 
     internal companion object {
         context(poetesse: PoetesseScope)
-        fun of(isDocumentation: Boolean = false) = JavaCodeBlockScope(poetesse.config, isDocumentation)
+        fun of(isComment: Boolean = false) = JavaCodeBlockScope(poetesse.config, isComment)
     }
 }
 

@@ -3,7 +3,7 @@ package io.github.diskria.poetesse.java
 sealed interface JavaDocumentationTrait : PoetesseJavaScope
 
 fun JavaDocumentationTrait.documentation(block: JavaCodeBlockScope.Block) {
-    container.append(JavaCodeBlockScope.of(isDocumentation = true).apply(block).build())
+    container.append(JavaCodeBlockScope.of(isComment = true).apply(block).build())
 }
 
 internal class JavaDocumentationContainer(val append: (codeBlock: JPCodeBlock) -> Unit)

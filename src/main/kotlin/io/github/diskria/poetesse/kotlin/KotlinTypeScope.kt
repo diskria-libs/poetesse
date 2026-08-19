@@ -10,28 +10,29 @@ class KotlinTypeScope private constructor(
     private val builder: KPTypeBuilder,
 ) : PoetesseKotlinScope,
     KotlinDocumentationTrait,
-    KotlinTypeVariableTrait,
-    KotlinTypeTrait,
-    KotlinTypeAliasTrait,
-    KotlinPropertyTrait,
-    KotlinConstructorTrait,
-    KotlinFunctionTrait,
     KotlinAnnotationTrait,
-    KotlinModifierTrait.WithVisibility {
+    KotlinModifierTrait.WithVisibility,
+    KotlinTypeVariableTrait,
+    KotlinConstructorTrait,
+    KotlinPropertyTrait,
+    KotlinFunctionTrait,
+    KotlinTypeTrait,
+    KotlinTypeAliasTrait {
 
     internal typealias Block = KotlinTypeScope.(className: XClassName) -> Unit
 
     internal val documentationContainer = KotlinDocumentationContainer(builder::addKdoc)
+    internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
+    internal val modifierContainer = KotlinModifierContainer(builder::addModifiers)
     internal val typeVariableContainer = KotlinTypeVariableContainer(builder::addTypeVariable)
+    internal val constructorContainer = KotlinConstructorContainer(builder) { constructor, isPrimary ->
+        if (isPrimary) builder.primaryConstructor(constructor)
+        else builder.addFunction(constructor)
+    }
+    internal val propertyContainer = KotlinPropertyContainer(builder::addProperty)
+    internal val functionContainer = KotlinFunctionContainer(builder::addFunction)
     internal val typeContainer = KotlinTypeContainer(className::nested, builder::addType)
     internal val typeAliasContainer = KotlinTypeAliasContainer(className::nested, builder::addTypeAlias)
-    internal val propertyContainer = KotlinPropertyContainer(builder::addProperty)
-    internal val constructorContainer = KotlinConstructorContainer(builder) { constructor, isPrimary ->
-        if (isPrimary) builder.primaryConstructor(constructor) else builder.addFunction(constructor)
-    }
-    internal val functionContainer = KotlinFunctionContainer(builder::addFunction)
-    internal val modifierContainer = KotlinModifierContainer(builder::addModifiers)
-    internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
 
     fun expect() = modifier(KPModifier.EXPECT)
     fun actual() = modifier(KPModifier.ACTUAL)

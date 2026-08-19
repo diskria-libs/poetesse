@@ -9,17 +9,17 @@ class KotlinPropertySetterScope private constructor(
     internal val builder: KPFunctionBuilder,
 ) : PoetesseKotlinScope,
     KotlinDocumentationTrait,
-    KotlinParameterTrait,
     KotlinAnnotationTrait,
     KotlinModifierTrait.WithVisibility,
+    KotlinParameterTrait,
     KotlinBodyTrait {
 
     internal typealias Block = KotlinPropertySetterScope.() -> Unit
 
     internal val documentationContainer = KotlinDocumentationContainer(builder::addKdoc)
-    internal val parameterContainer = KotlinParameterContainer(builder::addParameter)
     internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
     internal val modifierContainer = KotlinModifierContainer(builder::addModifiers)
+    internal val parameterContainer = KotlinParameterContainer(builder::addParameter)
     internal val statementContainer = KotlinBodyContainer(builder::addStatement)
 
     fun expect() = modifier(KPModifier.EXPECT)

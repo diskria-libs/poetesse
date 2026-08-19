@@ -16,11 +16,11 @@ class PoetesseJavaFile private constructor(
     private val config: Poetesse.Config,
     override val packageName: String?,
     override val fileName: String,
-    private val types: List<JPType>,
-    private val commentLines: List<String>,
     private val defaultImportPackageNames: Set<String>,
-    extraImports: Set<String>,
+    private val commentLines: List<String>,
     extraStaticImports: Set<String>,
+    extraImports: Set<String>,
+    private val types: List<JPType>,
 ) : PoetesseFile {
 
     override val extensionName: String = "java"
@@ -106,20 +106,20 @@ class PoetesseJavaFile private constructor(
         fun of(
             packageName: String?,
             fileName: String,
-            types: List<JPType>,
-            commentLines: List<String>,
             defaultImportPackageNames: Set<String>,
-            extraImports: Set<String>,
+            commentLines: List<String>,
             extraStaticImports: Set<String>,
+            extraImports: Set<String>,
+            types: List<JPType>,
         ) = PoetesseJavaFile(
             poetesse.config,
             packageName,
             fileName,
-            types,
-            commentLines,
             defaultImportPackageNames,
-            extraImports,
+            commentLines,
             extraStaticImports,
+            extraImports,
+            types,
         )
     }
 }

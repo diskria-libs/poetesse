@@ -10,16 +10,16 @@ class KotlinTypeAliasScope private constructor(
     private val builder: KPTypeAliasBuilder,
 ) : PoetesseKotlinScope,
     KotlinDocumentationTrait,
-    KotlinTypeVariableTrait,
     KotlinAnnotationTrait,
-    KotlinModifierTrait.WithVisibility {
+    KotlinModifierTrait.WithVisibility,
+    KotlinTypeVariableTrait {
 
     internal typealias Block = KotlinTypeAliasScope.() -> Unit
 
     internal val documentationContainer = KotlinDocumentationContainer(builder::addKdoc)
-    internal val typeVariableContainer = KotlinTypeVariableContainer(builder::addTypeVariable)
     internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
     internal val modifierContainer = KotlinModifierContainer(builder::addModifiers)
+    internal val typeVariableContainer = KotlinTypeVariableContainer(builder::addTypeVariable)
 
     fun actual() = modifier(KPModifier.ACTUAL)
 

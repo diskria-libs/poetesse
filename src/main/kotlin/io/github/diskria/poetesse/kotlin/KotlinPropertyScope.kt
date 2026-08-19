@@ -1,6 +1,5 @@
 package io.github.diskria.poetesse.kotlin
 
-import com.squareup.kotlinpoet.ExperimentalKotlinPoetApi
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.interop.PoetesseScope
 import io.github.diskria.poetesse.interop.XTypeName
@@ -13,25 +12,23 @@ class KotlinPropertyScope private constructor(
 ) : PoetesseKotlinScope,
     KotlinDocumentationTrait,
     KotlinContextParameterTrait,
-    KotlinExtensionReceiverTrait,
-    KotlinTypeVariableTrait,
     KotlinAnnotationTrait,
-    KotlinModifierTrait.WithVisibility {
+    KotlinModifierTrait.WithVisibility,
+    KotlinTypeVariableTrait,
+    KotlinExtensionReceiverTrait {
 
     internal typealias Block = KotlinPropertyScope.() -> Unit
 
     internal val documentationContainer = KotlinDocumentationContainer(builder::addKdoc)
-
-    @OptIn(ExperimentalKotlinPoetApi::class)
     internal val contextParameterContainer = KotlinContextParameterContainer(builder::contextParameter)
-    internal val extensionReceiverContainer = KotlinExtensionReceiverContainer(builder::receiver)
-    internal val typeVariableContainer = KotlinTypeVariableContainer(builder::addTypeVariable)
     internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
     internal val modifierContainer = KotlinModifierContainer(builder::addModifiers)
+    internal val typeVariableContainer = KotlinTypeVariableContainer(builder::addTypeVariable)
+    internal val extensionReceiverContainer = KotlinExtensionReceiverContainer(builder::receiver)
 
+    private val accessorModifiers: MutableList<KPModifier> by lazy { mutableListOf() }
     private var getter: KPFunctionBuilder? = null
     private var setter: KPFunctionBuilder? = null
-    private val accessorModifiers: MutableList<KPModifier> by lazy { mutableListOf() }
 
     fun expect() = modifier(KPModifier.EXPECT)
     fun actual() = modifier(KPModifier.ACTUAL)

@@ -1,6 +1,5 @@
 package io.github.diskria.poetesse.kotlin
 
-import com.squareup.kotlinpoet.ExperimentalKotlinPoetApi
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.extensions.addStatement
 import io.github.diskria.poetesse.interop.PoetesseScope
@@ -15,24 +14,22 @@ class KotlinFunctionScope private constructor(
 ) : PoetesseKotlinScope,
     KotlinDocumentationTrait,
     KotlinContextParameterTrait,
-    KotlinExtensionReceiverTrait,
-    KotlinTypeVariableTrait,
-    KotlinParameterTrait,
     KotlinAnnotationTrait,
     KotlinModifierTrait.WithVisibility,
+    KotlinTypeVariableTrait,
+    KotlinExtensionReceiverTrait,
+    KotlinParameterTrait,
     KotlinBodyTrait {
 
     internal typealias Block = KotlinFunctionScope.() -> Unit
 
     internal val documentationContainer = KotlinDocumentationContainer(builder::addKdoc)
-
-    @OptIn(ExperimentalKotlinPoetApi::class)
     internal val contextParameterContainer = KotlinContextParameterContainer(builder::contextParameter)
-    internal val extensionReceiverContainer = KotlinExtensionReceiverContainer(builder::receiver)
-    internal val typeVariableContainer = KotlinTypeVariableContainer(builder::addTypeVariable)
-    internal val parameterContainer = KotlinParameterContainer(builder::addParameter)
     internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
     internal val modifierContainer = KotlinModifierContainer(builder::addModifiers)
+    internal val typeVariableContainer = KotlinTypeVariableContainer(builder::addTypeVariable)
+    internal val extensionReceiverContainer = KotlinExtensionReceiverContainer(builder::receiver)
+    internal val parameterContainer = KotlinParameterContainer(builder::addParameter)
     internal val statementContainer = KotlinBodyContainer(builder::addStatement)
 
     fun expect() = modifier(KPModifier.EXPECT)

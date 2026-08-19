@@ -8,17 +8,17 @@ class JavaConstructorScope private constructor(
     private val builder: JPMethodBuilder,
 ) : PoetesseJavaScope,
     JavaDocumentationTrait,
-    JavaParameterTrait,
     JavaAnnotationTrait,
     JavaModifierTrait.WithVisibility,
+    JavaParameterTrait,
     JavaBodyTrait {
 
     internal typealias Block = JavaConstructorScope.() -> Unit
 
     internal val documentationContainer = JavaDocumentationContainer(builder::addJavadoc)
-    internal val parameterContainer = JavaParameterContainer(builder::addParameter)
     internal val annotationContainer = JavaAnnotationContainer(builder::addAnnotation)
     internal val modifierContainer = JavaModifierContainer(builder::addModifiers)
+    internal val parameterContainer = JavaParameterContainer(builder::addParameter)
     internal val statementContainer = JavaBodyContainer(builder::addStatement)
 
     internal fun build() = builder.build()
