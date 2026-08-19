@@ -23,6 +23,7 @@ class JavaFileScope private constructor(
 
     private val extraImports: MutableSet<String> = mutableSetOf()
     private val extraStaticImports: MutableSet<String> = mutableSetOf()
+    private val defaultImportPackageNames: MutableSet<String> = mutableSetOf()
     private val types: MutableList<JPType> = mutableListOf()
 
     fun import(className: XClassName) {
@@ -102,11 +103,25 @@ class JavaFileScope private constructor(
         extraStaticImports += "${enum.declaringJavaClass.canonicalName}.${enum.name}"
     }
 
+    fun defaultImport(packageName: String) {
+        defaultImportPackageNames += packageName
+    }
+
     internal fun build(): PoetesseJavaFile {
         requireNotNull(types.find { it.name() == fileName }) {
             "File '$fileName' cannot be built because primary type was not configured."
         }
-        return PoetesseJavaFile.of(packageName, fileName, types, extraImports, extraStaticImports)
+        if (config.skipLangDefaultImports) {
+            defaultImport("java.lang")
+        }
+        return PoetesseJavaFile.of(
+            packageName,
+            fileName,
+            types,
+            extraImports,
+            extraStaticImports,
+            defaultImportPackageNames,
+        )
     }
 
     internal companion object {

@@ -19,6 +19,7 @@ class PoetesseJavaFile private constructor(
     private val types: List<JPType>,
     extraImports: Set<String>,
     extraStaticImports: Set<String>,
+    val defaultImportPackageNames: Set<String>,
 ) : PoetesseFile {
 
     override val extensionName: String = "java"
@@ -34,12 +35,7 @@ class PoetesseJavaFile private constructor(
 
     init {
         types.forEach { spec ->
-            collectType(
-                JPFile.builder(packageName.orEmpty(), spec).apply {
-                    indent(config.indent)
-                    skipJavaLangImports(config.skipLangDefaultImports)
-                }.build().toString()
-            )
+            collectType(JPFile.builder(packageName.orEmpty(), spec).indent(config.indent).build().toString())
         }
     }
 
@@ -55,6 +51,7 @@ class PoetesseJavaFile private constructor(
             staticImports.forEach { out.appendLine(staticImportAffix.wrap(it)) }
             out.appendLine()
         }
+        val imports = imports.filter { it.substringBeforeLast(".") !in defaultImportPackageNames }
         if (imports.isNotEmpty()) {
             imports.forEach { out.appendLine(importAffix.wrap(it)) }
             out.appendLine()
@@ -111,6 +108,9 @@ class PoetesseJavaFile private constructor(
             types: List<JPType>,
             extraImports: Set<String>,
             extraStaticImports: Set<String>,
-        ) = PoetesseJavaFile(poetesse.config, packageName, fileName, types, extraImports, extraStaticImports)
+            defaultImportPackageNames: Set<String>,
+        ) = PoetesseJavaFile(
+            poetesse.config, packageName, fileName, types, extraImports, extraStaticImports, defaultImportPackageNames,
+        )
     }
 }

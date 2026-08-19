@@ -98,7 +98,7 @@ class KotlinFileScope private constructor(
     }
 
     fun memberImport(packageName: String?, name: String, block: ImportScope.Block = {}) {
-        addMemberImport(MemberName(packageName.orEmpty(), name), block)
+        addMemberImport(MemberName(packageName = packageName.orEmpty(), simpleName = name), block)
     }
 
     fun memberImport(packageName: String?, names: Iterable<String>) {
@@ -111,6 +111,10 @@ class KotlinFileScope private constructor(
 
     fun memberImport(enum: Enum<*>) {
         builder.addImport(enum)
+    }
+
+    fun defaultImport(packageName: String) {
+        builder.addDefaultPackageImport(packageName)
     }
 
     private fun addMemberImport(name: MemberName, block: ImportScope.Block = {}) {
@@ -142,8 +146,8 @@ class KotlinFileScope private constructor(
             config.comment?.let { addFileComment(it) }
             if (config.skipLangDefaultImports) {
                 addKotlinDefaultImports(includeJvm = true, includeJs = false)
-                addDefaultPackageImport("kotlin.math")
-                addDefaultPackageImport("kotlin.jvm")
+                defaultImport("kotlin.math")
+                defaultImport("kotlin.jvm")
             }
         }.build()
         return PoetesseKotlinFile(file)
