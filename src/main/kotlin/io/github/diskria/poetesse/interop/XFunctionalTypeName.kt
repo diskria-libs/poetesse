@@ -64,7 +64,7 @@ internal fun KPFunctionalTypeName.asXFunctionalTypeName() = with(poetesse) {
 
 @PublishedApi
 context(poetesse: PoetesseScope)
-internal fun JPParameterizedTypeName.asXFunctionalTypeNameOrNull(nullable: Boolean = false): XFunctionalTypeName? {
+internal fun JPParameterizedTypeName.asXFunctionalTypeNameOrNull(nullable: Boolean): XFunctionalTypeName? {
     val typeArguments = typeArguments()
     val arity = countArityOrNull(typeArguments) ?: return null
     val jvmFunctionArity = jvmFunctionAffix.unwrapOrNull(rawType().qualifiedName)?.toIntOrNull()

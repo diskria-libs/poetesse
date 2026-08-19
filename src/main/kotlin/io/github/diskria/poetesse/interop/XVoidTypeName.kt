@@ -32,12 +32,12 @@ class XVoidTypeName private constructor(
 
 @PublishedApi
 context(poetesse: PoetesseScope)
-internal fun KPTypeName.asXVoidTypeNameOrNull(boxed: Boolean = isNullable): XVoidTypeName? =
+internal fun KPTypeName.asXVoidTypeNameOrNull(boxed: Boolean): XVoidTypeName? =
     if (setNullable(false).withoutAnnotations() == KPUnit) XVoidTypeName.of(isNullable || boxed, isNullable)
     else null
 
 @PublishedApi
 context(poetesse: PoetesseScope)
-internal fun JPTypeName.asXVoidTypeNameOrNull(nullable: Boolean = false): XVoidTypeName? =
+internal fun JPTypeName.asXVoidTypeNameOrNull(nullable: Boolean): XVoidTypeName? =
     if (setBoxed(false).withoutAnnotations() == JPVoid) XVoidTypeName.of(nullable || isBoxedVoid, nullable)
     else null

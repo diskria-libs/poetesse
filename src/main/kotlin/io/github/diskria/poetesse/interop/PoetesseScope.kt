@@ -3,6 +3,7 @@ package io.github.diskria.poetesse.interop
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseX
 import io.github.diskria.poetesse.extensions.setNullable
+import io.github.diskria.poetesse.java.JPClassName
 import io.github.diskria.poetesse.java.JPTypeName
 import io.github.diskria.poetesse.kotlin.KPClassName
 import io.github.diskria.poetesse.kotlin.KPTypeName
@@ -24,7 +25,8 @@ inline fun <reified T> PoetesseScope.xType(nullable: Boolean = true, boxed: Bool
 
 inline fun <reified T : Any> PoetesseScope.xType(boxed: Boolean = false) = xType<T>(nullable = false, boxed = boxed)
 
-fun PoetesseScope.xType(jp: JPTypeName, nullable: Boolean = false) = jp.toXType(nullable)
+fun PoetesseScope.xType(jp: JPTypeName, nullable: Boolean = config.javaNullabilityResolver.isNullable(jp)) =
+    jp.toXType(nullable)
 
 fun PoetesseScope.xClass(kp: KPClassName, nullable: Boolean = kp.isNullable) =
     kp.setNullable(nullable).asX<XClassName>()
@@ -43,3 +45,6 @@ fun PoetesseScope.xClass(type: KClass<*>, nullable: Boolean = false) = type.toXC
 inline fun <reified T> PoetesseScope.xClass(nullable: Boolean = true) = xClass(T::class, nullable)
 
 inline fun <reified T : Any> PoetesseScope.xClass() = xClass<T>(nullable = false)
+
+fun PoetesseScope.xClass(jp: JPClassName, nullable: Boolean = config.javaNullabilityResolver.isNullable(jp)) =
+    jp.asX<XClassName>(nullable)

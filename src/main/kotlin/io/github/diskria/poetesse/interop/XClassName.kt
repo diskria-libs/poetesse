@@ -4,7 +4,6 @@ import com.squareup.kotlinpoet.asClassName
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.extensions.asJPClassName
 import io.github.diskria.poetesse.extensions.asKPClassName
-import io.github.diskria.poetesse.extensions.setNullable
 import io.github.diskria.poetesse.java.JPClassName
 import io.github.diskria.poetesse.kotlin.KPClassName
 import kotlin.reflect.KClass
@@ -137,22 +136,26 @@ internal fun KPClassName.asXClassName() =
 
 @PublishedApi
 context(poetesse: PoetesseScope)
-internal fun JPClassName.asXClassName(nullable: Boolean = false) =
+internal fun JPClassName.asXClassName(nullable: Boolean) =
     XClassName.of(packageName().ifEmpty { null }, simpleNames(), nullable)
 
 @PublishedApi
 context(poetesse: PoetesseScope)
-internal fun KClass<*>.toXClass(nullable: Boolean = false): XClassName {
+internal fun KClass<*>.toXClass(nullable: Boolean): XClassName {
     require(this != Array::class && !java.isArray) {
         val className = simpleName ?: this.toString()
+        val lines = listOf(
+            "xType<Int>().array()" to "IntArray / int[]",
+            "xType<Int>(boxed = true).array()" to "Array<Int> / Integer[]",
+            "xType<Int?>().array()" to "Array<Int?> / @Nullable Integer[]",
+        )
+        val maxLength = lines.maxOf { it.first.length }
         buildString {
             appendLine("Cannot create XClassName directly from array type '$className'.")
             appendLine()
             appendLine("Expected factory methods:")
-            appendLine("  xType<Int>().array()              => IntArray / int[]")
-            appendLine("  xType<Int>(boxed = true).array()  => Array<Int> / Integer[]")
-            appendLine("  xType<Int?>().array()             => Array<Int?> / @Nullable Integer[]")
+            lines.forEach { (left, right) -> appendLine("${left.padEnd(maxLength)} => $right".prependIndent("  ")) }
         }
     }
-    return asClassName().setNullable(nullable).asX<XClassName>()
+    return with(poetesse) { xClass(asClassName(), nullable) }
 }

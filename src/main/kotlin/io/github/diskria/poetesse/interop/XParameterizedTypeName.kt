@@ -29,13 +29,13 @@ class XParameterizedTypeName private constructor(
 @PublishedApi
 context(poetesse: PoetesseScope)
 internal fun KPParameterizedTypeName.asXParameterizedTypeName() = with(poetesse) {
-    XParameterizedTypeName.of(rawType.asX<XClassName>(), typeArguments.map { xType(it) }, isNullable)
+    XParameterizedTypeName.of(xClass(rawType), typeArguments.map { xType(it) }, isNullable)
 }
 
 @PublishedApi
 context(poetesse: PoetesseScope)
-internal fun JPParameterizedTypeName.asXParameterizedTypeName(nullable: Boolean = false) = with(poetesse) {
-    XParameterizedTypeName.of(rawType().asX<XClassName>(), typeArguments().map { xType(it) }, nullable)
+internal fun JPParameterizedTypeName.asXParameterizedTypeName(nullable: Boolean) = with(poetesse) {
+    XParameterizedTypeName.of(xClass(rawType()), typeArguments().map { xType(it) }, nullable)
 }
 
 fun XClassName.generic(typeArguments: Iterable<XTypeName>, nullable: Boolean = isNullable) =

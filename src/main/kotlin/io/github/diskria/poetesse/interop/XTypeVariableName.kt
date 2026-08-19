@@ -54,6 +54,6 @@ internal fun KPTypeVariableName.asXTypeVariableName() = with(poetesse) {
 
 @PublishedApi
 context(poetesse: PoetesseScope)
-internal fun JPTypeVariableName.asXTypeVariableName(nullable: Boolean = false) = with(poetesse) {
+internal fun JPTypeVariableName.asXTypeVariableName(nullable: Boolean) = with(poetesse) {
     XTypeVariableName.of(name(), bounds().map { xType(it) }, variance = null, isReified = false, nullable)
 }

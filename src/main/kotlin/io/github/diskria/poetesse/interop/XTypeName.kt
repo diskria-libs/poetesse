@@ -60,7 +60,7 @@ internal inline fun <reified X : XTypeName> KPTypeName.asX(boxed: Boolean = isNu
     }
 
 context(poetesse: PoetesseScope)
-internal fun KPTypeName.toXType(boxed: Boolean = isNullable): XTypeName = when (this) {
+internal fun KPTypeName.toXType(boxed: Boolean): XTypeName = when (this) {
     is KPClassName -> {
         asXOrNull<XVoidTypeName>(boxed)
             ?: asXOrNull<XPrimitiveTypeName>(boxed)
@@ -77,15 +77,19 @@ internal fun KPTypeName.toXType(boxed: Boolean = isNullable): XTypeName = when (
 
 @PublishedApi
 context(poetesse: PoetesseScope)
-internal fun KClass<*>.toXType(nullable: Boolean = false, boxed: Boolean = nullable): XTypeName = with(poetesse) {
+internal fun KClass<*>.toXType(nullable: Boolean, boxed: Boolean): XTypeName = with(poetesse) {
     require(java.typeParameters.isEmpty()) {
         val className = simpleName ?: this.toString()
+        val lines = listOf(
+            "xClass<List<*>>().generic(xType<String?>())" to "List<String?> / List<@Nullable String>",
+            "xType<String>().lambda(xType<Int>())" to "(Int) -> String / Function1<Integer, String>",
+        )
+        val maxLength = lines.maxOf { it.first.length }
         buildString {
-            appendLine("Cannot create XTypeName directly from parameterized class '$className'.")
+            appendLine("Cannot create XTypeName directly from generic class '$className'.")
             appendLine()
             appendLine("Expected factory methods:")
-            appendLine("  xClass<List<*>>().generic(xType<String?>())  => List<String?> / List<@Nullable String>")
-            appendLine("  xType<String>().lambda(xType<Int>())         => (Int) -> String / Function1<Integer, String>")
+            lines.forEach { (left, right) -> appendLine("${left.padEnd(maxLength)} => $right".prependIndent("  ")) }
         }
     }
     val kp = asClassName().setNullable(nullable)
@@ -96,7 +100,7 @@ internal fun KClass<*>.toXType(nullable: Boolean = false, boxed: Boolean = nulla
 
 @PublishedApi
 context(poetesse: PoetesseScope)
-internal inline fun <reified X : XTypeName> JPTypeName.asXOrNull(nullable: Boolean = false): X? = when (X::class) {
+internal inline fun <reified X : XTypeName> JPTypeName.asXOrNull(nullable: Boolean): X? = when (X::class) {
     XVoidTypeName::class -> asXVoidTypeNameOrNull(nullable)
     XPrimitiveTypeName::class -> asXPrimitiveTypeNameOrNull(nullable)
     XClassName::class if (this is JPClassName) -> asXClassName(nullable)
@@ -109,17 +113,15 @@ internal inline fun <reified X : XTypeName> JPTypeName.asXOrNull(nullable: Boole
 } as X?
 
 context(poetesse: PoetesseScope)
-internal inline fun <reified X : XTypeName> JPTypeName.asX(nullable: Boolean = false): X =
+internal inline fun <reified X : XTypeName> JPTypeName.asX(nullable: Boolean): X =
     requireNotNull(asXOrNull<X>(nullable)) {
         "Cannot convert JPTypeName '${this::class.simpleName}' ($this) to X-interop '${X::class.simpleName}'"
     }
 
 context(poetesse: PoetesseScope)
-internal fun JPTypeName.toXType(nullable: Boolean = false): XTypeName = when (this) {
+internal fun JPTypeName.toXType(nullable: Boolean): XTypeName = when (this) {
     is JPClassName -> {
-        asXOrNull<XVoidTypeName>(nullable)
-            ?: asXOrNull<XPrimitiveTypeName>(nullable)
-            ?: asX<XClassName>(nullable)
+        asXOrNull<XVoidTypeName>(nullable) ?: asXOrNull<XPrimitiveTypeName>(nullable) ?: asX<XClassName>(nullable)
     }
 
     is JPArrayTypeName -> asX<XArrayTypeName>(nullable)

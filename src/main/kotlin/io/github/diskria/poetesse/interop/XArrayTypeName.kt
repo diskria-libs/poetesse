@@ -53,7 +53,7 @@ internal fun KPTypeName.asXArrayTypeNameOrNull(): XArrayTypeName? {
 
 @PublishedApi
 context(poetesse: PoetesseScope)
-internal fun JPArrayTypeName.asXArrayTypeName(nullable: Boolean = false) = with(poetesse) {
+internal fun JPArrayTypeName.asXArrayTypeName(nullable: Boolean) = with(poetesse) {
     XArrayTypeName.of(xType(componentType()), nullable)
 }
 

@@ -52,7 +52,7 @@ internal fun KPWildcardTypeName.asXWildcardTypeName() = with(poetesse) {
 
 @PublishedApi
 context(poetesse: PoetesseScope)
-internal fun JPWildcardTypeName.asXWildcardTypeName(nullable: Boolean = false) = with(poetesse) {
+internal fun JPWildcardTypeName.asXWildcardTypeName(nullable: Boolean) = with(poetesse) {
     XWildcardTypeName.of(
         inType = lowerBounds().firstOrNull()?.let { xType(it) },
         outType = if (lowerBounds().isNotEmpty()) null else upperBounds().firstOrNull()?.let { xType(it) },

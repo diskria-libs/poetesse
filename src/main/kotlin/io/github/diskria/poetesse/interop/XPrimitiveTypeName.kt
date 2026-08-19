@@ -51,14 +51,14 @@ class XPrimitiveTypeName private constructor(
 
 @PublishedApi
 context(poetesse: PoetesseScope)
-internal fun KPTypeName.asXPrimitiveTypeNameOrNull(boxed: Boolean = isNullable): XPrimitiveTypeName? {
+internal fun KPTypeName.asXPrimitiveTypeNameOrNull(boxed: Boolean): XPrimitiveTypeName? {
     val kind = kotlinToKind[setNullable(false).withoutAnnotations()] ?: return null
     return XPrimitiveTypeName.of(kind, isNullable || boxed, isNullable)
 }
 
 @PublishedApi
 context(poetesse: PoetesseScope)
-internal fun JPTypeName.asXPrimitiveTypeNameOrNull(nullable: Boolean = false): XPrimitiveTypeName? {
+internal fun JPTypeName.asXPrimitiveTypeNameOrNull(nullable: Boolean): XPrimitiveTypeName? {
     val kind = javaToKind[setBoxed(false).withoutAnnotations()] ?: return null
     return XPrimitiveTypeName.of(kind, nullable || isBoxedPrimitive, nullable)
 }
