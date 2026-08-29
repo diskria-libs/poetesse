@@ -1,22 +1,25 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    alias(libs.plugins.projektor)
+    alias(convention.plugins.projektor)
+}
+
+projekt {
+    kotlinLibrary()
+    distribute {
+        mavenLocal()
+        mavenCentral()
+    }
 }
 
 dependencies {
     api(libs.bundles.poets)
 }
 
-projekt {
-    kotlinLibrary {
-        jvmTarget = JvmTarget.JVM_17
+tasks {
+    withType<KotlinCompile>().configureEach {
+        compilerOptions {
+            optIn.add("com.squareup.kotlinpoet.ExperimentalKotlinPoetApi")
+        }
     }
-}
-
-val compileKotlin: KotlinCompile by tasks
-compileKotlin.compilerOptions {
-    freeCompilerArgs.set(listOf("-XXLanguage:+ContextParameters"))
-    optIn.add("com.squareup.kotlinpoet.ExperimentalKotlinPoetApi")
 }

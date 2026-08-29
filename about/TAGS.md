@@ -1,3 +1,3 @@
-kotlinpoet
-javapoet
+kotlin-poet
+java-poet
 code-generation
