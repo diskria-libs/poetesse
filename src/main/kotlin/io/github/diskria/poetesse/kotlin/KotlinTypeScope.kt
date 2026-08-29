@@ -73,6 +73,12 @@ class KotlinTypeScope private constructor(
         builder.addInitializerBlock(KotlinCodeBlockScope.of().apply(block).build())
     }
 
+    fun companion(name: String? = null, block: Block = {}) {
+        val className = className.nested(name ?: "Companion")
+        val scope = KotlinTypeScope(config, className, KPType.companionObjectBuilder(name))
+        builder.addType(scope.apply { block(className) }.build())
+    }
+
     internal fun build() = builder.build()
 
     inner class SuperclassConstructorScope internal constructor() : KotlinArgumentTrait {
