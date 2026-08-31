@@ -6,14 +6,16 @@ import io.github.diskria.poetesse.interop.PoetesseScope
 sealed interface KotlinBodyTrait : PoetesseKotlinScope
 
 fun KotlinBodyTrait.body(block: KotlinBodyScope.Block = {}) {
-    KotlinBodyScope.of(container.append).apply(block)
+    KotlinBodyScope.of(container).apply(block)
 }
 
 fun KotlinBodyTrait.expression(block: KotlinCodeScope.Block) {
     body { line { "return ${L(block)}" } }
 }
 
-internal class KotlinBodyContainer(val append: (body: KPCodeBlock) -> Unit)
+internal class KotlinBodyContainer(
+    val append: (command: KotlinCodeBlockCommandType, codeBlock: KPCodeBlock) -> Unit
+)
 
 class KotlinBodyScope private constructor(
     override val config: Poetesse.Config,
@@ -24,8 +26,8 @@ class KotlinBodyScope private constructor(
 
     internal companion object {
         context(poetesse: PoetesseScope)
-        fun of(append: (statement: KPCodeBlock) -> Unit) =
-            KotlinBodyScope(poetesse.config, KotlinCodeBlockContainer(append))
+        fun of(container: KotlinBodyContainer) =
+            KotlinBodyScope(poetesse.config, KotlinCodeBlockContainer(container.append))
     }
 }
 

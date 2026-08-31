@@ -11,6 +11,8 @@ class XParameter(val name: String = "", val type: XTypeName) {
 
     fun interopToJava(fallbackName: String): JPParameter =
         JPParameter.builder(type.interopToJava(), name.ifEmpty { fallbackName }).build()
+
+    override fun toString(): String = name
 }
 
 context(poetesse: PoetesseScope)

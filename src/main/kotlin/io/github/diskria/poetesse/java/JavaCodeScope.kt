@@ -35,7 +35,7 @@ class JavaCodeScope private constructor(
     inline fun <reified T : Any> T(resolveNullability: Boolean = false) =
         T<T>(nullable = false, resolveNullability = resolveNullability)
 
-    fun S(value: CharSequence) = argument('S', value)
+    fun S(value: String) = argument('S', value)
 
     fun L(value: Boolean) = argument('L', value)
     fun L(value: Int) = argument('L', value)

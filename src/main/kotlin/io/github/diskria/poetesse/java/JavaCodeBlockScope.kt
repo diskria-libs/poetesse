@@ -33,7 +33,8 @@ class JavaCodeBlockScope private constructor(
 class JavaEmbeddableCodeBlockScope private constructor(
     override val config: Poetesse.Config,
     internal val statements: MutableList<JPCodeBlock> = mutableListOf()
-) : JavaCodeBlockTrait {
+) : PoetesseJavaScope,
+    JavaCodeBlockTrait {
 
     internal typealias Block = JavaEmbeddableCodeBlockScope.() -> Unit
 

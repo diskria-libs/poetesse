@@ -1,7 +1,7 @@
 package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.extensions.addStatement
+import io.github.diskria.poetesse.extensions.appendCommand
 import io.github.diskria.poetesse.interop.PoetesseScope
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.interopToKotlin
@@ -30,7 +30,7 @@ class KotlinFunctionScope private constructor(
     internal val typeVariableContainer = KotlinTypeVariableContainer(builder::addTypeVariable)
     internal val extensionReceiverContainer = KotlinExtensionReceiverContainer(builder::receiver)
     internal val parameterContainer = KotlinParameterContainer(builder::addParameter)
-    internal val statementContainer = KotlinBodyContainer(builder::addStatement)
+    internal val statementContainer = KotlinBodyContainer(builder::appendCommand)
 
     fun expect() = modifier(KPModifier.EXPECT)
     fun actual() = modifier(KPModifier.ACTUAL)

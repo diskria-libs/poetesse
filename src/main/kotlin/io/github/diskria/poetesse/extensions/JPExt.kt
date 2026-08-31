@@ -1,6 +1,7 @@
 package io.github.diskria.poetesse.extensions
 
 import io.github.diskria.poetesse.java.*
+import io.github.diskria.poetesse.kotlin.KPCodeBlock
 
 val JPTypeName.isVoid: Boolean
     get() = withoutAnnotations() == JPVoid
@@ -28,3 +29,9 @@ fun JPClassName.parameterizedBy(vararg typeArguments: JPTypeName): JPParameteriz
 
 fun JPClassName.parameterizedBy(typeArguments: Iterable<JPTypeName>): JPParameterizedTypeName =
     parameterizedBy(*typeArguments.toList().toTypedArray())
+
+fun JPCodeBlockBuilder.beginControlFlow(codeBlock: KPCodeBlock): JPCodeBlockBuilder =
+    beginControlFlow($$"$L", codeBlock)
+
+fun JPCodeBlockBuilder.nextControlFlow(codeBlock: KPCodeBlock): JPCodeBlockBuilder =
+    nextControlFlow($$"$L", codeBlock)

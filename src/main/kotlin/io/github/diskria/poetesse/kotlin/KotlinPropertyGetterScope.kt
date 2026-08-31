@@ -1,7 +1,7 @@
 package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.extensions.addStatement
+import io.github.diskria.poetesse.extensions.appendCommand
 import io.github.diskria.poetesse.interop.PoetesseScope
 
 class KotlinPropertyGetterScope private constructor(
@@ -18,7 +18,7 @@ class KotlinPropertyGetterScope private constructor(
     internal val documentationContainer = KotlinDocumentationContainer(builder::addKdoc)
     internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
     internal val modifierContainer = KotlinModifierContainer(builder::addModifiers)
-    internal val statementContainer = KotlinBodyContainer(builder::addStatement)
+    internal val statementContainer = KotlinBodyContainer(builder::appendCommand)
 
     fun expect() = modifier(KPModifier.EXPECT)
     fun actual() = modifier(KPModifier.ACTUAL)

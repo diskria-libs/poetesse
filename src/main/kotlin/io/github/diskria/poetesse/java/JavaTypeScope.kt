@@ -1,10 +1,8 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.interop.PoetesseScope
-import io.github.diskria.poetesse.interop.XClassName
-import io.github.diskria.poetesse.interop.XTypeName
-import io.github.diskria.poetesse.interop.interopToJava
+import io.github.diskria.poetesse.interop.*
+import kotlin.reflect.KClass
 
 class JavaTypeScope private constructor(
     override val config: Poetesse.Config,
@@ -44,6 +42,30 @@ class JavaTypeScope private constructor(
     }
 
     fun sealed(vararg permits: XTypeName) = sealed(permits.asIterable())
+
+    fun superclass(type: XTypeName) {
+        builder.superclass(type.interopToJava())
+    }
+
+    fun superclass(type: KClass<*>) {
+        superclass(xType(type))
+    }
+
+    inline fun <reified T : Any> superclass() {
+        superclass(T::class)
+    }
+
+    fun superinterface(type: XTypeName) {
+        builder.addSuperinterface(type.interopToJava())
+    }
+
+    fun superinterface(type: KClass<*>) {
+        superinterface(xType(type))
+    }
+
+    inline fun <reified T : Any> superinterface() {
+        superinterface(T::class)
+    }
 
     fun initializerBlock(block: JavaCodeBlockScope.Block = {}) {
         builder.addInitializerBlock(JavaCodeBlockScope.of().apply(block).build())

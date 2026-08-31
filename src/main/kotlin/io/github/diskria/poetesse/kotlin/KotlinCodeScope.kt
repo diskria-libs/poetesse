@@ -28,7 +28,7 @@ class KotlinCodeScope private constructor(
     inline fun <reified T> T(nullable: Boolean = true) = T(T::class, nullable)
     inline fun <reified T : Any> T() = T<T>(nullable = false)
 
-    fun S(value: CharSequence) = argument('S', value)
+    fun S(value: String) = argument('S', value)
 
     fun L(value: Boolean) = argument('L', value)
     fun L(value: Int) = argument('L', value)
