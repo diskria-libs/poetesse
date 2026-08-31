@@ -62,9 +62,8 @@ inline fun <reified T> JavaCodeBlockTrait.variable(
     name: String, nullable: Boolean = true, noinline block: JavaVariableScope.Block = {}
 ) = variable(name, T::class, nullable, block)
 
-inline fun <reified T : Any> JavaCodeBlockTrait.variable(
-    name: String, noinline block: JavaVariableScope.Block = {}
-) = variable<T>(name, nullable = false, block)
+inline fun <reified T : Any> JavaCodeBlockTrait.variable(name: String, noinline block: JavaVariableScope.Block = {}) =
+    variable<T>(name, nullable = false, block)
 
 inline fun <reified T> JavaCodeBlockTrait.variable(
     nullable: Boolean = true, noinline block: JavaVariableScope.Block = {}
@@ -80,10 +79,7 @@ fun JavaCodeBlockTrait.val_(name: String, type: XTypeName? = null, initializer: 
     }
 
 fun JavaCodeBlockTrait.val_(
-    name: String,
-    type: KClass<*>,
-    nullable: Boolean = false,
-    initializer: JavaCodeScope.Block
+    name: String, type: KClass<*>, nullable: Boolean = false, initializer: JavaCodeScope.Block
 ) = val_(name, xType(type, nullable = nullable), initializer)
 
 fun JavaCodeBlockTrait.val_(type: XTypeName? = null, initializer: JavaCodeScope.Block) =
@@ -106,10 +102,7 @@ fun JavaCodeBlockTrait.var_(name: String, type: XTypeName? = null, initializer: 
     variable(name, type) { initializer(initializer) }
 
 fun JavaCodeBlockTrait.var_(
-    name: String,
-    type: KClass<*>,
-    nullable: Boolean = false,
-    initializer: JavaCodeScope.Block
+    name: String, type: KClass<*>, nullable: Boolean = false, initializer: JavaCodeScope.Block
 ) = var_(name, xType(type, nullable = nullable), initializer)
 
 fun JavaCodeBlockTrait.var_(type: XTypeName? = null, initializer: JavaCodeScope.Block) =
@@ -125,9 +118,8 @@ inline fun <reified T : Any> JavaCodeBlockTrait.var_(noinline initializer: JavaC
     var_<T>(nullable = false, initializer = initializer)
 
 @JvmName("varUntypedInitializer")
-fun JavaCodeBlockTrait.var_(
-    initializer: JavaCodeScope.Block
-) = EagerDelegate { var_(it, type = null, initializer = initializer) }
+fun JavaCodeBlockTrait.var_(initializer: JavaCodeScope.Block) =
+    EagerDelegate { var_(it, type = null, initializer = initializer) }
 
 internal class JavaCodeBlockContainer(
     val applyCodeBlockMutation: (type: XCodeBlockMutationType, codeBlock: JPCodeBlock) -> Unit

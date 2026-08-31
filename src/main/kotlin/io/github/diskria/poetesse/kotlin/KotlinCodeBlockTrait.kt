@@ -45,10 +45,7 @@ fun KotlinCodeBlockTrait.variable(name: String, block: KotlinVariableScope.Block
     variable(name, type = null, block)
 
 fun KotlinCodeBlockTrait.variable(
-    name: String,
-    type: KClass<*>,
-    nullable: Boolean = false,
-    block: KotlinVariableScope.Block = {}
+    name: String, type: KClass<*>, nullable: Boolean = false, block: KotlinVariableScope.Block = {}
 ) = variable(name, xType(type, nullable = nullable), block)
 
 fun KotlinCodeBlockTrait.variable(type: KClass<*>, nullable: Boolean = false, block: KotlinVariableScope.Block = {}) =
@@ -62,19 +59,15 @@ fun KotlinCodeBlockTrait.variable(block: KotlinVariableScope.Block = {}) =
     EagerDelegate { variable(it, type = null, block) }
 
 inline fun <reified T> KotlinCodeBlockTrait.variable(
-    name: String,
-    nullable: Boolean = true,
-    noinline block: KotlinVariableScope.Block = {}
+    name: String, nullable: Boolean = true, noinline block: KotlinVariableScope.Block = {}
 ) = variable(name, T::class, nullable, block)
 
 inline fun <reified T : Any> KotlinCodeBlockTrait.variable(
-    name: String,
-    noinline block: KotlinVariableScope.Block = {}
+    name: String, noinline block: KotlinVariableScope.Block = {}
 ) = variable<T>(name, nullable = false, block)
 
 inline fun <reified T> KotlinCodeBlockTrait.variable(
-    nullable: Boolean = true,
-    noinline block: KotlinVariableScope.Block = {}
+    nullable: Boolean = true, noinline block: KotlinVariableScope.Block = {}
 ) = EagerDelegate { variable<T>(it, nullable, block) }
 
 inline fun <reified T : Any> KotlinCodeBlockTrait.variable(
@@ -85,10 +78,7 @@ fun KotlinCodeBlockTrait.val_(name: String, type: XTypeName? = null, initializer
     variable(name, type) { initializer(initializer) }
 
 fun KotlinCodeBlockTrait.val_(
-    name: String,
-    type: KClass<*>,
-    nullable: Boolean = false,
-    initializer: KotlinCodeScope.Block
+    name: String, type: KClass<*>, nullable: Boolean = false, initializer: KotlinCodeScope.Block
 ) = val_(name, xType(type, nullable = nullable), initializer)
 
 fun KotlinCodeBlockTrait.val_(type: XTypeName? = null, initializer: KotlinCodeScope.Block) =
@@ -98,8 +88,7 @@ fun KotlinCodeBlockTrait.val_(type: KClass<*>, nullable: Boolean = false, initia
     EagerDelegate { val_(it, type, nullable, initializer) }
 
 inline fun <reified T> KotlinCodeBlockTrait.val_(
-    nullable: Boolean = true,
-    noinline initializer: KotlinCodeScope.Block
+    nullable: Boolean = true, noinline initializer: KotlinCodeScope.Block
 ) = EagerDelegate { val_(it, xType(T::class, nullable = nullable), initializer) }
 
 inline fun <reified T : Any> KotlinCodeBlockTrait.val_(noinline initializer: KotlinCodeScope.Block) =
@@ -116,10 +105,7 @@ fun KotlinCodeBlockTrait.var_(name: String, type: XTypeName? = null, initializer
     }
 
 fun KotlinCodeBlockTrait.var_(
-    name: String,
-    type: KClass<*>,
-    nullable: Boolean = false,
-    initializer: KotlinCodeScope.Block
+    name: String, type: KClass<*>, nullable: Boolean = false, initializer: KotlinCodeScope.Block
 ) = var_(name, xType(type, nullable = nullable), initializer)
 
 fun KotlinCodeBlockTrait.var_(type: XTypeName? = null, initializer: KotlinCodeScope.Block) =
@@ -129,8 +115,7 @@ fun KotlinCodeBlockTrait.var_(type: KClass<*>, nullable: Boolean = false, initia
     EagerDelegate { var_(it, type, nullable, initializer) }
 
 inline fun <reified T> KotlinCodeBlockTrait.var_(
-    nullable: Boolean = true,
-    noinline initializer: KotlinCodeScope.Block
+    nullable: Boolean = true, noinline initializer: KotlinCodeScope.Block
 ) = EagerDelegate { var_(it, xType(T::class, nullable = nullable), initializer) }
 
 inline fun <reified T : Any> KotlinCodeBlockTrait.var_(noinline initializer: KotlinCodeScope.Block) =

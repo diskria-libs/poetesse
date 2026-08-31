@@ -37,7 +37,7 @@ fun JPCodeBlockBuilder.nextControlFlow(codeBlock: JPCodeBlock): JPCodeBlockBuild
     nextControlFlow($$"$L", codeBlock)
 
 fun JPCodeBlockBuilder.endControlFlow(codeBlock: JPCodeBlock): JPCodeBlockBuilder =
-    endControlFlow($$"$L", codeBlock)
+    add($$"$<}$L;\n", codeBlock)
 
 internal fun JPMethodBuilder.applyCodeBlockMutation(type: XCodeBlockMutationType, codeBlock: JPCodeBlock) {
     when (type) {
@@ -46,7 +46,7 @@ internal fun JPMethodBuilder.applyCodeBlockMutation(type: XCodeBlockMutationType
         XCodeBlockMutationType.NEXT_CONTROL_FLOW -> nextControlFlow(codeBlock)
         XCodeBlockMutationType.END_CONTROL_FLOW -> {
             if (codeBlock.isEmpty) endControlFlow()
-            else endControlFlow(codeBlock)
+            else addCode($$"$<}$L;\n", codeBlock)
         }
     }
 }
