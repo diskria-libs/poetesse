@@ -1,6 +1,7 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
+import io.github.diskria.poetesse.extensions.applyCodeBlockMutation
 import io.github.diskria.poetesse.interop.PoetesseScope
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.interopToJava
@@ -25,7 +26,7 @@ class JavaMethodScope private constructor(
     internal val modifierContainer = JavaModifierContainer(builder::addModifiers)
     internal val typeVariableContainer = JavaTypeVariableContainer(builder::addTypeVariable)
     internal val parameterContainer = JavaParameterContainer(builder::addParameter)
-    internal val statementContainer = JavaBodyContainer(builder::addStatement)
+    internal val statementContainer = JavaBodyContainer(builder::applyCodeBlockMutation)
 
     fun abstract() = modifier(JPModifier.ABSTRACT)
     fun static() = modifier(JPModifier.STATIC)

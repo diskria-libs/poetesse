@@ -2,6 +2,7 @@ package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.interop.PoetesseScope
+import io.github.diskria.poetesse.interop.XCodeBlockMutationType
 
 sealed interface KotlinBodyTrait : PoetesseKotlinScope
 
@@ -14,7 +15,7 @@ fun KotlinBodyTrait.expression(block: KotlinCodeScope.Block) {
 }
 
 internal class KotlinBodyContainer(
-    val append: (command: KotlinCodeBlockCommandType, codeBlock: KPCodeBlock) -> Unit
+    val applyCodeBlockMutation: (type: XCodeBlockMutationType, codeBlock: KPCodeBlock) -> Unit
 )
 
 class KotlinBodyScope private constructor(
@@ -27,7 +28,7 @@ class KotlinBodyScope private constructor(
     internal companion object {
         context(poetesse: PoetesseScope)
         fun of(container: KotlinBodyContainer) =
-            KotlinBodyScope(poetesse.config, KotlinCodeBlockContainer(container.append))
+            KotlinBodyScope(poetesse.config, KotlinCodeBlockContainer(container.applyCodeBlockMutation))
     }
 }
 

@@ -1,72 +1,77 @@
 package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.extensions.appendCommand
+import io.github.diskria.poetesse.extensions.applyCodeBlockMutation
 import io.github.diskria.poetesse.interop.PoetesseScope
+import io.github.diskria.poetesse.interop.XCodeBlockMutationType
 
 class KotlinCodeBlockScope private constructor(
     override val config: Poetesse.Config,
-    internal val codeBlockContainer: KotlinCodeBlockContainer,
-    private val builder: KPCodeBlockBuilder? = null,
+    private val builder: KPCodeBlockBuilder = KPCodeBlock.builder(),
 ) : PoetesseKotlinScope,
     KotlinCodeBlockTrait {
 
     internal typealias Block = KotlinCodeBlockScope.() -> Unit
 
-    internal fun build(): KPCodeBlock =
-        builder?.build() ?: error("Cannot call build() on a Scope created from external container")
+    internal val codeBlockContainer = KotlinCodeBlockContainer(builder::applyCodeBlockMutation)
+
+    internal fun build(): KPCodeBlock = builder.build()
 
     internal companion object {
         context(poetesse: PoetesseScope)
-        fun of(): KotlinCodeBlockScope {
-            val builder = KPCodeBlock.builder()
-            return KotlinCodeBlockScope(
-                config = poetesse.config,
-                codeBlockContainer = KotlinCodeBlockContainer(builder::appendCommand),
-                builder = builder
-            )
-        }
-
-        context(poetesse: PoetesseScope)
-        fun of(container: KotlinCodeBlockContainer): KotlinCodeBlockScope {
-            return KotlinCodeBlockScope(
-                config = poetesse.config,
-                codeBlockContainer = container,
-                builder = null
-            )
-        }
+        fun of() = KotlinCodeBlockScope(poetesse.config)
     }
 }
 
-class KotlinEmbeddableCodeBlockScope private constructor(
+class KotlinCodeBlockContainerScope private constructor(
     override val config: Poetesse.Config,
-    private val commands: MutableList<KotlinCodeBlockCommand> = mutableListOf(),
+    private val mutations: MutableList<KotlinCodeBlockMutation> = mutableListOf(),
 ) : PoetesseKotlinScope,
     KotlinCodeBlockTrait {
 
-    internal typealias Block = KotlinEmbeddableCodeBlockScope.() -> Unit
+    internal typealias Block = KotlinCodeBlockContainerScope.() -> Unit
 
     internal val codeBlockContainer = KotlinCodeBlockContainer { command, codeBlock ->
-        commands += KotlinCodeBlockCommand(command, codeBlock)
+        mutations += KotlinCodeBlockMutation(command, codeBlock)
     }
 
-    internal fun build() = commands
+    internal fun build() = mutations
 
     internal companion object {
         context(poetesse: PoetesseScope)
-        fun of() = KotlinEmbeddableCodeBlockScope(poetesse.config)
+        fun of() = KotlinCodeBlockContainerScope(poetesse.config)
     }
 }
 
 class KotlinControlFlowScope private constructor(
     override val config: Poetesse.Config,
-    private val codeBlockScope: KotlinEmbeddableCodeBlockScope,
-) : PoetesseKotlinScope {
+    private val mutations: MutableList<KotlinCodeBlockMutation> = mutableListOf(),
+) : PoetesseKotlinScope,
+    KotlinCodeBlockTrait {
 
     internal typealias Block = KotlinControlFlowScope.() -> Unit
 
-    private var hasStarted = false
+    internal val codeBlockContainer = KotlinCodeBlockContainer { command, codeBlock ->
+        mutations += KotlinCodeBlockMutation(command, codeBlock)
+    }
+
+    private var hasStarted: Boolean = false
     private var endingCodeBlock: KPCodeBlock = KPCodeBlock.of("")
+
+    fun branch(header: KotlinCodeScope.Block, block: Block = {}) {
+        val mutationType = if (!hasStarted) {
+            hasStarted = true
+            XCodeBlockMutationType.BEGIN_CONTROL_FLOW
+        } else {
+            XCodeBlockMutationType.NEXT_CONTROL_FLOW
+        }
+        codeBlockContainer.applyCodeBlockMutation(mutationType, KotlinCodeScope.of(header).codeBlock)
+        apply(block)
+    }
+
+    fun branch(header: String, block: Block = {}) {
+        branch({ header }, block)
+    }
 
     fun ending(code: String) {
         endingCodeBlock = KPCodeBlock.of(code)
@@ -76,48 +81,15 @@ class KotlinControlFlowScope private constructor(
         endingCodeBlock = KotlinCodeScope.of(block).codeBlock
     }
 
-    fun branch(code: String): KotlinBranchScope =
-        KotlinBranchScope(KPCodeBlock.of(code))
-
-    fun branch(block: KotlinCodeScope.Block): KotlinBranchScope =
-        KotlinBranchScope(KotlinCodeScope.of(block).codeBlock)
-
-    inner class KotlinBranchScope internal constructor(
-        private val headerCodeBlock: KPCodeBlock,
-    ) {
-        fun body(body: KotlinCodeBlockScope.Block) {
-            if (!hasStarted) {
-                codeBlockScope.codeBlockContainer.append(
-                    KotlinCodeBlockCommandType.BEGIN_CONTROL_FLOW,
-                    headerCodeBlock
-                )
-                hasStarted = true
-            } else {
-                codeBlockScope.codeBlockContainer.append(
-                    KotlinCodeBlockCommandType.NEXT_CONTROL_FLOW,
-                    headerCodeBlock
-                )
-            }
-            KotlinCodeBlockScope.of(codeBlockScope.codeBlockContainer).apply(body)
-        }
-    }
-
-    internal fun build(): List<KotlinCodeBlockCommand> {
+    internal fun build(): List<KotlinCodeBlockMutation> {
         if (hasStarted) {
-            codeBlockScope.codeBlockContainer.append(
-                KotlinCodeBlockCommandType.END_CONTROL_FLOW,
-                endingCodeBlock
-            )
+            codeBlockContainer.applyCodeBlockMutation(XCodeBlockMutationType.END_CONTROL_FLOW, endingCodeBlock)
         }
-        return codeBlockScope.build()
+        return mutations
     }
 
     internal companion object {
         context(poetesse: PoetesseScope)
-        fun of(): KotlinControlFlowScope =
-            KotlinControlFlowScope(
-                config = poetesse.config,
-                codeBlockScope = KotlinEmbeddableCodeBlockScope.of()
-            )
+        fun of() = KotlinControlFlowScope(poetesse.config)
     }
 }

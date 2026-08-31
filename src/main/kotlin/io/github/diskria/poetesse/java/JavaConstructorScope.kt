@@ -1,6 +1,7 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
+import io.github.diskria.poetesse.extensions.applyCodeBlockMutation
 import io.github.diskria.poetesse.interop.PoetesseScope
 
 class JavaConstructorScope private constructor(
@@ -19,7 +20,7 @@ class JavaConstructorScope private constructor(
     internal val annotationContainer = JavaAnnotationContainer(builder::addAnnotation)
     internal val modifierContainer = JavaModifierContainer(builder::addModifiers)
     internal val parameterContainer = JavaParameterContainer(builder::addParameter)
-    internal val statementContainer = JavaBodyContainer(builder::addStatement)
+    internal val statementContainer = JavaBodyContainer(builder::applyCodeBlockMutation)
 
     internal fun build() = builder.build()
 

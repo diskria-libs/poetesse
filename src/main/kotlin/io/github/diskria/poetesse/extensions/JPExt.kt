@@ -1,7 +1,7 @@
 package io.github.diskria.poetesse.extensions
 
+import io.github.diskria.poetesse.interop.XCodeBlockMutationType
 import io.github.diskria.poetesse.java.*
-import io.github.diskria.poetesse.kotlin.KPCodeBlock
 
 val JPTypeName.isVoid: Boolean
     get() = withoutAnnotations() == JPVoid
@@ -30,8 +30,35 @@ fun JPClassName.parameterizedBy(vararg typeArguments: JPTypeName): JPParameteriz
 fun JPClassName.parameterizedBy(typeArguments: Iterable<JPTypeName>): JPParameterizedTypeName =
     parameterizedBy(*typeArguments.toList().toTypedArray())
 
-fun JPCodeBlockBuilder.beginControlFlow(codeBlock: KPCodeBlock): JPCodeBlockBuilder =
+fun JPCodeBlockBuilder.beginControlFlow(codeBlock: JPCodeBlock): JPCodeBlockBuilder =
     beginControlFlow($$"$L", codeBlock)
 
-fun JPCodeBlockBuilder.nextControlFlow(codeBlock: KPCodeBlock): JPCodeBlockBuilder =
+fun JPCodeBlockBuilder.nextControlFlow(codeBlock: JPCodeBlock): JPCodeBlockBuilder =
     nextControlFlow($$"$L", codeBlock)
+
+fun JPCodeBlockBuilder.endControlFlow(codeBlock: JPCodeBlock): JPCodeBlockBuilder =
+    endControlFlow($$"$L", codeBlock)
+
+internal fun JPMethodBuilder.applyCodeBlockMutation(type: XCodeBlockMutationType, codeBlock: JPCodeBlock) {
+    when (type) {
+        XCodeBlockMutationType.ADD_STATEMENT -> addStatement(codeBlock)
+        XCodeBlockMutationType.BEGIN_CONTROL_FLOW -> beginControlFlow(codeBlock)
+        XCodeBlockMutationType.NEXT_CONTROL_FLOW -> nextControlFlow(codeBlock)
+        XCodeBlockMutationType.END_CONTROL_FLOW -> {
+            if (codeBlock.isEmpty) endControlFlow()
+            else endControlFlow(codeBlock)
+        }
+    }
+}
+
+internal fun JPCodeBlockBuilder.applyCodeBlockMutation(type: XCodeBlockMutationType, codeBlock: JPCodeBlock) {
+    when (type) {
+        XCodeBlockMutationType.ADD_STATEMENT -> addStatement(codeBlock)
+        XCodeBlockMutationType.BEGIN_CONTROL_FLOW -> beginControlFlow(codeBlock)
+        XCodeBlockMutationType.NEXT_CONTROL_FLOW -> nextControlFlow(codeBlock)
+        XCodeBlockMutationType.END_CONTROL_FLOW -> {
+            if (codeBlock.isEmpty) endControlFlow()
+            else endControlFlow(codeBlock)
+        }
+    }
+}

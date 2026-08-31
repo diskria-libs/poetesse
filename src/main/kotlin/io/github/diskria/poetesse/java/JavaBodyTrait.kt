@@ -2,14 +2,17 @@ package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.interop.PoetesseScope
+import io.github.diskria.poetesse.interop.XCodeBlockMutationType
 
 sealed interface JavaBodyTrait : PoetesseJavaScope
 
 fun JavaBodyTrait.body(block: JavaBodyScope.Block = {}) {
-    JavaBodyScope.of(container.append).apply(block)
+    JavaBodyScope.of(container).apply(block)
 }
 
-internal class JavaBodyContainer(val append: (statement: JPCodeBlock) -> Unit)
+internal class JavaBodyContainer(
+    val applyCodeBlockMutation: (type: XCodeBlockMutationType, codeBlock: JPCodeBlock) -> Unit
+)
 
 class JavaBodyScope private constructor(
     override val config: Poetesse.Config,
@@ -20,8 +23,8 @@ class JavaBodyScope private constructor(
 
     internal companion object {
         context(poetesse: PoetesseScope)
-        fun of(append: (statement: JPCodeBlock) -> Unit) =
-            JavaBodyScope(poetesse.config, JavaCodeBlockContainer(append))
+        fun of(container: JavaBodyContainer) =
+            JavaBodyScope(poetesse.config, JavaCodeBlockContainer(container.applyCodeBlockMutation))
     }
 }
 

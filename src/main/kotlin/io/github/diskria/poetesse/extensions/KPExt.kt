@@ -1,5 +1,6 @@
 package io.github.diskria.poetesse.extensions
 
+import io.github.diskria.poetesse.interop.XCodeBlockMutationType
 import io.github.diskria.poetesse.kotlin.*
 
 val KPClassName.qualifiedName: String
@@ -51,32 +52,20 @@ fun KPCodeBlockBuilder.addStatement(codeBlock: KPCodeBlock) {
     add("\n»")
 }
 
-internal fun KPFunctionBuilder.appendCommand(type: KotlinCodeBlockCommandType, codeBlock: KPCodeBlock) {
+internal fun KPFunctionBuilder.applyCodeBlockMutation(type: XCodeBlockMutationType, codeBlock: KPCodeBlock) {
     when (type) {
-        KotlinCodeBlockCommandType.STATEMENT -> addStatement(codeBlock)
-        KotlinCodeBlockCommandType.BEGIN_CONTROL_FLOW -> beginControlFlow(codeBlock)
-        KotlinCodeBlockCommandType.NEXT_CONTROL_FLOW -> nextControlFlow(codeBlock)
-        KotlinCodeBlockCommandType.END_CONTROL_FLOW -> {
-            if (codeBlock.isNotEmpty()) {
-                endControlFlow(codeBlock)
-            } else {
-                endControlFlow()
-            }
-        }
+        XCodeBlockMutationType.ADD_STATEMENT -> addStatement(codeBlock)
+        XCodeBlockMutationType.BEGIN_CONTROL_FLOW -> beginControlFlow(codeBlock)
+        XCodeBlockMutationType.NEXT_CONTROL_FLOW -> nextControlFlow(codeBlock)
+        XCodeBlockMutationType.END_CONTROL_FLOW -> endControlFlow(codeBlock)
     }
 }
 
-internal fun KPCodeBlockBuilder.appendCommand(type: KotlinCodeBlockCommandType, codeBlock: KPCodeBlock) {
+internal fun KPCodeBlockBuilder.applyCodeBlockMutation(type: XCodeBlockMutationType, codeBlock: KPCodeBlock) {
     when (type) {
-        KotlinCodeBlockCommandType.STATEMENT -> add(codeBlock)
-        KotlinCodeBlockCommandType.BEGIN_CONTROL_FLOW -> beginControlFlow(codeBlock)
-        KotlinCodeBlockCommandType.NEXT_CONTROL_FLOW -> nextControlFlow(codeBlock)
-        KotlinCodeBlockCommandType.END_CONTROL_FLOW -> {
-            if (codeBlock.isNotEmpty()) {
-                endControlFlow(codeBlock)
-            } else {
-                endControlFlow()
-            }
-        }
+        XCodeBlockMutationType.ADD_STATEMENT -> addStatement(codeBlock)
+        XCodeBlockMutationType.BEGIN_CONTROL_FLOW -> beginControlFlow(codeBlock)
+        XCodeBlockMutationType.NEXT_CONTROL_FLOW -> nextControlFlow(codeBlock)
+        XCodeBlockMutationType.END_CONTROL_FLOW -> endControlFlow(codeBlock)
     }
 }
