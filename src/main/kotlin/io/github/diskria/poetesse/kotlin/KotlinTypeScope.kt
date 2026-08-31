@@ -73,10 +73,11 @@ class KotlinTypeScope private constructor(
         builder.addInitializerBlock(KotlinCodeBlockScope.of().apply(block).build())
     }
 
-    fun companion(name: String? = null, block: Block = {}) {
-        val className = className.nested(name ?: "Companion")
-        val scope = KotlinTypeScope(config, className, KPType.companionObjectBuilder(name))
-        builder.addType(scope.apply { block(className) }.build())
+    fun companion_object(name: String = "Companion", block: Block = {}) {
+        object_(name) {
+            modifier(KPModifier.COMPANION)
+            block(className.nested(name))
+        }
     }
 
     internal fun build() = builder.build()
