@@ -35,7 +35,7 @@ class KotlinCodeBlockContainerScope private constructor(
         mutations += KotlinCodeBlockMutation(command, codeBlock)
     }
 
-    internal fun build() = mutations
+    internal fun build() = mutations.toList()
 
     internal companion object {
         context(poetesse: PoetesseScope)
@@ -84,8 +84,9 @@ class KotlinControlFlowScope private constructor(
     internal fun build(): List<KotlinCodeBlockMutation> {
         if (hasStarted) {
             codeBlockContainer.applyCodeBlockMutation(XCodeBlockMutationType.END_CONTROL_FLOW, endingCodeBlock)
+            hasStarted = false
         }
-        return mutations
+        return mutations.toList()
     }
 
     internal companion object {

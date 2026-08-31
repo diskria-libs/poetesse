@@ -14,13 +14,15 @@ class JavaCodeBlockScope private constructor(
 
     internal typealias Block = JavaCodeBlockScope.() -> Unit
 
-    internal val codeBlockContainer = JavaCodeBlockContainer(builder::applyCodeBlockMutation)
-
-//        if (isComment) {
-//            builder.add("$[")
-//            builder.add(it)
-//            builder.add("\n$]")
-//        }
+    internal val codeBlockContainer = if (isComment) {
+        JavaCodeBlockContainer { _, codeBlock ->
+            builder.add("$[")
+            builder.add(codeBlock)
+            builder.add("\n$]")
+        }
+    } else {
+        JavaCodeBlockContainer(builder::applyCodeBlockMutation)
+    }
 
     internal fun build() = builder.build()
 
@@ -42,7 +44,7 @@ class JavaCodeBlockContainerScope private constructor(
         mutations += JavaCodeBlockMutation(command, codeBlock)
     }
 
-    internal fun build() = mutations
+    internal fun build() = mutations.toList()
 
     internal companion object {
         context(poetesse: PoetesseScope)
@@ -91,8 +93,9 @@ class JavaControlFlowScope private constructor(
     internal fun build(): List<JavaCodeBlockMutation> {
         if (hasStarted) {
             codeBlockContainer.applyCodeBlockMutation(XCodeBlockMutationType.END_CONTROL_FLOW, endingCodeBlock)
+            hasStarted = false
         }
-        return mutations
+        return mutations.toList()
     }
 
     internal companion object {

@@ -127,11 +127,11 @@ class JavaFileScope private constructor(
         return PoetesseJavaFile.of(
             packageName,
             fileName,
-            defaultImportPackageNames,
-            commentLines,
-            extraStaticImports,
-            extraImports,
-            types,
+            defaultImportPackageNames = defaultImportPackageNames.toSet(),
+            commentLines = commentLines.toList(),
+            extraStaticImports = extraStaticImports.toSet(),
+            extraImports = extraImports.toSet(),
+            types = types.toList(),
         )
     }
 
