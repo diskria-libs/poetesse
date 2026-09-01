@@ -24,5 +24,6 @@ internal val KotlinFunctionTrait.factory: KotlinFunctionFactory
 private val KotlinFunctionTrait.container: KotlinFunctionContainer
     get() = when (this) {
         is KotlinFileScope -> functionContainer
-        is KotlinTypeScope -> functionContainer
+        is AbstractKotlinBodyScope -> functionContainer
+        is KotlinEnumTypeScope.ConstantScope -> functionContainer
     }

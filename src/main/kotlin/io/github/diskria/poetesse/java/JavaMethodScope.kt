@@ -21,12 +21,12 @@ class JavaMethodScope private constructor(
 
     internal typealias Block = JavaMethodScope.() -> Unit
 
-    internal val documentationContainer = JavaDocumentationContainer(builder::addJavadoc)
-    internal val annotationContainer = JavaAnnotationContainer(builder::addAnnotation)
-    internal val modifierContainer = JavaModifierContainer(builder::addModifiers)
-    internal val typeVariableContainer = JavaTypeVariableContainer(builder::addTypeVariable)
-    internal val parameterContainer = JavaParameterContainer(builder::addParameter)
-    internal val statementContainer = JavaBodyContainer(builder::applyCodeBlockMutation)
+    internal val documentationContainer by lazy { JavaDocumentationContainer(builder::addJavadoc) }
+    internal val annotationContainer by lazy { JavaAnnotationContainer(builder::addAnnotation) }
+    internal val modifierContainer by lazy { JavaModifierContainer(builder::addModifiers) }
+    internal val typeVariableContainer by lazy { JavaTypeVariableContainer(builder::addTypeVariable) }
+    internal val parameterContainer by lazy { JavaParameterContainer(builder::addParameter) }
+    internal val statementContainer by lazy { JavaBodyContainer(builder::applyCodeBlockMutation) }
 
     fun abstract() = modifier(JPModifier.ABSTRACT)
     fun static() = modifier(JPModifier.STATIC)

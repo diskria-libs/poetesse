@@ -23,14 +23,14 @@ class KotlinFunctionScope private constructor(
 
     internal typealias Block = KotlinFunctionScope.() -> Unit
 
-    internal val documentationContainer = KotlinDocumentationContainer(builder::addKdoc)
-    internal val contextParameterContainer = KotlinContextParameterContainer(builder::contextParameter)
-    internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
-    internal val modifierContainer = KotlinModifierContainer(builder::addModifiers)
-    internal val typeVariableContainer = KotlinTypeVariableContainer(builder::addTypeVariable)
-    internal val extensionReceiverContainer = KotlinExtensionReceiverContainer(builder::receiver)
-    internal val parameterContainer = KotlinParameterContainer(builder::addParameter)
-    internal val statementContainer = KotlinBodyContainer(builder::applyCodeBlockMutation)
+    internal val documentationContainer by lazy { KotlinDocumentationContainer(builder::addKdoc) }
+    internal val contextParameterContainer by lazy { KotlinContextParameterContainer(builder::contextParameter) }
+    internal val annotationContainer by lazy { KotlinAnnotationContainer(builder::addAnnotation) }
+    internal val modifierContainer by lazy { KotlinModifierContainer(builder::addModifiers) }
+    internal val typeVariableContainer by lazy { KotlinTypeVariableContainer(builder::addTypeVariable) }
+    internal val extensionReceiverContainer by lazy { KotlinExtensionReceiverContainer(builder::receiver) }
+    internal val parameterContainer by lazy { KotlinParameterContainer(builder::addParameter) }
+    internal val statementContainer by lazy { KotlinBodyContainer(builder::applyCodeBlockMutation) }
 
     fun expect() = modifier(KPModifier.EXPECT)
     fun actual() = modifier(KPModifier.ACTUAL)

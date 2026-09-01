@@ -15,6 +15,8 @@ class XClassName private constructor(
     override val isNullable: Boolean,
 ) : XTypedTypeName<KPClassName, JPClassName>(config) {
 
+    internal typealias Factory = (name: String) -> XClassName
+
     val simpleName: String = simpleNames.last()
     val nestedName: String = simpleNames.joinToString(".")
     val qualifiedName: String = buildString {
@@ -52,10 +54,10 @@ class XClassName private constructor(
                 Iterator::class, Collection::class, List::class, Set::class, Map::class, ListIterator::class,
                 Iterable::class, Map.Entry::class
             ).forEach { kClass ->
-                val kp = kClass.asKPClassName()
-                val jp = kClass.asJPClassName()
-                put(kp, jp)
-                put(KPClassName(kp.packageName, kp.simpleNames.map { "Mutable$it" }), jp)
+                val kpClassName = kClass.asKPClassName()
+                val jpClassName = kClass.asJPClassName()
+                put(kpClassName, jpClassName)
+                put(KPClassName(kpClassName.packageName, kpClassName.simpleNames.map { "Mutable$it" }), jpClassName)
             }
 
             sequenceOf(
@@ -112,8 +114,8 @@ class XClassName private constructor(
                 ),
             ).forEach { (packageName, typeAliases) ->
                 typeAliases.forEach {
-                    val jp = it.asJPClassName()
-                    put(KPClassName(packageName, jp.simpleNames()), jp)
+                    val jpClassName = it.asJPClassName()
+                    put(KPClassName(packageName, jpClassName.simpleNames()), jpClassName)
                 }
             }
         }

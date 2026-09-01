@@ -49,5 +49,6 @@ internal val KotlinPropertyTrait.factory: KotlinPropertyFactory
 private val KotlinPropertyTrait.container: KotlinPropertyContainer
     get() = when (this) {
         is KotlinFileScope -> propertyContainer
-        is KotlinTypeScope -> propertyContainer
+        is AbstractKotlinBodyScope -> propertyContainer
+        is KotlinEnumTypeScope.ConstantScope -> propertyContainer
     }

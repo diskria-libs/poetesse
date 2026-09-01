@@ -19,12 +19,12 @@ class KotlinPropertyScope private constructor(
 
     internal typealias Block = KotlinPropertyScope.() -> Unit
 
-    internal val documentationContainer = KotlinDocumentationContainer(builder::addKdoc)
-    internal val contextParameterContainer = KotlinContextParameterContainer(builder::contextParameter)
-    internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
-    internal val modifierContainer = KotlinModifierContainer(builder::addModifiers)
-    internal val typeVariableContainer = KotlinTypeVariableContainer(builder::addTypeVariable)
-    internal val extensionReceiverContainer = KotlinExtensionReceiverContainer(builder::receiver)
+    internal val documentationContainer by lazy { KotlinDocumentationContainer(builder::addKdoc) }
+    internal val contextParameterContainer by lazy { KotlinContextParameterContainer(builder::contextParameter) }
+    internal val annotationContainer by lazy { KotlinAnnotationContainer(builder::addAnnotation) }
+    internal val modifierContainer by lazy { KotlinModifierContainer(builder::addModifiers) }
+    internal val typeVariableContainer by lazy { KotlinTypeVariableContainer(builder::addTypeVariable) }
+    internal val extensionReceiverContainer by lazy { KotlinExtensionReceiverContainer(builder::receiver) }
 
     private val accessorModifiers: MutableList<KPModifier> by lazy { mutableListOf() }
     private var getter: KPFunctionBuilder? = null

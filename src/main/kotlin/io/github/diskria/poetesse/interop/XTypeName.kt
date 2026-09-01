@@ -32,11 +32,11 @@ fun <J : JPTypeName, X : XTypedTypeName<*, J>> X.box(): XTypedTypeName<*, J> =
 
 @Suppress("UNCHECKED_CAST")
 fun <J : JPTypeName, X : XTypedTypeName<*, J>> X.interopToJava(resolveNullability: Boolean = true): J {
-    val jp = interopToJavaInternal()
-    if (resolveNullability && isBoxed && config.javaNullabilityResolver.isNullable(jp) != isNullable) {
-        return config.javaNullabilityResolver.setNullable(jp, isNullable) as J
+    val jpTypeName = interopToJavaInternal()
+    if (resolveNullability && isBoxed && config.javaNullabilityResolver.isNullable(jpTypeName) != isNullable) {
+        return config.javaNullabilityResolver.setNullable(jpTypeName, isNullable) as J
     }
-    return jp
+    return jpTypeName
 }
 
 @PublishedApi
@@ -92,9 +92,9 @@ internal fun KClass<*>.toXType(nullable: Boolean, boxed: Boolean): XTypeName = w
             lines.forEach { (left, right) -> appendLine("${left.padEnd(maxLength)} => $right".prependIndent("  ")) }
         }
     }
-    val kp = asClassName().setNullable(nullable)
-    return kp.asXOrNull<XVoidTypeName>(boxed)
-        ?: kp.asXOrNull<XPrimitiveTypeName>(boxed)
+    val kpClassName = asClassName().setNullable(nullable)
+    return kpClassName.asXOrNull<XVoidTypeName>(boxed)
+        ?: kpClassName.asXOrNull<XPrimitiveTypeName>(boxed)
         ?: xClass(this@toXType, nullable)
 }
 

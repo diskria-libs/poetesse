@@ -30,7 +30,7 @@ internal val KotlinAnnotationTrait.factory: KotlinAnnotationFactory
 private val KotlinAnnotationTrait.container: KotlinAnnotationContainer
     get() = when (this) {
         is KotlinFileScope -> annotationContainer
-        is KotlinTypeScope -> annotationContainer
+        is AbstractKotlinBodyScope -> annotationContainer
         is KotlinTypeAliasScope -> annotationContainer
         is KotlinPropertyScope -> annotationContainer
         is KotlinPropertyGetterScope -> annotationContainer

@@ -23,13 +23,13 @@ class KotlinFileScope private constructor(
 
     internal typealias Block = KotlinFileScope.() -> Unit
 
-    private val classNameFactory: (String) -> XClassName = { name -> xClass(packageName, name) }
+    private val classNameFactory: XClassName.Factory = { name -> xClass(packageName, name) }
 
-    internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
-    internal val propertyContainer = KotlinPropertyContainer(builder::addProperty)
-    internal val functionContainer = KotlinFunctionContainer(builder::addFunction)
-    internal val typeContainer = KotlinTypeContainer(classNameFactory, builder::addType)
-    internal val typeAliasContainer = KotlinTypeAliasContainer(classNameFactory, builder::addTypeAlias)
+    internal val annotationContainer by lazy { KotlinAnnotationContainer(builder::addAnnotation) }
+    internal val propertyContainer by lazy { KotlinPropertyContainer(builder::addProperty) }
+    internal val functionContainer by lazy { KotlinFunctionContainer(builder::addFunction) }
+    internal val typeContainer by lazy { KotlinTypeContainer(classNameFactory, builder::addType) }
+    internal val typeAliasContainer by lazy { KotlinTypeAliasContainer(classNameFactory, builder::addTypeAlias) }
 
     private var isSubsequentComment: Boolean = false
 
@@ -49,11 +49,11 @@ class KotlinFileScope private constructor(
 
     fun import(className: XClassName, block: ImportScope.Block = {}) {
         val alias = ImportScope().apply(block).alias
-        val kp = className.interopToKotlin()
+        val kpClassName = className.interopToKotlin()
         if (alias != null) {
-            builder.addAliasedImport(kp, alias)
+            builder.addAliasedImport(kpClassName, alias)
         } else {
-            builder.addImport(kp.packageName, kp.simpleNames.joinToString("."))
+            builder.addImport(kpClassName.packageName, kpClassName.simpleNames.joinToString("."))
         }
     }
 

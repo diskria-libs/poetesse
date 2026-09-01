@@ -16,10 +16,10 @@ class KotlinTypeAliasScope private constructor(
 
     internal typealias Block = KotlinTypeAliasScope.() -> Unit
 
-    internal val documentationContainer = KotlinDocumentationContainer(builder::addKdoc)
-    internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
-    internal val modifierContainer = KotlinModifierContainer(builder::addModifiers)
-    internal val typeVariableContainer = KotlinTypeVariableContainer(builder::addTypeVariable)
+    internal val documentationContainer by lazy { KotlinDocumentationContainer(builder::addKdoc) }
+    internal val annotationContainer by lazy { KotlinAnnotationContainer(builder::addAnnotation) }
+    internal val modifierContainer by lazy { KotlinModifierContainer(builder::addModifiers) }
+    internal val typeVariableContainer by lazy { KotlinTypeVariableContainer(builder::addTypeVariable) }
 
     fun actual() = modifier(KPModifier.ACTUAL)
 

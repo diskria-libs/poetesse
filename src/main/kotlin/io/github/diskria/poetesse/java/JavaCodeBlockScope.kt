@@ -14,14 +14,16 @@ class JavaCodeBlockScope private constructor(
 
     internal typealias Block = JavaCodeBlockScope.() -> Unit
 
-    internal val codeBlockContainer = if (isComment) {
-        JavaCodeBlockContainer { _, codeBlock ->
-            builder.add("$[")
-            builder.add(codeBlock)
-            builder.add("\n$]")
+    internal val codeBlockContainer by lazy {
+        if (isComment) {
+            JavaCodeBlockContainer { _, codeBlock ->
+                builder.add("$[")
+                builder.add(codeBlock)
+                builder.add("\n$]")
+            }
+        } else {
+            JavaCodeBlockContainer(builder::applyCodeBlockMutation)
         }
-    } else {
-        JavaCodeBlockContainer(builder::applyCodeBlockMutation)
     }
 
     internal fun build() = builder.build()
@@ -40,8 +42,10 @@ class JavaCodeBlockContainerScope private constructor(
 
     internal typealias Block = JavaCodeBlockContainerScope.() -> Unit
 
-    internal val codeBlockContainer = JavaCodeBlockContainer { command, codeBlock ->
-        mutations += JavaCodeBlockMutation(command, codeBlock)
+    internal val codeBlockContainer by lazy {
+        JavaCodeBlockContainer { command, codeBlock ->
+            mutations += JavaCodeBlockMutation(command, codeBlock)
+        }
     }
 
     internal fun build() = mutations.toList()
@@ -60,8 +64,10 @@ class JavaControlFlowScope private constructor(
 
     internal typealias Block = JavaControlFlowScope.() -> Unit
 
-    internal val codeBlockContainer = JavaCodeBlockContainer { command, codeBlock ->
-        mutations += JavaCodeBlockMutation(command, codeBlock)
+    internal val codeBlockContainer by lazy {
+        JavaCodeBlockContainer { command, codeBlock ->
+            mutations += JavaCodeBlockMutation(command, codeBlock)
+        }
     }
 
     private var hasStarted: Boolean = false

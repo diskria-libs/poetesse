@@ -15,10 +15,10 @@ class KotlinPropertyGetterScope private constructor(
 
     internal typealias Block = KotlinPropertyGetterScope.() -> Unit
 
-    internal val documentationContainer = KotlinDocumentationContainer(builder::addKdoc)
-    internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
-    internal val modifierContainer = KotlinModifierContainer(builder::addModifiers)
-    internal val statementContainer = KotlinBodyContainer(builder::applyCodeBlockMutation)
+    internal val documentationContainer by lazy { KotlinDocumentationContainer(builder::addKdoc) }
+    internal val annotationContainer by lazy { KotlinAnnotationContainer(builder::addAnnotation) }
+    internal val modifierContainer by lazy { KotlinModifierContainer(builder::addModifiers) }
+    internal val statementContainer by lazy { KotlinBodyContainer(builder::applyCodeBlockMutation) }
 
     fun expect() = modifier(KPModifier.EXPECT)
     fun actual() = modifier(KPModifier.ACTUAL)

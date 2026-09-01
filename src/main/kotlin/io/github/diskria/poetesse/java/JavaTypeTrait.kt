@@ -4,7 +4,7 @@ import io.github.diskria.poetesse.interop.XClassName
 
 sealed interface JavaTypeTrait : JavaTypeFactory {
     operator fun JavaTypeRef.unaryPlus(): XClassName {
-        val className = container.className(name)
+        val className = container.classNameFactory(name)
         container.append(build(className))
         return className
     }
@@ -29,7 +29,7 @@ fun JavaTypeTrait.annotation_(name: String, block: JavaTypeScope.Block = {}) =
     +factory.annotation_(name, block)
 
 internal class JavaTypeContainer(
-    val className: (name: String) -> XClassName,
+    val classNameFactory: XClassName.Factory,
     val append: (type: JPType) -> Unit,
 )
 

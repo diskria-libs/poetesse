@@ -10,7 +10,7 @@ internal class KotlinDocumentationContainer(val append: (codeBlock: KPCodeBlock)
 
 private val KotlinDocumentationTrait.container: KotlinDocumentationContainer
     get() = when (this) {
-        is KotlinTypeScope -> documentationContainer
+        is AbstractKotlinBodyScope -> documentationContainer
         is KotlinTypeAliasScope -> documentationContainer
         is KotlinPropertyScope -> documentationContainer
         is KotlinPropertyGetterScope -> documentationContainer

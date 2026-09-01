@@ -18,8 +18,8 @@ class JavaVariableScope private constructor(
     private val annotations: MutableList<JPAnnotation> = mutableListOf()
     private val modifiers: MutableList<JPModifier> = mutableListOf()
 
-    internal val annotationContainer = JavaAnnotationContainer { annotations += it }
-    internal val modifierContainer = JavaModifierContainer { modifiers += it }
+    internal val annotationContainer by lazy { JavaAnnotationContainer { annotations += it } }
+    internal val modifierContainer by lazy { JavaModifierContainer { modifiers += it } }
 
     private var initializer: JavaCodeRef? = null
 

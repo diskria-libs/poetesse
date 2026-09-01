@@ -13,7 +13,7 @@ class KotlinCodeBlockScope private constructor(
 
     internal typealias Block = KotlinCodeBlockScope.() -> Unit
 
-    internal val codeBlockContainer = KotlinCodeBlockContainer(builder::applyCodeBlockMutation)
+    internal val codeBlockContainer by lazy { KotlinCodeBlockContainer(builder::applyCodeBlockMutation) }
 
     internal fun build(): KPCodeBlock = builder.build()
 
@@ -31,8 +31,10 @@ class KotlinCodeBlockContainerScope private constructor(
 
     internal typealias Block = KotlinCodeBlockContainerScope.() -> Unit
 
-    internal val codeBlockContainer = KotlinCodeBlockContainer { command, codeBlock ->
-        mutations += KotlinCodeBlockMutation(command, codeBlock)
+    internal val codeBlockContainer by lazy {
+        KotlinCodeBlockContainer { command, codeBlock ->
+            mutations += KotlinCodeBlockMutation(command, codeBlock)
+        }
     }
 
     internal fun build() = mutations.toList()
@@ -51,8 +53,10 @@ class KotlinControlFlowScope private constructor(
 
     internal typealias Block = KotlinControlFlowScope.() -> Unit
 
-    internal val codeBlockContainer = KotlinCodeBlockContainer { command, codeBlock ->
-        mutations += KotlinCodeBlockMutation(command, codeBlock)
+    internal val codeBlockContainer by lazy {
+        KotlinCodeBlockContainer { command, codeBlock ->
+            mutations += KotlinCodeBlockMutation(command, codeBlock)
+        }
     }
 
     private var hasStarted: Boolean = false

@@ -40,5 +40,5 @@ internal class KotlinArgumentContainer(val append: (codeBlock: KPCodeBlock) -> U
 
 private val KotlinArgumentTrait.container: KotlinArgumentContainer
     get() = when (this) {
-        is KotlinTypeScope.SuperclassConstructorScope -> argumentsContainer
+        is KotlinSuperclassConstructorScope -> argumentsContainer
     }

@@ -20,5 +20,5 @@ internal val KotlinConstructorTrait.factory: KotlinConstructorFactory
 
 private val KotlinConstructorTrait.container: KotlinConstructorContainer
     get() = when (this) {
-        is KotlinTypeScope -> constructorContainer
+        is AbstractKotlinTypeScope -> constructorContainer
     }

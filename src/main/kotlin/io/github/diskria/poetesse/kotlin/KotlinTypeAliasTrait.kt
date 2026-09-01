@@ -6,7 +6,7 @@ import io.github.diskria.poetesse.interop.XTypeName
 sealed interface KotlinTypeAliasTrait : KotlinTypeAliasFactory {
     operator fun KotlinTypeAliasRef.unaryPlus(): XClassName {
         container.append(spec)
-        return container.className(name)
+        return container.classNameFactory(name)
     }
 }
 
@@ -14,7 +14,7 @@ fun KotlinTypeAliasTrait.typeAlias(name: String, type: XTypeName, block: KotlinT
     +factory.typeAlias(name, type, block)
 
 internal class KotlinTypeAliasContainer(
-    val className: (name: String) -> XClassName,
+    val classNameFactory: XClassName.Factory,
     val append: (typeAlias: KPTypeAlias) -> Unit,
 )
 
@@ -25,5 +25,6 @@ internal val KotlinTypeAliasTrait.factory: KotlinTypeAliasFactory
 private val KotlinTypeAliasTrait.container: KotlinTypeAliasContainer
     get() = when (this) {
         is KotlinFileScope -> typeAliasContainer
-        is KotlinTypeScope -> typeAliasContainer
+        is AbstractKotlinTypeScope -> typeAliasContainer
+        is KotlinCompanionObjectTypeScope -> typeAliasContainer
     }

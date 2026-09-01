@@ -4,61 +4,28 @@ import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.interop.*
 import kotlin.reflect.KClass
 
-class KotlinTypeScope private constructor(
+sealed class AbstractKotlinBodyScope(
     override val config: Poetesse.Config,
-    private val className: XClassName,
-    private val builder: KPTypeBuilder,
+    protected val builder: KPTypeBuilder,
 ) : PoetesseKotlinScope,
     KotlinDocumentationTrait,
     KotlinAnnotationTrait,
-    KotlinModifierTrait.WithVisibility,
-    KotlinTypeVariableTrait,
-    KotlinConstructorTrait,
     KotlinPropertyTrait,
     KotlinFunctionTrait,
-    KotlinTypeTrait,
-    KotlinTypeAliasTrait {
+    KotlinTypeTrait {
 
-    internal typealias Block = KotlinTypeScope.(className: XClassName) -> Unit
+    protected abstract val classNameFactory: XClassName.Factory
 
-    internal val documentationContainer = KotlinDocumentationContainer(builder::addKdoc)
-    internal val annotationContainer = KotlinAnnotationContainer(builder::addAnnotation)
-    internal val modifierContainer = KotlinModifierContainer(builder::addModifiers)
-    internal val typeVariableContainer = KotlinTypeVariableContainer(builder::addTypeVariable)
-    internal val constructorContainer = KotlinConstructorContainer(builder) { constructor, isPrimary ->
-        if (isPrimary) builder.primaryConstructor(constructor)
-        else builder.addFunction(constructor)
-    }
-    internal val propertyContainer = KotlinPropertyContainer(builder::addProperty)
-    internal val functionContainer = KotlinFunctionContainer(builder::addFunction)
-    internal val typeContainer = KotlinTypeContainer(className::nested, builder::addType)
-    internal val typeAliasContainer = KotlinTypeAliasContainer(className::nested, builder::addTypeAlias)
-
-    fun expect() = modifier(KPModifier.EXPECT)
-    fun actual() = modifier(KPModifier.ACTUAL)
-    fun final() = modifier(KPModifier.FINAL)
-    fun open() = modifier(KPModifier.OPEN)
-    fun abstract() = modifier(KPModifier.ABSTRACT)
-    fun external() = modifier(KPModifier.EXTERNAL)
-    fun sealed() = modifier(KPModifier.SEALED)
-    fun inner() = modifier(KPModifier.INNER)
-
-    fun superclass(type: XTypeName, block: SuperclassConstructorScope.Block = {}) {
-        builder.superclass(type.interopToKotlin())
-        SuperclassConstructorScope().block()
-    }
-
-    fun superclass(type: KClass<*>, block: SuperclassConstructorScope.Block = {}) {
-        superclass(xType(type), block)
-    }
-
-    inline fun <reified T : Any> superclass(noinline block: SuperclassConstructorScope.Block = {}) {
-        superclass(T::class, block)
-    }
+    internal val documentationContainer by lazy { KotlinDocumentationContainer(builder::addKdoc) }
+    internal val annotationContainer by lazy { KotlinAnnotationContainer(builder::addAnnotation) }
+    internal val propertyContainer by lazy { KotlinPropertyContainer(builder::addProperty) }
+    internal val functionContainer by lazy { KotlinFunctionContainer(builder::addFunction) }
+    internal val typeContainer by lazy { KotlinTypeContainer(classNameFactory, builder::addType) }
 
     fun superinterface(type: XTypeName, by: KotlinCodeScope.Block? = null) {
-        val kp = type.interopToKotlin()
-        by?.let { builder.addSuperinterface(kp, KotlinCodeScope.of(by).codeBlock) } ?: builder.addSuperinterface(kp)
+        val kpTypeName = type.interopToKotlin()
+        val delegate = by?.let { KotlinCodeScope.of(it).codeBlock }
+        delegate?.let { builder.addSuperinterface(kpTypeName, it) } ?: builder.addSuperinterface(kpTypeName)
     }
 
     fun superinterface(type: KClass<*>, by: KotlinCodeScope.Block? = null) {
@@ -73,24 +40,97 @@ class KotlinTypeScope private constructor(
         builder.addInitializerBlock(KotlinCodeBlockScope.of().apply(block).build())
     }
 
-    fun companion_object(name: String = "Companion", block: Block = {}) {
-        object_(name) {
-            modifier(KPModifier.COMPANION)
-            block(className.nested(name))
-        }
+    internal fun build(): KPType = builder.build()
+}
+
+class KotlinAnonymousBodyScope private constructor(
+    config: Poetesse.Config,
+    packageName: String?,
+    builder: KPTypeBuilder,
+) : AbstractKotlinBodyScope(config, builder) {
+
+    internal typealias Block = KotlinAnonymousBodyScope.() -> Unit
+
+    override val classNameFactory: XClassName.Factory = { name -> xClass(packageName, name) }
+
+    fun superclass(type: XTypeName, block: KotlinSuperclassConstructorScope.Block = {}) {
+        builder.superclass(type.interopToKotlin())
+        KotlinSuperclassConstructorScope.of(builder).block()
     }
 
-    internal fun build() = builder.build()
+    fun superclass(type: KClass<*>, block: KotlinSuperclassConstructorScope.Block = {}) {
+        superclass(xType(type), block)
+    }
 
-    inner class SuperclassConstructorScope internal constructor() : KotlinArgumentTrait {
+    inline fun <reified T : Any> superclass(noinline block: KotlinSuperclassConstructorScope.Block = {}) {
+        superclass(T::class, block)
+    }
 
-        override val config: Poetesse.Config = this@KotlinTypeScope.config
+    internal companion object {
+        context(poetesse: PoetesseScope)
+        fun of(packageName: String?): KotlinAnonymousBodyScope =
+            KotlinAnonymousBodyScope(poetesse.config, packageName, KPType.anonymousClassBuilder())
+    }
+}
 
-        internal typealias Block = SuperclassConstructorScope.() -> Unit
+sealed class AbstractKotlinTypeScope(
+    config: Poetesse.Config,
+    protected val className: XClassName,
+    builder: KPTypeBuilder,
+) : AbstractKotlinBodyScope(config, builder),
+    KotlinModifierTrait.WithVisibility,
+    KotlinConstructorTrait,
+    KotlinTypeAliasTrait {
 
-        internal val argumentsContainer = KotlinArgumentContainer(
-            this@KotlinTypeScope.builder::addSuperclassConstructorParameter
-        )
+    override val classNameFactory = className::nested
+
+    internal val modifierContainer by lazy { KotlinModifierContainer(builder::addModifiers) }
+    internal val constructorContainer by lazy {
+        KotlinConstructorContainer(builder) { constructor, isPrimary ->
+            if (isPrimary) builder.primaryConstructor(constructor)
+            else builder.addFunction(constructor)
+        }
+    }
+    internal val typeAliasContainer by lazy { KotlinTypeAliasContainer(classNameFactory, builder::addTypeAlias) }
+
+    fun expect() = modifier(KPModifier.EXPECT)
+    fun actual() = modifier(KPModifier.ACTUAL)
+
+    fun companion_object(name: String? = null, block: KotlinCompanionObjectTypeScope.Block = {}) {
+        val className = className.nested(name ?: "Companion")
+        builder.addType(KotlinCompanionObjectTypeScope.of(name, className).apply { block(className) }.build())
+    }
+}
+
+class KotlinTypeScope private constructor(
+    config: Poetesse.Config,
+    className: XClassName,
+    builder: KPTypeBuilder,
+) : AbstractKotlinTypeScope(config, className, builder),
+    KotlinTypeVariableTrait {
+
+    internal typealias Block = KotlinTypeScope.(className: XClassName) -> Unit
+
+    internal val typeVariableContainer by lazy { KotlinTypeVariableContainer(builder::addTypeVariable) }
+
+    fun final() = modifier(KPModifier.FINAL)
+    fun open() = modifier(KPModifier.OPEN)
+    fun abstract() = modifier(KPModifier.ABSTRACT)
+    fun external() = modifier(KPModifier.EXTERNAL)
+    fun sealed() = modifier(KPModifier.SEALED)
+    fun inner() = modifier(KPModifier.INNER)
+
+    fun superclass(type: XTypeName, block: KotlinSuperclassConstructorScope.Block = {}) {
+        builder.superclass(type.interopToKotlin())
+        KotlinSuperclassConstructorScope.of(builder).block()
+    }
+
+    fun superclass(type: KClass<*>, block: KotlinSuperclassConstructorScope.Block = {}) {
+        superclass(xType(type), block)
+    }
+
+    inline fun <reified T : Any> superclass(noinline block: KotlinSuperclassConstructorScope.Block = {}) {
+        superclass(T::class, block)
     }
 
     internal companion object {
@@ -103,5 +143,76 @@ class KotlinTypeScope private constructor(
             }
             return KotlinTypeScope(poetesse.config, className, builder)
         }
+    }
+}
+
+class KotlinEnumTypeScope private constructor(
+    config: Poetesse.Config,
+    className: XClassName,
+    builder: KPTypeBuilder,
+) : AbstractKotlinTypeScope(config, className, builder) {
+
+    internal typealias Block = KotlinEnumTypeScope.(className: XClassName) -> Unit
+
+    fun constant(name: String, block: ConstantScope.Block = {}) {
+        builder.addEnumConstant(name, ConstantScope().apply(block).build())
+    }
+
+    inner class ConstantScope internal constructor(
+        override val config: Poetesse.Config = this@KotlinEnumTypeScope.config,
+        private val builder: KPTypeBuilder = KPType.anonymousClassBuilder()
+    ) : KotlinSuperclassConstructorScope(config, builder),
+        KotlinPropertyTrait,
+        KotlinFunctionTrait {
+
+        internal typealias Block = ConstantScope.() -> Unit
+
+        internal val propertyContainer by lazy { KotlinPropertyContainer(builder::addProperty) }
+        internal val functionContainer by lazy { KotlinFunctionContainer(builder::addFunction) }
+
+        internal fun build() = builder.build()
+    }
+
+    internal companion object {
+        context(poetesse: PoetesseScope)
+        fun of(name: String, className: XClassName): KotlinEnumTypeScope =
+            KotlinEnumTypeScope(poetesse.config, className, KPType.enumBuilder(name))
+    }
+}
+
+class KotlinCompanionObjectTypeScope private constructor(
+    config: Poetesse.Config,
+    private val className: XClassName,
+    builder: KPTypeBuilder,
+) : AbstractKotlinBodyScope(config, builder),
+    KotlinModifierTrait.WithVisibility,
+    KotlinTypeAliasTrait {
+
+    internal typealias Block = KotlinCompanionObjectTypeScope.(className: XClassName) -> Unit
+
+    override val classNameFactory = className::nested
+
+    internal val modifierContainer by lazy { KotlinModifierContainer(builder::addModifiers) }
+    internal val typeAliasContainer by lazy { KotlinTypeAliasContainer(classNameFactory, builder::addTypeAlias) }
+
+    fun external() = modifier(KPModifier.EXTERNAL)
+
+    fun superclass(type: XTypeName, block: KotlinSuperclassConstructorScope.Block = {}) {
+        builder.superclass(type.interopToKotlin())
+        KotlinSuperclassConstructorScope.of(builder).block()
+    }
+
+    fun superclass(type: KClass<*>, block: KotlinSuperclassConstructorScope.Block = {}) {
+        superclass(xType(type), block)
+    }
+
+    inline fun <reified T : Any> superclass(noinline block: KotlinSuperclassConstructorScope.Block = {}) {
+        superclass(T::class, block)
+    }
+
+    internal companion object {
+        context(poetesse: PoetesseScope)
+        fun of(name: String?, className: XClassName): KotlinCompanionObjectTypeScope =
+            KotlinCompanionObjectTypeScope(poetesse.config, className, KPType.companionObjectBuilder(name))
     }
 }

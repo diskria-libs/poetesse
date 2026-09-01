@@ -22,8 +22,8 @@ class JavaFileScope private constructor(
     private val extraImports: MutableSet<String> = mutableSetOf()
     private val types: MutableList<JPType> = mutableListOf()
 
-    private val classNameFactory: (String) -> XClassName = { name -> xClass(packageName, name) }
-    internal val typeContainer = JavaTypeContainer(classNameFactory) { types += it }
+    private val classNameFactory: XClassName.Factory = { name -> xClass(packageName, name) }
+    internal val typeContainer by lazy { JavaTypeContainer(classNameFactory) { types += it } }
 
     private val defaultImportPackageNames: MutableSet<String> = mutableSetOf()
 

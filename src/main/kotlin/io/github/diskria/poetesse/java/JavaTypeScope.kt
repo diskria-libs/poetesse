@@ -20,14 +20,14 @@ class JavaTypeScope private constructor(
 
     internal typealias Block = JavaTypeScope.(className: XClassName) -> Unit
 
-    internal val documentationContainer = JavaDocumentationContainer(builder::addJavadoc)
-    internal val annotationContainer = JavaAnnotationContainer(builder::addAnnotation)
-    internal val modifierContainer = JavaModifierContainer(builder::addModifiers)
-    internal val typeVariableContainer = JavaTypeVariableContainer(builder::addTypeVariable)
-    internal val fieldContainer = JavaFieldContainer(builder::addField)
-    internal val constructorContainer = JavaConstructorContainer(builder::addMethod)
-    internal val methodContainer = JavaMethodContainer(builder::addMethod)
-    internal val typeContainer = JavaTypeContainer(className::nested, builder::addType)
+    internal val documentationContainer by lazy { JavaDocumentationContainer(builder::addJavadoc) }
+    internal val annotationContainer by lazy { JavaAnnotationContainer(builder::addAnnotation) }
+    internal val modifierContainer by lazy { JavaModifierContainer(builder::addModifiers) }
+    internal val typeVariableContainer by lazy { JavaTypeVariableContainer(builder::addTypeVariable) }
+    internal val fieldContainer by lazy { JavaFieldContainer(builder::addField) }
+    internal val constructorContainer by lazy { JavaConstructorContainer(builder::addMethod) }
+    internal val methodContainer by lazy { JavaMethodContainer(builder::addMethod) }
+    internal val typeContainer by lazy { JavaTypeContainer(className::nested, builder::addType) }
 
     fun abstract() = modifier(JPModifier.ABSTRACT)
     fun static() = modifier(JPModifier.STATIC)

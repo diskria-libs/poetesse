@@ -21,7 +21,8 @@ internal class KotlinModifierContainer(val append: (modifier: KPModifier) -> Uni
 
 private val KotlinModifierTrait.container: KotlinModifierContainer
     get() = when (this) {
-        is KotlinTypeScope -> modifierContainer
+        is AbstractKotlinTypeScope -> modifierContainer
+        is KotlinCompanionObjectTypeScope -> modifierContainer
         is KotlinTypeAliasScope -> modifierContainer
         is KotlinPropertyScope -> modifierContainer
         is KotlinPropertyGetterScope -> modifierContainer

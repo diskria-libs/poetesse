@@ -4,7 +4,7 @@ import io.github.diskria.poetesse.interop.XClassName
 
 sealed interface KotlinTypeTrait : KotlinTypeFactory {
     operator fun KotlinTypeRef.unaryPlus(): XClassName {
-        val className = container.className(name)
+        val className = container.classNameFactory(name)
         container.append(build(className))
         return className
     }
@@ -19,7 +19,7 @@ fun KotlinTypeTrait.class_(name: String, block: KotlinTypeScope.Block = {}) =
 fun KotlinTypeTrait.value_class_(name: String, block: KotlinTypeScope.Block = {}) =
     +factory.value_class_(name, block)
 
-fun KotlinTypeTrait.enum_class_(name: String, block: KotlinTypeScope.Block = {}) =
+fun KotlinTypeTrait.enum_class_(name: String, block: KotlinEnumTypeScope.Block = {}) =
     +factory.enum_class_(name, block)
 
 fun KotlinTypeTrait.data_class_(name: String, block: KotlinTypeScope.Block = {}) =
@@ -41,7 +41,7 @@ fun KotlinTypeTrait.fun_interface_(name: String, block: KotlinTypeScope.Block = 
     +factory.fun_interface_(name, block)
 
 internal class KotlinTypeContainer(
-    val className: (name: String) -> XClassName,
+    val classNameFactory: XClassName.Factory,
     val append: (type: KPType) -> Unit,
 )
 
@@ -52,5 +52,5 @@ internal val KotlinTypeTrait.factory: KotlinTypeFactory
 private val KotlinTypeTrait.container: KotlinTypeContainer
     get() = when (this) {
         is KotlinFileScope -> typeContainer
-        is KotlinTypeScope -> typeContainer
+        is AbstractKotlinBodyScope -> typeContainer
     }
