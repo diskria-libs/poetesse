@@ -160,7 +160,7 @@ class KotlinEnumTypeScope private constructor(
 
     inner class ConstantScope internal constructor(
         override val config: Poetesse.Config = this@KotlinEnumTypeScope.config,
-        private val builder: KPTypeBuilder = KPType.anonymousClassBuilder()
+        private val builder: KPTypeBuilder = KPType.anonymousClassBuilder(),
     ) : KotlinSuperclassConstructorScope(config, builder),
         KotlinPropertyTrait,
         KotlinFunctionTrait {

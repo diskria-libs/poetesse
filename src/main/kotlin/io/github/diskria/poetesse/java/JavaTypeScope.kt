@@ -1,6 +1,5 @@
 package io.github.diskria.poetesse.java
 
-import com.palantir.javapoet.TypeSpec
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.interop.*
 import kotlin.reflect.KClass
@@ -66,19 +65,18 @@ class JavaAnonymousBodyScope private constructor(
         superclass(T::class, block)
     }
 
-    override fun build(): JPType {
-        val source = builder.build()
-        return TypeSpec.anonymousClassBuilder(superclassArguments).apply {
-            addJavadoc(source.javadoc())
-            addAnnotations(source.annotations())
-            addFields(source.fieldSpecs())
-            addMethods(source.methodSpecs())
-            addTypes(source.typeSpecs())
-            source.superclass()?.let { superclass(it) }
-            source.superinterfaces().forEach { addSuperinterface(it) }
-            source.initializerBlock().takeIf { !it.isEmpty }?.let { addInitializerBlock(it) }
+    override fun build(): JPType =
+        JPType.anonymousClassBuilder(superclassArguments).apply {
+            val spec = builder.build()
+            addJavadoc(spec.javadoc())
+            addAnnotations(spec.annotations())
+            addFields(spec.fieldSpecs())
+            addMethods(spec.methodSpecs())
+            addTypes(spec.typeSpecs())
+            spec.superclass()?.let { superclass(it) }
+            spec.superinterfaces().forEach { addSuperinterface(it) }
+            spec.initializerBlock().takeIf { !it.isEmpty }?.let { addInitializerBlock(it) }
         }.build()
-    }
 
     internal companion object {
         context(poetesse: PoetesseScope)
@@ -172,20 +170,22 @@ class JavaEnumTypeScope private constructor(
 
     inner class ConstantScope internal constructor(
         override val config: Poetesse.Config = this@JavaEnumTypeScope.config,
+        private val builder: JPTypeBuilder = JPType.anonymousClassBuilder(""),
     ) : JavaSuperclassConstructorScope(config),
         JavaFieldTrait,
         JavaMethodTrait {
 
         internal typealias Block = ConstantScope.() -> Unit
 
-        private val fields: MutableList<JPField> = mutableListOf()
-        private val methods: MutableList<JPMethod> = mutableListOf()
+        internal val fieldContainer by lazy { JavaFieldContainer(builder::addField) }
+        internal val methodContainer by lazy { JavaMethodContainer(builder::addMethod) }
 
-        internal val fieldContainer by lazy { JavaFieldContainer { fields += it } }
-        internal val methodContainer by lazy { JavaMethodContainer { methods += it } }
-
-        internal fun build() =
-            JPType.anonymousClassBuilder(joinArguments()).addFields(fields).addMethods(methods).build()
+        internal fun build(): JPType =
+            JPType.anonymousClassBuilder(joinArguments()).apply {
+                val spec = builder.build()
+                addFields(spec.fieldSpecs())
+                addMethods(spec.methodSpecs())
+            }.build()
     }
 
     internal companion object {
