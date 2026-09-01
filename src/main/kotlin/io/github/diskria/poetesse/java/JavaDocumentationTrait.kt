@@ -10,7 +10,7 @@ internal class JavaDocumentationContainer(val append: (codeBlock: JPCodeBlock) -
 
 private val JavaDocumentationTrait.container: JavaDocumentationContainer
     get() = when (this) {
-        is JavaTypeScope -> documentationContainer
+        is AbstractJavaBodyScope -> documentationContainer
         is JavaFieldScope -> documentationContainer
         is JavaConstructorScope -> documentationContainer
         is JavaMethodScope -> documentationContainer

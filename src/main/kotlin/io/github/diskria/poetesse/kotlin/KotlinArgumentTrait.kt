@@ -7,11 +7,7 @@ sealed interface KotlinArgumentTrait : PoetesseKotlinScope {
     }
 
     fun argument(name: String, nameAsComment: Boolean, value: KotlinCodeRef) {
-        val prefix = if (name.isNotEmpty()) {
-            if (nameAsComment) "/* $name = */ " else "$name = "
-        } else {
-            ""
-        }
+        val prefix = name.ifEmpty { null }?.let { if (nameAsComment) "/* $it = */ " else "$it = " }.orEmpty()
         argument(KotlinCodeScope.of { prefix + L(value) }.codeBlock)
     }
 
@@ -40,5 +36,5 @@ internal class KotlinArgumentContainer(val append: (codeBlock: KPCodeBlock) -> U
 
 private val KotlinArgumentTrait.container: KotlinArgumentContainer
     get() = when (this) {
-        is KotlinSuperclassConstructorScope -> argumentsContainer
+        is KotlinSuperclassConstructorScope -> argumentContainer
     }

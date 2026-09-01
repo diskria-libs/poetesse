@@ -17,5 +17,5 @@ internal val JavaConstructorTrait.factory: JavaConstructorFactory
 
 private val JavaConstructorTrait.container: JavaConstructorContainer
     get() = when (this) {
-        is JavaTypeScope -> constructorContainer
+        is AbstractJavaTypeScope -> constructorContainer
     }

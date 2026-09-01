@@ -14,8 +14,8 @@ fun JavaTypeFactory.record_(name: String, block: JavaTypeScope.Block = {}) =
 fun JavaTypeFactory.interface_(name: String, block: JavaTypeScope.Block = {}) =
     type(JPTypeKind.INTERFACE, name, block)
 
-fun JavaTypeFactory.enum_(name: String, block: JavaTypeScope.Block = {}) =
-    type(JPTypeKind.ENUM, name, block)
+fun JavaTypeFactory.enum_(name: String, block: JavaEnumTypeScope.Block = {}) =
+    JavaTypeRef(name) { className -> JavaEnumTypeScope.of(name, className).apply { block(className) }.build() }
 
 fun JavaTypeFactory.annotation_(name: String, block: JavaTypeScope.Block = {}) =
     type(JPTypeKind.ANNOTATION, name, block)

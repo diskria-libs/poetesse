@@ -23,5 +23,6 @@ internal val JavaMethodTrait.factory: JavaMethodFactory
 
 private val JavaMethodTrait.container: JavaMethodContainer
     get() = when (this) {
-        is JavaTypeScope -> methodContainer
+        is AbstractJavaBodyScope -> methodContainer
+        is JavaEnumTypeScope.ConstantScope -> methodContainer
     }

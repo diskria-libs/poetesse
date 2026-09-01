@@ -45,5 +45,6 @@ internal val JavaFieldTrait.factory: JavaFieldFactory
 
 private val JavaFieldTrait.container: JavaFieldContainer
     get() = when (this) {
-        is JavaTypeScope -> fieldContainer
+        is AbstractJavaBodyScope -> fieldContainer
+        is JavaEnumTypeScope.ConstantScope -> fieldContainer
     }

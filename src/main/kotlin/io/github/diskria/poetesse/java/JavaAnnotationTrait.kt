@@ -26,7 +26,7 @@ internal val JavaAnnotationTrait.factory: JavaAnnotationFactory
 
 private val JavaAnnotationTrait.container: JavaAnnotationContainer
     get() = when (this) {
-        is JavaTypeScope -> annotationContainer
+        is AbstractJavaBodyScope -> annotationContainer
         is JavaFieldScope -> annotationContainer
         is JavaConstructorScope -> annotationContainer
         is JavaMethodScope -> annotationContainer

@@ -10,7 +10,7 @@ open class KotlinSuperclassConstructorScope internal constructor(
 
     internal typealias Block = KotlinSuperclassConstructorScope.() -> Unit
 
-    internal val argumentsContainer by lazy { KotlinArgumentContainer(builder::addSuperclassConstructorParameter) }
+    internal val argumentContainer by lazy { KotlinArgumentContainer(builder::addSuperclassConstructorParameter) }
 
     internal companion object {
         context(poetesse: PoetesseScope)

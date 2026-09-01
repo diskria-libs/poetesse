@@ -36,11 +36,11 @@ sealed class AbstractKotlinBodyScope(
         superinterface(T::class, by)
     }
 
-    fun initializerBlock(block: KotlinCodeBlockScope.Block = {}) {
+    fun init(block: KotlinCodeBlockScope.Block = {}) {
         builder.addInitializerBlock(KotlinCodeBlockScope.of().apply(block).build())
     }
 
-    internal fun build(): KPType = builder.build()
+    internal fun build() = builder.build()
 }
 
 class KotlinAnonymousBodyScope private constructor(

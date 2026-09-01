@@ -22,7 +22,7 @@ fun JavaTypeTrait.record_(name: String, block: JavaTypeScope.Block = {}) =
 fun JavaTypeTrait.interface_(name: String, block: JavaTypeScope.Block = {}) =
     +factory.interface_(name, block)
 
-fun JavaTypeTrait.enum_(name: String, block: JavaTypeScope.Block = {}) =
+fun JavaTypeTrait.enum_(name: String, block: JavaEnumTypeScope.Block = {}) =
     +factory.enum_(name, block)
 
 fun JavaTypeTrait.annotation_(name: String, block: JavaTypeScope.Block = {}) =
@@ -40,5 +40,5 @@ internal val JavaTypeTrait.factory: JavaTypeFactory
 private val JavaTypeTrait.container: JavaTypeContainer
     get() = when (this) {
         is JavaFileScope -> typeContainer
-        is JavaTypeScope -> typeContainer
+        is AbstractJavaBodyScope -> typeContainer
     }

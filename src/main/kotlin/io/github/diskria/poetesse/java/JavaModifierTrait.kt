@@ -21,7 +21,7 @@ internal class JavaModifierContainer(val append: (modifier: JPModifier) -> Unit)
 
 private val JavaModifierTrait.container: JavaModifierContainer
     get() = when (this) {
-        is JavaTypeScope -> modifierContainer
+        is AbstractJavaTypeScope -> modifierContainer
         is JavaFieldScope -> modifierContainer
         is JavaConstructorScope -> modifierContainer
         is JavaMethodScope -> modifierContainer

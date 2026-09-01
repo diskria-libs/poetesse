@@ -15,7 +15,7 @@ class KotlinCodeBlockScope private constructor(
 
     internal val codeBlockContainer by lazy { KotlinCodeBlockContainer(builder::applyCodeBlockMutation) }
 
-    internal fun build(): KPCodeBlock = builder.build()
+    internal fun build() = builder.build()
 
     internal companion object {
         context(poetesse: PoetesseScope)
