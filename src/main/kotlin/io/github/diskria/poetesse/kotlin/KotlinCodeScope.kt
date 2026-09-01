@@ -16,8 +16,6 @@ class KotlinCodeScope private constructor(
 
     internal typealias Block = KotlinCodeScope.() -> String
 
-    val expression: ExpressionScope by lazy { ExpressionScope() }
-
     fun argument(mask: Char, argument: Any?): String {
         arguments += argument
         return "%$mask"
@@ -40,26 +38,6 @@ class KotlinCodeScope private constructor(
     fun L(codeBlock: KPCodeBlock) = argument('L', codeBlock)
     fun L(code: KotlinCodeRef) = L(code.codeBlock)
     fun L(block: Block) = L(code(block))
-
-    inner class ExpressionScope {
-        fun classLiteral(type: XTypeName): String =
-            "${T(type)}::class"
-
-        fun classLiteral(type: KClass<*>): String =
-            classLiteral(xType(type))
-
-        inline fun <reified T> classLiteral(): String =
-            classLiteral(T::class)
-
-        inline fun <reified E : Enum<E>> enumEntry(value: E): String =
-            "${T<E>()}.${L(value.name)}"
-
-        inline fun <reified E> arrayOf(values: Iterable<E>, crossinline transform: (E) -> String): String =
-            values.joinToString(prefix = "[", postfix = "]") { transform(it) }
-
-        fun concat(vararg elements: String): String =
-            elements.joinToString(separator = " + ")
-    }
 
     internal fun build() = KPCodeBlock.of(block(), *arguments.toTypedArray())
 

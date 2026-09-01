@@ -19,7 +19,7 @@ class KotlinAnnotationScope<A : Annotation> private constructor(
     fun member(name: String? = null, value: KPCodeBlock) {
         builder.addMember(KotlinCodeScope.of {
             buildString {
-                name?.let { append("$it = ") }
+                name?.ifEmpty { null }?.let { append("$it = ") }
                 append(L(value))
             }
         }.codeBlock)
@@ -41,7 +41,7 @@ class KotlinAnnotationScope<A : Annotation> private constructor(
     @JvmName("stringArrayArgument")
     fun argument(property: ArrayArgumentProperty<A, String>, values: Iterable<String>) {
         argument(property.name) {
-            expression.arrayOf(values) { S(it) }
+            this@KotlinAnnotationScope.arrayOf(values) { S(it) }
         }
     }
 
@@ -58,7 +58,7 @@ class KotlinAnnotationScope<A : Annotation> private constructor(
     @JvmName("booleanArrayArgument")
     fun argument(property: ArgumentProperty<A, BooleanArray>, values: Iterable<Boolean>) {
         argument(property.name) {
-            expression.arrayOf(values) { L(it) }
+            this@KotlinAnnotationScope.arrayOf(values) { L(it) }
         }
     }
 
@@ -75,7 +75,7 @@ class KotlinAnnotationScope<A : Annotation> private constructor(
     @JvmName("intArrayArgument")
     fun argument(property: ArgumentProperty<A, IntArray>, values: Iterable<Int>) {
         argument(property.name) {
-            expression.arrayOf(values) { L(it) }
+            this@KotlinAnnotationScope.arrayOf(values) { L(it) }
         }
     }
 
@@ -86,13 +86,13 @@ class KotlinAnnotationScope<A : Annotation> private constructor(
 
     @JvmName("classArgument")
     fun argument(property: ArgumentProperty<A, KClass<*>>, value: KClass<*>) {
-        argument(property.name) { expression.classLiteral(value) }
+        argument(property.name) { "${T(value)}::class" }
     }
 
     @JvmName("classArrayArgument")
     fun argument(property: ArrayArgumentProperty<A, KClass<*>>, values: Iterable<KClass<*>>) {
         argument(property.name) {
-            expression.arrayOf(values) { expression.classLiteral(it) }
+            this@KotlinAnnotationScope.arrayOf(values) { "${T(it)}::class" }
         }
     }
 
@@ -103,13 +103,13 @@ class KotlinAnnotationScope<A : Annotation> private constructor(
 
     @JvmName("xTypeArgument")
     fun argument(property: ArgumentProperty<A, KClass<*>>, value: XTypeName) {
-        argument(property.name) { expression.classLiteral(value) }
+        argument(property.name) { "${T(value)}::class" }
     }
 
     @JvmName("xTypeArrayArgument")
     fun argument(property: ArrayArgumentProperty<A, KClass<*>>, values: Iterable<XTypeName>) {
         argument(property.name) {
-            expression.arrayOf(values) { expression.classLiteral(it) }
+            this@KotlinAnnotationScope.arrayOf(values) { "${T(it)}::class" }
         }
     }
 
@@ -120,13 +120,13 @@ class KotlinAnnotationScope<A : Annotation> private constructor(
 
     @JvmName("enumArgument")
     inline fun <reified E : Enum<E>> argument(property: ArgumentProperty<A, E>, value: E) {
-        argument(property.name) { expression.enumEntry(value) }
+        argument(property.name) { "${T<E>()}.${L(value.name)}" }
     }
 
     @JvmName("enumArrayArgument")
     inline fun <reified E : Enum<E>> argument(property: ArrayArgumentProperty<A, E>, values: Iterable<E>) {
         argument(property.name) {
-            expression.arrayOf(values) { expression.enumEntry(it) }
+            this@KotlinAnnotationScope.arrayOf(values) { "${T<E>()}.${L(it.name)}" }
         }
     }
 
@@ -159,7 +159,7 @@ class KotlinAnnotationScope<A : Annotation> private constructor(
         values: Iterable<KotlinTypedAnnotationRef<Nested>>
     ) {
         argument(property.name) {
-            expression.arrayOf(values) { L(it) }
+            this@KotlinAnnotationScope.arrayOf(values) { L(it) }
         }
     }
 
@@ -170,6 +170,10 @@ class KotlinAnnotationScope<A : Annotation> private constructor(
     ) {
         argument(property, values.asIterable())
     }
+
+    @PublishedApi
+    internal inline fun <reified E> arrayOf(values: Iterable<E>, crossinline transform: (E) -> String): String =
+        values.joinToString(prefix = "[", postfix = "]") { transform(it) }
 
     @PublishedApi
     internal fun build() = builder.build()

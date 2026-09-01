@@ -44,7 +44,8 @@ sealed class AbstractJavaBodyScope(
 class JavaAnonymousBodyScope private constructor(
     config: Poetesse.Config,
     packageName: String?,
-) : AbstractJavaBodyScope(config, JPType.anonymousClassBuilder("")) {
+) : AbstractJavaBodyScope(config, JPType.anonymousClassBuilder("")),
+    PoetesseJavaScope {
 
     internal typealias Block = JavaAnonymousBodyScope.() -> Unit
 
@@ -90,6 +91,7 @@ sealed class AbstractJavaTypeScope(
     protected val className: XClassName,
     builder: JPTypeBuilder,
 ) : AbstractJavaBodyScope(config, builder),
+    PoetesseJavaScope,
     JavaModifierTrait.WithVisibility,
     JavaConstructorTrait {
 
@@ -108,6 +110,7 @@ class JavaTypeScope private constructor(
     className: XClassName,
     builder: JPTypeBuilder,
 ) : AbstractJavaTypeScope(config, className, builder),
+    PoetesseJavaScope,
     JavaModifierTrait.WithVisibility,
     JavaTypeVariableTrait {
 
@@ -160,7 +163,8 @@ class JavaEnumTypeScope private constructor(
     config: Poetesse.Config,
     className: XClassName,
     builder: JPTypeBuilder,
-) : AbstractJavaTypeScope(config, className, builder) {
+) : AbstractJavaTypeScope(config, className, builder),
+    PoetesseJavaScope {
 
     internal typealias Block = JavaEnumTypeScope.(className: XClassName) -> Unit
 

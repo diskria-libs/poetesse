@@ -47,7 +47,8 @@ class KotlinAnonymousBodyScope private constructor(
     config: Poetesse.Config,
     packageName: String?,
     builder: KPTypeBuilder,
-) : AbstractKotlinBodyScope(config, builder) {
+) : AbstractKotlinBodyScope(config, builder),
+    PoetesseKotlinScope {
 
     internal typealias Block = KotlinAnonymousBodyScope.() -> Unit
 
@@ -78,6 +79,7 @@ sealed class AbstractKotlinTypeScope(
     protected val className: XClassName,
     builder: KPTypeBuilder,
 ) : AbstractKotlinBodyScope(config, builder),
+    PoetesseKotlinScope,
     KotlinModifierTrait.WithVisibility,
     KotlinConstructorTrait,
     KotlinTypeAliasTrait {
@@ -107,6 +109,7 @@ class KotlinTypeScope private constructor(
     className: XClassName,
     builder: KPTypeBuilder,
 ) : AbstractKotlinTypeScope(config, className, builder),
+    PoetesseKotlinScope,
     KotlinTypeVariableTrait {
 
     internal typealias Block = KotlinTypeScope.(className: XClassName) -> Unit
@@ -150,7 +153,8 @@ class KotlinEnumTypeScope private constructor(
     config: Poetesse.Config,
     className: XClassName,
     builder: KPTypeBuilder,
-) : AbstractKotlinTypeScope(config, className, builder) {
+) : AbstractKotlinTypeScope(config, className, builder),
+    PoetesseKotlinScope {
 
     internal typealias Block = KotlinEnumTypeScope.(className: XClassName) -> Unit
 
@@ -185,6 +189,7 @@ class KotlinCompanionObjectTypeScope private constructor(
     private val className: XClassName,
     builder: KPTypeBuilder,
 ) : AbstractKotlinBodyScope(config, builder),
+    PoetesseKotlinScope,
     KotlinModifierTrait.WithVisibility,
     KotlinTypeAliasTrait {
 
