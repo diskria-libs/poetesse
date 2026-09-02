@@ -1,6 +1,7 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
+import io.github.diskria.poetesse.extensions.toCodeString
 import io.github.diskria.poetesse.interop.PoetesseScope
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.interopToJava
@@ -36,12 +37,16 @@ class JavaCodeScope private constructor(
     fun S(value: String) = argument('S', value)
 
     fun L(value: Boolean) = argument('L', value)
+    fun L(value: Byte) = L(value.toCodeString())
+    fun L(value: Short) = argument('L', value)
     fun L(value: Int) = argument('L', value)
+    fun L(value: Long) = L("${value}L")
+    fun L(value: Char) = L(value.toCodeString())
+    fun L(value: Float) = L("${value}f")
+    fun L(value: Double) = argument('L', value)
     fun L(value: String) = argument('L', value)
-
     fun L(value: JPAnnotation) = argument('L', value)
     fun L(value: JavaAnnotationRef) = L(value.spec)
-
     fun L(codeBlock: JPCodeBlock) = argument('L', codeBlock)
     fun L(code: JavaCodeRef) = L(code.codeBlock)
     fun L(block: Block) = L(code(block))

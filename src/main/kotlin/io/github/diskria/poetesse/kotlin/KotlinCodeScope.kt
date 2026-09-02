@@ -1,6 +1,7 @@
 package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
+import io.github.diskria.poetesse.extensions.toCodeString
 import io.github.diskria.poetesse.interop.PoetesseScope
 import io.github.diskria.poetesse.interop.XTypeName
 import io.github.diskria.poetesse.interop.interopToKotlin
@@ -29,9 +30,14 @@ class KotlinCodeScope private constructor(
     fun S(value: String) = argument('S', value)
 
     fun L(value: Boolean) = argument('L', value)
+    fun L(value: Byte) = L(value.toCodeString())
+    fun L(value: Short) = argument('L', value)
     fun L(value: Int) = argument('L', value)
+    fun L(value: Long) = L("${value}L")
+    fun L(value: Char) = L(value.toCodeString())
+    fun L(value: Float) = L("${value}f")
+    fun L(value: Double) = argument('L', value)
     fun L(value: String) = argument('L', value)
-
     fun L(value: KPAnnotation) = argument('L', value)
     fun L(value: KotlinAnnotationRef) = L(value.spec)
 
