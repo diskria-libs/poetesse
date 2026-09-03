@@ -1,6 +1,7 @@
 package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
+import io.github.diskria.poetesse.extensions.appendCodeString
 import io.github.diskria.poetesse.extensions.toCodeString
 import io.github.diskria.poetesse.interop.PoetesseScope
 import io.github.diskria.poetesse.interop.XTypeName
@@ -27,7 +28,13 @@ class KotlinCodeScope private constructor(
     inline fun <reified T> T(nullable: Boolean = true) = T(T::class, nullable)
     inline fun <reified T : Any> T() = T<T>(nullable = false)
 
-    fun S(value: String) = argument('S', value)
+    fun S(value: String, dollars: Int = 1, raw: Boolean = false): String {
+        val explicitDollars = if (dollars > 1) dollars else 0
+        val quotes = if (raw) 3 else 1
+        return L(buildString(explicitDollars + quotes * 2 + value.length + 30) {
+            appendCodeString(value, dollars = dollars, raw = raw)
+        })
+    }
 
     fun L(value: Boolean) = argument('L', value)
     fun L(value: Byte) = L(value.toCodeString())
