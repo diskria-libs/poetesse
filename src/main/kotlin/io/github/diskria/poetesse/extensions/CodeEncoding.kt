@@ -33,7 +33,7 @@ fun Char.toCodeString(isJava: Boolean = false): String = buildString(8) {
 }
 
 context(poetesse: PoetesseScope)
-fun StringBuilder.appendCodeString(value: String, dollars: Int = 1, raw: Boolean = false, isJava: Boolean = false) {
+fun StringBuilder.appendCodeString(value: String, dollars: Int = 0, raw: Boolean = false, isJava: Boolean = false) {
     val explicitDollars = if (dollars > 1) dollars else 0
     val quotes = if (raw) 3 else 1
     repeat(explicitDollars) { append('$') }
@@ -41,7 +41,7 @@ fun StringBuilder.appendCodeString(value: String, dollars: Int = 1, raw: Boolean
     var index = 0
     while (index < value.length) {
         val char = value[index]
-        if (dollars > 0 && char == '$') {
+        if (!isJava && char == '$') {
             val startDollarIndex = index
             index = appendWhile(value, index) { it == '$' }
             val dollarCount = index - startDollarIndex
@@ -78,12 +78,34 @@ private inline fun StringBuilder.appendWhile(value: String, startIndex: Int, pre
 private fun StringBuilder.appendExpression(value: String, startIndex: Int): Int {
     var index = startIndex
     var depth = 0
+    var inString = false
+    var inChar = false
+    var isEscape = false
     while (index < value.length) {
         val char = value[index++]
         append(char)
-        when (char) {
-            '{' -> depth++
-            '}' -> if (--depth == 0) break
+        if (isEscape) {
+            isEscape = false
+            continue
+        }
+        if (!inChar && char == '"') {
+            inString = !inString
+            continue
+        }
+        if (!inString && char == '\'') {
+            inChar = !inChar
+            continue
+        }
+        if (inString || inChar) {
+            if (char == '\\') {
+                isEscape = true
+                continue
+            }
+        } else {
+            when (char) {
+                '{' -> depth++
+                '}' -> if (--depth == 0) break
+            }
         }
     }
     return index

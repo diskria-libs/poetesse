@@ -37,7 +37,7 @@ class JavaCodeScope private constructor(
 
     fun S(value: String): String =
         L(buildString(value.length + 32) {
-            appendCodeString(value, dollars = 0, raw = false, isJava = true)
+            appendCodeString(value, isJava = true)
         })
 
     fun L(value: Boolean) = argument('L', value)

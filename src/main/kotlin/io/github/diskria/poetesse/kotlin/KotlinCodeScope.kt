@@ -47,7 +47,6 @@ class KotlinCodeScope private constructor(
     fun L(value: String) = argument('L', value)
     fun L(value: KPAnnotation) = argument('L', value)
     fun L(value: KotlinAnnotationRef) = L(value.spec)
-
     fun L(codeBlock: KPCodeBlock) = argument('L', codeBlock)
     fun L(code: KotlinCodeRef) = L(code.codeBlock)
     fun L(block: Block) = L(code(block))
