@@ -15,12 +15,12 @@ fun StringBuilder.appendEscapedChar(char: Char, quoteToEscape: Char?, isJava: Bo
         '\b' -> append("""\b""")
         '\t' -> append("""\t""")
         '\n' -> append("""\n""")
-        12.toChar() if isJava -> append("""\f""")
+        '' if isJava -> append("""\f""")
         '\r' -> append("""\r""")
         '\\' -> append("""\\""")
         quoteToEscape -> append("""\$quoteToEscape""")
         else -> {
-            if (char.isISOControl()) append(String.format("\\u%04x", char.code))
+            if (char.isISOControl()) append("\\u${char.code.toUInt().toString(16).padStart(4, '0')}")
             else append(char)
         }
     }
