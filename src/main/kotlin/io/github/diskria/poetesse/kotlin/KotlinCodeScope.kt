@@ -30,8 +30,10 @@ class KotlinCodeScope private constructor(
     inline fun <reified T> T(nullable: Boolean = true) = T(T::class, nullable)
     inline fun <reified T : Any> T() = T<T>(nullable = false)
 
-    fun S(value: String, dollars: Int = 1, raw: Boolean = false, trimBy: String? = "|") =
-        L(buildStringLiteral(value, dollars, raw, trimBy))
+    fun S(value: String, dollars: Int = 1, block: StringScope.() -> Unit = {}): String {
+        val scope = StringScope().apply(block)
+        return L(buildStringLiteral(value, dollars, scope.isRaw, scope.multilineTrim))
+    }
 
     fun L(value: Boolean) = argument('L', value)
     fun L(value: Byte) = L(value.toCodeString())
@@ -50,7 +52,12 @@ class KotlinCodeScope private constructor(
 
     internal fun build() = KPCodeBlock.of(block(), *arguments.toTypedArray())
 
-    private fun buildStringLiteral(value: String, dollars: Int, raw: Boolean, trimBy: String?): String {
+    private fun buildStringLiteral(
+        value: String,
+        dollars: Int,
+        raw: Boolean,
+        multilineTrim: Poetesse.StringTrim,
+    ): String {
         val prefixDollars = if (dollars > 1) dollars else 0
         val quotes = if (raw) 3 else 1
         return buildString(prefixDollars + quotes + value.length + 30 + quotes) {
@@ -67,7 +74,7 @@ class KotlinCodeScope private constructor(
                         continue
                     }
                     if (char == '\n') {
-                        val lineBreak = "\n${trimBy.orEmpty()}"
+                        val lineBreak = "\n${(multilineTrim as? Poetesse.StringTrim.Margin)?.prefix.orEmpty()}"
                         append(lineBreak)
                         if (!multiline) {
                             insert(stringStart, lineBreak)
@@ -108,14 +115,33 @@ class KotlinCodeScope private constructor(
             }
             if (raw && multiline && !value.endsWith('\n')) append('\n')
             repeat(quotes) { append('"') }
-            if (raw && multiline && trimBy != null) {
-                if (trimBy.isEmpty()) {
-                    append(".trimIndent()")
-                } else {
-                    append(".trimMargin(${trimBy.takeIf { it != "|" }?.doubleQuoted().orEmpty()})")
+            if (raw && multiline && multilineTrim != Poetesse.StringTrim.None) {
+                when (multilineTrim) {
+                    Poetesse.StringTrim.Indent -> append(".trimIndent()")
+                    is Poetesse.StringTrim.Margin -> {
+                        append(".trimMargin(${multilineTrim.prefix.takeIf { it != "|" }?.doubleQuoted().orEmpty()})")
+                    }
                 }
             }
         }
+    }
+
+    inner class StringScope internal constructor(
+        override val config: Poetesse.Config = this@KotlinCodeScope.config,
+    ) : PoetesseKotlinScope {
+
+        internal var isRaw: Boolean = false
+        internal var multilineTrim: Poetesse.StringTrim = config.defaultRawMultilineTrim
+
+        fun raw(multilineTrim: Poetesse.StringTrim = config.defaultRawMultilineTrim, enabled: Boolean = true) {
+            isRaw = enabled
+            this.multilineTrim = multilineTrim
+        }
+
+        fun trimMargin() = Poetesse.StringTrim.Default
+        fun trimMargin(prefix: String) = Poetesse.StringTrim.Margin(prefix)
+        fun trimIndent() = Poetesse.StringTrim.Indent
+        fun noTrim() = Poetesse.StringTrim.None
     }
 
     internal companion object {

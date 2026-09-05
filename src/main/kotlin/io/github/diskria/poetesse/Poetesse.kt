@@ -22,12 +22,12 @@ class Poetesse private constructor(
         val comment: String? = null,
         val skipLangDefaultImports: Boolean = true,
         val javaNullabilityResolver: JavaNullabilityResolver = JavaNullabilityResolver.Default,
+        val defaultRawMultilineTrim: StringTrim = StringTrim.Default,
     )
 
     interface JavaNullabilityResolver {
 
         fun isNullable(typeName: JPTypeName): Boolean
-
         fun setNullable(typeName: JPTypeName, nullable: Boolean): JPTypeName
 
         companion object {
@@ -46,13 +46,33 @@ class Poetesse private constructor(
         }
     }
 
+    sealed interface StringTrim {
+
+        class Margin(val prefix: String) : StringTrim
+        object Indent : StringTrim
+        object None : StringTrim
+
+        companion object {
+            val Default: StringTrim = Margin("|")
+        }
+    }
+
     class Builder {
         var indent: String = Default.config.indent
         var commentHeader: String? = Default.config.comment
         var skipLangDefaultImports: Boolean = Default.config.skipLangDefaultImports
         var javaNullabilityResolver: JavaNullabilityResolver = Default.config.javaNullabilityResolver
+        var defaultRawMultilineTrim: StringTrim = Default.config.defaultRawMultilineTrim
 
-        internal fun build() = Poetesse(Config(indent, commentHeader, skipLangDefaultImports, javaNullabilityResolver))
+        internal fun build() = Poetesse(
+            Config(
+                indent,
+                commentHeader,
+                skipLangDefaultImports,
+                javaNullabilityResolver,
+                defaultRawMultilineTrim,
+            )
+        )
 
         internal typealias Block = Builder.() -> Unit
     }
