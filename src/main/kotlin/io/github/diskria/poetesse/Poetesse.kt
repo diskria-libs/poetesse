@@ -1,6 +1,7 @@
 package io.github.diskria.poetesse
 
 import io.github.diskria.poetesse.extensions.asJPClassName
+import io.github.diskria.poetesse.extensions.doubleQuoted
 import io.github.diskria.poetesse.interop.XTypeVariableFactory
 import io.github.diskria.poetesse.java.JPAnnotation
 import io.github.diskria.poetesse.java.JPClassName
@@ -48,12 +49,30 @@ class Poetesse private constructor(
 
     sealed interface StringTrim {
 
-        class Margin(val prefix: String) : StringTrim
-        object Indent : StringTrim
+        val linePrefix: String get() = ""
+        val postProcess: String get() = ""
+
+        class Margin(override val linePrefix: String) : StringTrim {
+            override val postProcess: String
+                get() {
+                    val argument = linePrefix.takeIf { it != Default.linePrefix }?.doubleQuoted().orEmpty()
+                    return ".trimMargin($argument)"
+                }
+        }
+
+        object Indent : StringTrim {
+            override val postProcess: String get() = ".trimIndent()"
+        }
+
         object None : StringTrim
 
+        class Custom(
+            override val linePrefix: String,
+            override val postProcess: String,
+        ) : StringTrim
+
         companion object {
-            val Default: StringTrim = Margin("|")
+            val Default: Margin = Margin("|")
         }
     }
 

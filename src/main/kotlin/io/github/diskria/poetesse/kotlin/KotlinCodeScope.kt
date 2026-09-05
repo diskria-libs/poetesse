@@ -2,7 +2,6 @@ package io.github.diskria.poetesse.kotlin
 
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.extensions.appendEscapedChar
-import io.github.diskria.poetesse.extensions.doubleQuoted
 import io.github.diskria.poetesse.extensions.toCodeString
 import io.github.diskria.poetesse.extensions.unicodeEscaped
 import io.github.diskria.poetesse.interop.PoetesseScope
@@ -74,7 +73,7 @@ class KotlinCodeScope private constructor(
                         continue
                     }
                     if (char == '\n') {
-                        val lineBreak = "\n${(multilineTrim as? Poetesse.StringTrim.Margin)?.prefix.orEmpty()}"
+                        val lineBreak = "\n${multilineTrim.linePrefix}"
                         append(lineBreak)
                         if (!multiline) {
                             insert(stringStart, lineBreak)
@@ -115,14 +114,7 @@ class KotlinCodeScope private constructor(
             }
             if (raw && multiline && !value.endsWith('\n')) append('\n')
             repeat(quotes) { append('"') }
-            if (raw && multiline && multilineTrim != Poetesse.StringTrim.None) {
-                when (multilineTrim) {
-                    Poetesse.StringTrim.Indent -> append(".trimIndent()")
-                    is Poetesse.StringTrim.Margin -> {
-                        append(".trimMargin(${multilineTrim.prefix.takeIf { it != "|" }?.doubleQuoted().orEmpty()})")
-                    }
-                }
-            }
+            if (raw && multiline) append(multilineTrim.postProcess)
         }
     }
 
