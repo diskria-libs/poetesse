@@ -5,3 +5,5 @@ fun String.capitalized(): String =
         if (it.isLowerCase()) it.titlecase()
         else it.toString()
     }
+
+fun String.doubleQuoted(): String = "\"$this\""

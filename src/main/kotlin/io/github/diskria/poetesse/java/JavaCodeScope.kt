@@ -1,7 +1,7 @@
 package io.github.diskria.poetesse.java
 
 import io.github.diskria.poetesse.Poetesse
-import io.github.diskria.poetesse.extensions.appendCodeString
+import io.github.diskria.poetesse.extensions.appendEscapedChar
 import io.github.diskria.poetesse.extensions.toCodeString
 import io.github.diskria.poetesse.interop.PoetesseScope
 import io.github.diskria.poetesse.interop.XTypeName
@@ -35,10 +35,7 @@ class JavaCodeScope private constructor(
     inline fun <reified T : Any> T(resolveNullability: Boolean = false) =
         T<T>(nullable = false, resolveNullability = resolveNullability)
 
-    fun S(value: String): String =
-        L(buildString(value.length + 32) {
-            appendCodeString(value, isJava = true)
-        })
+    fun S(value: String): String = L(buildStringLiteral(value))
 
     fun L(value: Boolean) = argument('L', value)
     fun L(value: Byte) = L(value.toCodeString())
@@ -56,6 +53,13 @@ class JavaCodeScope private constructor(
     fun L(block: Block) = L(code(block))
 
     internal fun build() = JPCodeBlock.of(block(), *arguments.toTypedArray())
+
+    private fun buildStringLiteral(value: String) =
+        buildString(1 + value.length + 10 + 1) {
+            append('"')
+            value.forEach { appendEscapedChar(it, quoteToEscape = '"', isJava = true) }
+            append('"')
+        }
 
     internal companion object {
         context(poetesse: PoetesseScope)
