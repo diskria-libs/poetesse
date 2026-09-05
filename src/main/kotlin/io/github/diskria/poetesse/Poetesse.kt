@@ -72,7 +72,7 @@ class Poetesse private constructor(
         ) : StringTrim
 
         companion object {
-            val Default: Margin = Margin("|")
+            val Default: StringTrim = Margin("|")
         }
     }
 

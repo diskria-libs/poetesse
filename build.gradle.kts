@@ -7,7 +7,6 @@ plugins {
 projekt {
     kotlinLibrary()
     distribute {
-        mavenLocal()
         mavenCentral()
     }
 }
