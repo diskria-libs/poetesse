@@ -45,6 +45,13 @@ class KotlinPropertyScope private constructor(
         if (by) builder.delegate(codeBlock) else builder.initializer(codeBlock)
     }
 
+    fun backingField(type: XTypeName = this@KotlinPropertyScope.type, initializer: KotlinCodeScope.Block? = null) {
+        builder.backingFieldType(type.interopToKotlin())
+        initializer?.let {
+            builder.backingFieldInitializer(KotlinCodeScope.of(initializer).codeBlock)
+        }
+    }
+
     fun mutable(mutable: Boolean = true) {
         builder.mutable(mutable)
     }
