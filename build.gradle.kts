@@ -1,9 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-plugins {
-    alias(convention.plugins.projektor)
-}
-
 projekt {
     kotlinLibrary()
     distribute {
