@@ -19,8 +19,17 @@ class JavaFieldScope private constructor(
     internal val annotationContainer by lazy { JavaAnnotationContainer(builder::addAnnotation) }
     internal val modifierContainer by lazy { JavaModifierContainer(builder::addModifiers) }
 
+    fun static() = modifier(JPModifier.STATIC)
+    fun final() = modifier(JPModifier.FINAL)
+    fun transient() = modifier(JPModifier.TRANSIENT)
+    fun volatile() = modifier(JPModifier.VOLATILE)
+
+    fun initializer(code: JavaCodeRef) {
+        builder.initializer(code.codeBlock)
+    }
+
     fun initializer(block: JavaCodeScope.Block) {
-        builder.initializer(JavaCodeScope.of(block).codeBlock)
+        initializer(JavaCodeScope.of(block))
     }
 
     internal fun build() = builder.build()

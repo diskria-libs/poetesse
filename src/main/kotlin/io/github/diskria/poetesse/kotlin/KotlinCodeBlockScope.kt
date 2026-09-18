@@ -77,12 +77,12 @@ class KotlinControlFlowScope private constructor(
         branch({ header }, block)
     }
 
-    fun ending(code: String) {
-        endingCodeBlock = KPCodeBlock.of(code)
+    fun ending(code: KotlinCodeRef) {
+        endingCodeBlock = code.codeBlock
     }
 
     fun ending(block: KotlinCodeScope.Block) {
-        endingCodeBlock = KotlinCodeScope.of(block).codeBlock
+        ending(KotlinCodeScope.of(block))
     }
 
     internal fun build(): List<KotlinCodeBlockMutation> {

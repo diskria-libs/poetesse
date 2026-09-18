@@ -27,12 +27,12 @@ class JavaFileScope private constructor(
 
     private val defaultImportPackageNames: MutableSet<String> = mutableSetOf()
 
-    fun comment(block: JavaCodeScope.Block) {
-        commentLines += JavaCodeScope.of(block).codeBlock.toString()
+    fun comment(code: JavaCodeRef) {
+        commentLines += code.codeBlock.toString()
     }
 
-    fun comment(text: String) {
-        comment { text }
+    fun comment(block: JavaCodeScope.Block) {
+        comment(JavaCodeScope.of(block))
     }
 
     fun memberImport(owner: XClassName, name: String) {
@@ -120,7 +120,7 @@ class JavaFileScope private constructor(
         requireNotNull(types.find { it.name() == fileName }) {
             "File '$fileName' cannot be built because primary type was not configured."
         }
-        config.comment?.let { comment(it) }
+        config.comment?.let { comment { it } }
         if (config.skipLangDefaultImports) {
             defaultImport("java.lang")
         }

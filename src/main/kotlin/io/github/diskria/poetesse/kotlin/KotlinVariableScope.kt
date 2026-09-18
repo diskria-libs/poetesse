@@ -28,8 +28,12 @@ class KotlinVariableScope private constructor(
         isMutable = mutable
     }
 
+    fun initializer(code: KotlinCodeRef) {
+        initializer = code
+    }
+
     fun initializer(block: KotlinCodeScope.Block) {
-        initializer = KotlinCodeScope.of(block)
+        initializer(KotlinCodeScope.of(block))
     }
 
     internal fun build(): KotlinCodeScope.Block {

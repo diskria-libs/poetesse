@@ -23,8 +23,12 @@ class KotlinParameterScope private constructor(
     fun noinline() = modifier(KPModifier.NOINLINE)
     fun crossinline() = modifier(KPModifier.CROSSINLINE)
 
+    fun defaultArgument(code: KotlinCodeRef) {
+        builder.defaultValue(code.codeBlock)
+    }
+
     fun defaultArgument(block: KotlinCodeScope.Block) {
-        builder.defaultValue(KotlinCodeScope.of(block).codeBlock)
+        defaultArgument(KotlinCodeScope.of(block))
     }
 
     internal fun build() = builder.build()

@@ -25,8 +25,12 @@ class JavaVariableScope private constructor(
 
     fun final() = modifier(JPModifier.FINAL)
 
+    fun initializer(code: JavaCodeRef) {
+        initializer = code
+    }
+
     fun initializer(block: JavaCodeScope.Block) {
-        initializer = JavaCodeScope.of(block)
+        initializer(JavaCodeScope.of(block))
     }
 
     internal fun build(): JavaCodeScope.Block {

@@ -33,14 +33,14 @@ class KotlinFileScope private constructor(
 
     private var isSubsequentComment: Boolean = false
 
-    fun comment(block: KotlinCodeScope.Block) {
-        val text = KotlinCodeScope.of(block).codeBlock.toString()
+    fun comment(code: KotlinCodeRef) {
+        val text = code.codeBlock.toString()
         builder.addFileComment(if (isSubsequentComment) "\n" + text else text)
         isSubsequentComment = true
     }
 
-    fun comment(text: String) {
-        comment { text }
+    fun comment(block: KotlinCodeScope.Block) {
+        comment(KotlinCodeScope.of(block))
     }
 
     fun defaultImport(packageName: String) {
@@ -155,7 +155,7 @@ class KotlinFileScope private constructor(
     internal fun build(): PoetesseKotlinFile {
         val file = builder.apply {
             indent(config.indent)
-            config.comment?.let { comment(it) }
+            config.comment?.let { comment { it } }
             if (config.skipLangDefaultImports) {
                 addKotlinDefaultImports(includeJvm = true, includeJs = false)
                 defaultImport("kotlin.math")

@@ -88,12 +88,12 @@ class JavaControlFlowScope private constructor(
         branch({ header }, block)
     }
 
-    fun ending(code: String) {
-        endingCodeBlock = JPCodeBlock.of(code)
+    fun ending(code: JavaCodeRef) {
+        endingCodeBlock = code.codeBlock
     }
 
     fun ending(block: JavaCodeScope.Block) {
-        endingCodeBlock = JavaCodeScope.of(block).codeBlock
+        ending(JavaCodeScope.of(block))
     }
 
     internal fun build(): List<JavaCodeBlockMutation> {

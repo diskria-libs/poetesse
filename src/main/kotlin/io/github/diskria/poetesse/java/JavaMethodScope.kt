@@ -29,7 +29,9 @@ class JavaMethodScope private constructor(
     internal val statementContainer by lazy { JavaBodyContainer(builder::applyCodeBlockMutation) }
 
     fun abstract() = modifier(JPModifier.ABSTRACT)
+    fun default() = modifier(JPModifier.DEFAULT)
     fun static() = modifier(JPModifier.STATIC)
+    fun final() = modifier(JPModifier.FINAL)
     fun synchronized() = modifier(JPModifier.SYNCHRONIZED)
     fun native() = modifier(JPModifier.NATIVE)
     fun strictfp() = modifier(JPModifier.STRICTFP)

@@ -40,9 +40,13 @@ class KotlinPropertyScope private constructor(
     fun override() = modifier(KPModifier.OVERRIDE)
     fun lateinit() = modifier(KPModifier.LATEINIT)
 
+    fun initializer(code: KotlinCodeRef, by: Boolean = false) {
+        if (by) builder.delegate(code.codeBlock)
+        else builder.initializer(code.codeBlock)
+    }
+
     fun initializer(by: Boolean = false, block: KotlinCodeScope.Block) {
-        val codeBlock = KotlinCodeScope.of(block).codeBlock
-        if (by) builder.delegate(codeBlock) else builder.initializer(codeBlock)
+        initializer(KotlinCodeScope.of(block), by)
     }
 
     fun backingField(type: XTypeName = this@KotlinPropertyScope.type, initializer: KotlinCodeScope.Block? = null) {
