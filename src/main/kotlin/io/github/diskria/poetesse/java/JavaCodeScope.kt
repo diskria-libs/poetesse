@@ -37,6 +37,8 @@ class JavaCodeScope private constructor(
 
     fun S(value: String): String = L(buildStringLiteral(value))
 
+    fun N(value: String) = argument('N', value)
+
     fun L(value: Boolean) = argument('L', value)
     fun L(value: Byte) = L(value.toCodeString())
     fun L(value: Short) = argument('L', value)

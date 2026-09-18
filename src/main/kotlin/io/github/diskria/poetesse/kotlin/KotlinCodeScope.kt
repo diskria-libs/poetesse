@@ -34,6 +34,8 @@ class KotlinCodeScope private constructor(
         return L(buildStringLiteral(value, dollars, scope.isRaw, scope.multilineTrim))
     }
 
+    fun N(value: String) = argument('N', value)
+
     fun L(value: Boolean) = argument('L', value)
     fun L(value: Byte) = L(value.toCodeString())
     fun L(value: Short) = argument('L', value)
