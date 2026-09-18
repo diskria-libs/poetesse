@@ -23,7 +23,7 @@ sealed class AbstractJavaBodyScope(
     internal val typeContainer by lazy { JavaTypeContainer(classNameFactory, builder::addType) }
 
     fun superinterface(type: XTypeName) {
-        builder.addSuperinterface(type.interopToJava())
+        builder.addSuperinterface(type.interopToJava(resolveNullability = false))
     }
 
     fun superinterface(type: KClass<*>) {
@@ -126,14 +126,14 @@ class JavaTypeScope private constructor(
     fun sealed(permits: Iterable<XTypeName>) {
         modifier(JPModifier.SEALED)
         permits.forEach {
-            builder.addPermittedSubclass(it.interopToJava())
+            builder.addPermittedSubclass(it.interopToJava(resolveNullability = false))
         }
     }
 
     fun sealed(vararg permits: XTypeName) = sealed(permits.asIterable())
 
     fun superclass(type: XTypeName) {
-        builder.superclass(type.interopToJava())
+        builder.superclass(type.interopToJava(resolveNullability = false))
     }
 
     fun superclass(type: KClass<*>) {

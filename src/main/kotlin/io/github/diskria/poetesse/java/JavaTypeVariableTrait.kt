@@ -8,7 +8,7 @@ import io.github.diskria.poetesse.interop.interopToJava
 
 sealed interface JavaTypeVariableTrait : PoetesseJavaScope {
     operator fun XTypeVariableName.unaryPlus(): XTypeVariableName {
-        this@JavaTypeVariableTrait.container.append(interopToJava())
+        this@JavaTypeVariableTrait.container.append(interopToJava(resolveNullability = false))
         return this
     }
 }
