@@ -36,8 +36,17 @@ class XClassName private constructor(
     override fun interopToJavaInternal(): JPClassName =
         kotlinToJava[rawKotlin] ?: rawJava
 
-    internal fun nested(name: String): XClassName =
+    fun nested(name: String): XClassName =
         of(packageName, (simpleNames + name), false)
+
+    fun peer(simpleName: String): XClassName =
+        of(packageName, simpleNames.dropLast(1) + simpleName, isNullable)
+
+    fun withSuffix(suffix: String): XClassName =
+        peer(simpleName + suffix)
+
+    fun withPrefix(prefix: String): XClassName =
+        peer(prefix + simpleName)
 
     internal companion object {
         private val kotlinToJava = buildMap {
