@@ -4,7 +4,6 @@ import com.squareup.kotlinpoet.asClassName
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.extensions.asJPClassName
 import io.github.diskria.poetesse.extensions.asKPClassName
-import io.github.diskria.poetesse.interop.XClassName.Companion.of
 import io.github.diskria.poetesse.java.JPClassName
 import io.github.diskria.poetesse.kotlin.KPClassName
 import kotlin.reflect.KClass
@@ -132,12 +131,12 @@ class XClassName private constructor(
 @PublishedApi
 context(poetesse: PoetesseScope)
 internal fun KPClassName.asXClassName() =
-    of(packageName.ifEmpty { null }, simpleNames, isNullable)
+    XClassName.of(packageName.ifEmpty { null }, simpleNames, isNullable)
 
 @PublishedApi
 context(poetesse: PoetesseScope)
 internal fun JPClassName.asXClassName(nullable: Boolean) =
-    of(packageName().ifEmpty { null }, simpleNames(), nullable)
+    XClassName.of(packageName().ifEmpty { null }, simpleNames(), nullable)
 
 @PublishedApi
 context(poetesse: PoetesseScope)
@@ -161,10 +160,10 @@ internal fun KClass<*>.toXClass(nullable: Boolean): XClassName {
 }
 
 fun XClassName.nested(name: String): XClassName =
-    of(packageName, (simpleNames + name), false)
+    XClassName.of(packageName, (simpleNames + name), false)
 
 fun XClassName.peer(simpleName: String): XClassName =
-    of(packageName, simpleNames.dropLast(1) + simpleName, isNullable)
+    XClassName.of(packageName, simpleNames.dropLast(1) + simpleName, isNullable)
 
 fun XClassName.withSuffix(suffix: String): XClassName =
     peer(simpleName + suffix)
@@ -173,4 +172,4 @@ fun XClassName.withPrefix(prefix: String): XClassName =
     peer(prefix + simpleName)
 
 fun XClassName.nullable(nullable: Boolean = true): XClassName =
-    of(packageName, simpleNames, nullable)
+    XClassName.of(packageName, simpleNames, nullable)

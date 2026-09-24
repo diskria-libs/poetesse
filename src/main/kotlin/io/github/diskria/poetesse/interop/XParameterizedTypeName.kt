@@ -8,8 +8,8 @@ import io.github.diskria.poetesse.kotlin.KPParameterizedTypeName
 
 class XParameterizedTypeName private constructor(
     config: Poetesse.Config,
-    private val rawType: XClassName,
-    private val typeArguments: List<XTypeName>,
+    val rawType: XClassName,
+    val typeArguments: List<XTypeName>,
     override val isNullable: Boolean,
 ) : XTypedTypeName<KPParameterizedTypeName, JPParameterizedTypeName>(config) {
 

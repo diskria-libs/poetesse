@@ -2,8 +2,10 @@ package io.github.diskria.poetesse.interop
 
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.java.JPTypeVariableName
+import io.github.diskria.poetesse.kotlin.KPCodeBlock
 import io.github.diskria.poetesse.kotlin.KPModifier
 import io.github.diskria.poetesse.kotlin.KPTypeVariableName
+import javax.lang.model.SourceVersion
 
 class XTypeVariableName private constructor(
     config: Poetesse.Config,
@@ -15,12 +17,18 @@ class XTypeVariableName private constructor(
 ) : XTypedTypeName<KPTypeVariableName, JPTypeVariableName>(config) {
 
     override fun interopToKotlinInternal(): KPTypeVariableName =
-        KPTypeVariableName(name, bounds.map { it.interopToKotlin() }, variance?.modifier).copy(reified = isReified)
+        KPTypeVariableName(
+            name.escapeIfNecessary(),
+            bounds.map { it.interopToKotlin() },
+            variance?.modifier,
+        ).copy(reified = isReified)
 
     override fun interopToJavaInternal(): JPTypeVariableName {
-        if (variance != null) error("Java type variables doesn't support variance")
-        if (isReified) error("Java type variables doesn't support reified")
-        return JPTypeVariableName.get(name, *bounds.map { it.box().interopToJava() }.toTypedArray())
+        require(variance == null) { "Java type variables doesn't support variance" }
+        require(!isReified) { "Java type variables doesn't support reified" }
+        val cleanName = name.unwrapBackticks()
+        require(SourceVersion.isIdentifier(cleanName)) { "'$cleanName' is not a valid Java identifier name." }
+        return JPTypeVariableName.get(cleanName, *bounds.map { it.box().interopToJava() }.toTypedArray())
     }
 
     internal companion object {
@@ -34,6 +42,9 @@ class XTypeVariableName private constructor(
         ) = XTypeVariableName(poetesse.config, name, bounds, variance, isReified, isNullable)
     }
 }
+
+private fun String.unwrapBackticks(): String = removeSurrounding("`")
+private fun String.escapeIfNecessary(): String = KPCodeBlock.of("%N", unwrapBackticks()).toString()
 
 enum class XVariance(internal val modifier: KPModifier) {
 
