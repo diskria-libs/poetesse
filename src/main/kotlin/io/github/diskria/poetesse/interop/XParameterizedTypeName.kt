@@ -13,6 +13,10 @@ class XParameterizedTypeName private constructor(
     override val isNullable: Boolean,
 ) : XTypedTypeName<KPParameterizedTypeName, JPParameterizedTypeName>(config) {
 
+    init {
+        require(typeArguments.isNotEmpty()) { "XParameterizedTypeName requires at least one type argument." }
+    }
+
     override fun interopToKotlinInternal(): KPParameterizedTypeName =
         rawType.interopToKotlin().parameterizedBy(typeArguments.map { it.interopToKotlin() })
 

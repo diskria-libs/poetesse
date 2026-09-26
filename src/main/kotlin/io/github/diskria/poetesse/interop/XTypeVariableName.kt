@@ -68,3 +68,6 @@ context(poetesse: PoetesseScope)
 internal fun JPTypeVariableName.asXTypeVariableName(nullable: Boolean) = with(poetesse) {
     XTypeVariableName.of(name(), bounds().map { xType(it) }, variance = null, isReified = false, nullable)
 }
+
+fun XTypeVariableName.nullable(nullable: Boolean = true): XTypeVariableName =
+    XTypeVariableName.of(name, bounds, variance, isReified, nullable)

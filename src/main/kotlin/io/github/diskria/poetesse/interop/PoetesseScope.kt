@@ -17,6 +17,9 @@ interface PoetesseScope {
 fun PoetesseScope.xType(kp: KPTypeName, nullable: Boolean = kp.isNullable, boxed: Boolean = nullable) =
     kp.setNullable(nullable).toXType(boxed)
 
+fun PoetesseScope.xType(packageName: String?, simpleNames: Iterable<String>, nullable: Boolean = false) =
+    xType(KPClassName(packageName.orEmpty(), simpleNames.toList()), nullable)
+
 fun PoetesseScope.xType(type: KClass<*>, nullable: Boolean = false, boxed: Boolean = nullable) =
     type.toXType(nullable, boxed)
 
