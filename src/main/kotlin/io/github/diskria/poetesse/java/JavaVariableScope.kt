@@ -40,9 +40,10 @@ class JavaVariableScope private constructor(
         val name = name
         val initializer = initializer
         return {
-            val annotations = annotations.joinWithTrailing(" ") { L(it) }
             val modifiers = modifiers.joinWithTrailing(" ")
+            val annotations = annotations.joinWithTrailing(" ") { L(it) }
             val type = type?.let { T(it, resolveNullability = true) } ?: L("var")
+            val name = N(name)
             val initializer = initializer?.takeIf { !it.codeBlock.isEmpty }?.let { " = ${L(it)}" }.orEmpty()
             "$modifiers$annotations$type $name$initializer"
         }

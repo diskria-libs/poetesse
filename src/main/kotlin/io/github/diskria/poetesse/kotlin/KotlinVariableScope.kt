@@ -47,6 +47,7 @@ class KotlinVariableScope private constructor(
             val annotations = annotations.joinWithTrailing(" ") { L(it) }
             val modifiers = modifiers.joinWithTrailing(" ")
             val keyword = if (isMutable) "var" else "val"
+            val name = N(name)
             val type = type?.let { ": ${T(it)}" }.orEmpty()
             val initializer = initializer?.takeIf { it.codeBlock.isNotEmpty() }?.let { " = ${L(it)}" }.orEmpty()
             "$annotations$modifiers$keyword $name$type$initializer"
