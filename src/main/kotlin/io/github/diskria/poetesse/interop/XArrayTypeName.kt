@@ -34,6 +34,31 @@ class XArrayTypeName private constructor(
         context(poetesse: PoetesseScope)
         fun of(componentType: XTypeName, isNullable: Boolean = false) =
             XArrayTypeName(poetesse.config, componentType, isNullable)
+
+        fun isKotlinArray(packageName: String?, simpleNames: List<String>): Boolean =
+            packageName == "kotlin" && simpleNames.singleOrNull() == "Array"
+
+        fun <T> extractKotlinArrayComponentOrNull(
+            packageName: String?,
+            simpleNames: List<String>,
+            typeArguments: List<T>,
+        ): T? =
+            if (isKotlinArray(packageName, simpleNames)) typeArguments.singleOrNull()
+            else null
+
+        context(poetesse: PoetesseScope)
+        fun fromGenericOrNull(
+            rawClassName: XClassName,
+            typeArguments: List<XTypeName>,
+            nullable: Boolean,
+        ): XArrayTypeName? {
+            val componentType = extractKotlinArrayComponentOrNull(
+                packageName = rawClassName.packageName,
+                simpleNames = rawClassName.simpleNames,
+                typeArguments = typeArguments,
+            ) ?: return null
+            return of(componentType.box(), nullable)
+        }
     }
 }
 
@@ -42,8 +67,14 @@ context(poetesse: PoetesseScope)
 internal fun KPTypeName.asXArrayTypeNameOrNull(): XArrayTypeName? {
     val componentType = when (this) {
         is KPClassName -> kotlinPrimitiveArrays[this]?.asX<XPrimitiveTypeName>()
-        is KPParameterizedTypeName if (rawType.setNullable(false).withoutAnnotations() == KPArray) -> {
-            typeArguments.firstOrNull()?.let { poetesse.xType(it, boxed = true) }
+        is KPParameterizedTypeName -> {
+            val cleanRawType = rawType.setNullable(false).withoutAnnotations()
+            val kpComponentTypeName = XArrayTypeName.extractKotlinArrayComponentOrNull(
+                packageName = cleanRawType.packageName,
+                simpleNames = cleanRawType.simpleNames,
+                typeArguments = typeArguments,
+            ) ?: return null
+            poetesse.xType(kpComponentTypeName, boxed = true)
         }
 
         else -> null
