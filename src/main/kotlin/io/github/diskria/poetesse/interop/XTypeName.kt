@@ -45,7 +45,7 @@ internal inline fun <reified X : XTypeName> KPTypeName.asXOrNull(boxed: Boolean 
     XVoidTypeName::class -> asXVoidTypeNameOrNull(boxed)
     XPrimitiveTypeName::class -> asXPrimitiveTypeNameOrNull(boxed)
     XClassName::class if (this is KPClassName) -> asXClassName()
-    XArrayTypeName::class if (this is KPParameterizedTypeName) -> asXArrayTypeNameOrNull()
+    XArrayTypeName::class -> asXArrayTypeNameOrNull()
     XFunctionalTypeName::class if (this is KPFunctionalTypeName) -> asXFunctionalTypeName()
     XParameterizedTypeName::class if (this is KPParameterizedTypeName) -> asXParameterizedTypeName()
     XTypeVariableName::class if (this is KPTypeVariableName) -> asXTypeVariableName()
