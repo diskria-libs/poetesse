@@ -24,8 +24,13 @@ class XArrayTypeName private constructor(
             KPArray.parameterizedBy(componentType.interopToKotlin())
         }
 
-    override fun interopToJavaInternal(): JPArrayTypeName =
-        JPArrayTypeName.of(componentType.interopToJava())
+    override fun interopToJavaInternal(): JPArrayTypeName {
+        val targetType = when (componentType) {
+            is XWildcardTypeName -> componentType.outType ?: componentType.inType ?: xType<Any>()
+            else -> componentType
+        }
+        return JPArrayTypeName.of(targetType.interopToJava())
+    }
 
     internal companion object {
         val kotlinPrimitiveArrays: Map<KPClassName, KPClassName> =
