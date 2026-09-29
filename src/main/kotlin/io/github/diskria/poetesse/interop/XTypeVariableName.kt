@@ -59,15 +59,23 @@ enum class XVariance(internal val modifier: KPModifier) {
 
 @PublishedApi
 context(poetesse: PoetesseScope)
-internal fun KPTypeVariableName.asXTypeVariableName() = with(poetesse) {
-    XTypeVariableName.of(name, bounds.map { xType(it) }, XVariance.of(variance), isReified, isNullable)
-}
+internal fun KPTypeVariableName.asXTypeVariableName() = XTypeVariableName.of(
+    name = name,
+    bounds = bounds.map { poetesse.xType(it) },
+    variance = XVariance.of(variance),
+    isReified = isReified,
+    isNullable = isNullable,
+)
 
 @PublishedApi
 context(poetesse: PoetesseScope)
-internal fun JPTypeVariableName.asXTypeVariableName(nullable: Boolean) = with(poetesse) {
-    XTypeVariableName.of(name(), bounds().map { xType(it) }, variance = null, isReified = false, nullable)
-}
+internal fun JPTypeVariableName.asXTypeVariableName(nullable: Boolean) = XTypeVariableName.of(
+    name = name(),
+    bounds = bounds().map { poetesse.xType(it) },
+    variance = null,
+    isReified = false,
+    isNullable = nullable,
+)
 
 fun XTypeVariableName.nullable(nullable: Boolean = true): XTypeVariableName =
     XTypeVariableName.of(name, bounds, variance, isReified, nullable)

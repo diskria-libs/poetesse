@@ -49,15 +49,13 @@ class XFunctionalTypeName private constructor(
 
 @PublishedApi
 context(poetesse: PoetesseScope)
-internal fun KPFunctionalTypeName.asXFunctionalTypeName() = with(poetesse) {
-    XFunctionalTypeName.of(
-        contextParameters = contextParameters.map { xType(it) },
-        receiver = receiver?.let { xType(it) },
-        parameters = parameters.map { it.asXParameter() },
-        returnType = xType(returnType),
-        isNullable = isNullable,
-    )
-}
+internal fun KPFunctionalTypeName.asXFunctionalTypeName() = XFunctionalTypeName.of(
+    contextParameters = contextParameters.map { poetesse.xType(it) },
+    receiver = receiver?.let { poetesse.xType(it) },
+    parameters = parameters.map { it.asXParameter() },
+    returnType = poetesse.xType(returnType),
+    isNullable = isNullable,
+)
 
 @PublishedApi
 context(poetesse: PoetesseScope)
@@ -66,15 +64,13 @@ internal fun JPParameterizedTypeName.asXFunctionalTypeNameOrNull(nullable: Boole
     val arity = countArityOrNull(typeArguments) ?: return null
     val jvmFunctionArity = jvmFunctionAffix.unwrapOrNull(rawType().qualifiedName)?.toIntOrNull()
     if (arity != jvmFunctionArity) return null
-    return with(poetesse) {
-        XFunctionalTypeName.of(
-            contextParameters = emptyList(),
-            receiver = null,
-            parameters = typeArguments.take(arity).map { XParameter(type = xType(it)) },
-            returnType = xType(typeArguments.last()),
-            isNullable = nullable,
-        )
-    }
+    return XFunctionalTypeName.of(
+        contextParameters = emptyList(),
+        receiver = null,
+        parameters = typeArguments.take(arity).map { XParameter(type = poetesse.xType(it)) },
+        returnType = poetesse.xType(typeArguments.last()),
+        isNullable = nullable,
+    )
 }
 
 private val jvmFunctionAffix = StringAffix(prefix = "kotlin.jvm.functions.Function")

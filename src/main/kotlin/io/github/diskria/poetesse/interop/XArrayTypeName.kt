@@ -42,8 +42,8 @@ context(poetesse: PoetesseScope)
 internal fun KPTypeName.asXArrayTypeNameOrNull(): XArrayTypeName? {
     val componentType = when (this) {
         is KPClassName -> kotlinPrimitiveArrays[this]?.asX<XPrimitiveTypeName>()
-        is KPParameterizedTypeName if (rawType.setNullable(false).withoutAnnotations() == KPArray) -> with(poetesse) {
-            typeArguments.firstOrNull()?.let { xType(it) }
+        is KPParameterizedTypeName if (rawType.setNullable(false).withoutAnnotations() == KPArray) -> {
+            typeArguments.firstOrNull()?.let { poetesse.xType(it, boxed = true) }
         }
 
         else -> null
@@ -53,8 +53,7 @@ internal fun KPTypeName.asXArrayTypeNameOrNull(): XArrayTypeName? {
 
 @PublishedApi
 context(poetesse: PoetesseScope)
-internal fun JPArrayTypeName.asXArrayTypeName(nullable: Boolean) = with(poetesse) {
-    XArrayTypeName.of(xType(componentType()), nullable)
-}
+internal fun JPArrayTypeName.asXArrayTypeName(nullable: Boolean) =
+    XArrayTypeName.of(poetesse.xType(componentType()), nullable)
 
 fun XTypeName.array(nullable: Boolean = false) = XArrayTypeName.of(this, nullable)

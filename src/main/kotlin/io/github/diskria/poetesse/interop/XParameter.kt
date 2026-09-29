@@ -16,16 +16,13 @@ class XParameter(val name: String = "", val type: XTypeName) {
 }
 
 context(poetesse: PoetesseScope)
-fun KPParameter.asXParameter(): XParameter = with(poetesse) {
-    XParameter(name, xType(type))
-}
+fun KPParameter.asXParameter(): XParameter =
+    XParameter(name, poetesse.xType(type))
 
 context(poetesse: PoetesseScope)
-fun KPContextParameter.asXParameter(): XParameter = with(poetesse) {
-    XParameter(name, xType(type))
-}
+fun KPContextParameter.asXParameter(): XParameter =
+    XParameter(name, poetesse.xType(type))
 
 context(poetesse: PoetesseScope)
-fun JPParameter.asXParameter(): XParameter = with(poetesse) {
-    XParameter(name(), xType(type()))
-}
+fun JPParameter.asXParameter(): XParameter =
+    XParameter(name(), poetesse.xType(type()))

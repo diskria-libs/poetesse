@@ -77,7 +77,7 @@ internal fun KPTypeName.toXType(boxed: Boolean): XTypeName = when (this) {
 
 @PublishedApi
 context(poetesse: PoetesseScope)
-internal fun KClass<*>.toXType(nullable: Boolean, boxed: Boolean): XTypeName = with(poetesse) {
+internal fun KClass<*>.toXType(nullable: Boolean, boxed: Boolean): XTypeName {
     require(java.typeParameters.isEmpty()) {
         val className = simpleName ?: this.toString()
         val lines = listOf(
@@ -95,7 +95,7 @@ internal fun KClass<*>.toXType(nullable: Boolean, boxed: Boolean): XTypeName = w
     val kpClassName = asClassName().setNullable(nullable)
     return kpClassName.asXOrNull<XVoidTypeName>(boxed)
         ?: kpClassName.asXOrNull<XPrimitiveTypeName>(boxed)
-        ?: xClass(this@toXType, nullable)
+        ?: poetesse.xClass(this, nullable)
 }
 
 @PublishedApi

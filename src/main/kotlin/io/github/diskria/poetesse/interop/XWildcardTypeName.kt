@@ -42,23 +42,19 @@ class XWildcardTypeName private constructor(
 
 @PublishedApi
 context(poetesse: PoetesseScope)
-internal fun KPWildcardTypeName.asXWildcardTypeName() = with(poetesse) {
-    XWildcardTypeName.of(
-        inType = inTypes.firstOrNull()?.let { xType(it) },
-        outType = outTypes.firstOrNull()?.let { xType(it) },
-        isNullable = isNullable,
-    )
-}
+internal fun KPWildcardTypeName.asXWildcardTypeName() = XWildcardTypeName.of(
+    inType = inTypes.firstOrNull()?.let { poetesse.xType(it) },
+    outType = outTypes.firstOrNull()?.let { poetesse.xType(it) },
+    isNullable = isNullable,
+)
 
 @PublishedApi
 context(poetesse: PoetesseScope)
-internal fun JPWildcardTypeName.asXWildcardTypeName(nullable: Boolean) = with(poetesse) {
-    XWildcardTypeName.of(
-        inType = lowerBounds().firstOrNull()?.let { xType(it) },
-        outType = if (lowerBounds().isNotEmpty()) null else upperBounds().firstOrNull()?.let { xType(it) },
-        isNullable = nullable,
-    )
-}
+internal fun JPWildcardTypeName.asXWildcardTypeName(nullable: Boolean) = XWildcardTypeName.of(
+    inType = lowerBounds().firstOrNull()?.let { poetesse.xType(it) },
+    outType = if (lowerBounds().isNotEmpty()) null else upperBounds().firstOrNull()?.let { poetesse.xType(it) },
+    isNullable = nullable,
+)
 
 fun XTypeName.consumer(nullable: Boolean = false) =
     XWildcardTypeName.of(inType = this, outType = null, isNullable = nullable)

@@ -156,7 +156,7 @@ internal fun KClass<*>.toXClass(nullable: Boolean): XClassName {
             lines.forEach { (left, right) -> appendLine("${left.padEnd(maxLength)} => $right".prependIndent("  ")) }
         }
     }
-    return with(poetesse) { xClass(asClassName(), nullable) }
+    return poetesse.xClass(asClassName(), nullable)
 }
 
 fun XClassName.nested(name: String): XClassName =
