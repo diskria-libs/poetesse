@@ -14,8 +14,8 @@ sealed class XTypedTypeName<K : KPTypeName, J : JPTypeName>(
     override val config: Poetesse.Config
 ) : PoetesseScope {
 
-    internal open val isBoxed: Boolean = true
-    internal abstract val isNullable: Boolean
+    open val isBoxed: Boolean = true
+    abstract val isNullable: Boolean
 
     internal open fun boxInternal(): XTypedTypeName<K, J> = this
 

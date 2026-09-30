@@ -38,6 +38,7 @@ typealias KPWildcardTypeName = WildcardTypeName
 typealias KPFunctionalTypeName = LambdaTypeName
 
 val KPUnit: KPClassName = UNIT
+val KPNothing: KPClassName = NOTHING
 
 val KPBoolean: KPClassName = BOOLEAN
 val KPByte: KPClassName = BYTE

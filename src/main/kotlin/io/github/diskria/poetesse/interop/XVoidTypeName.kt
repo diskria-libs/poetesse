@@ -8,36 +8,54 @@ import io.github.diskria.poetesse.extensions.withoutAnnotations
 import io.github.diskria.poetesse.java.JPBoxedVoid
 import io.github.diskria.poetesse.java.JPTypeName
 import io.github.diskria.poetesse.java.JPVoid
+import io.github.diskria.poetesse.kotlin.KPNothing
 import io.github.diskria.poetesse.kotlin.KPTypeName
 import io.github.diskria.poetesse.kotlin.KPUnit
 
 class XVoidTypeName private constructor(
     config: Poetesse.Config,
+    val isNothing: Boolean,
     override val isBoxed: Boolean,
     override val isNullable: Boolean,
 ) : XTypedTypeName<KPTypeName, JPTypeName>(config) {
 
-    override fun interopToKotlinInternal(): KPTypeName = KPUnit
+    override fun interopToKotlinInternal(): KPTypeName = if (isNothing) KPNothing else KPUnit
 
     override fun interopToJavaInternal(): JPTypeName = if (isBoxed) JPBoxedVoid else JPVoid
 
-    override fun boxInternal() = of(isBoxed = true, isNullable)
+    override fun boxInternal() = of(isNothing, isBoxed = true, isNullable)
 
     internal companion object {
         context(poetesse: PoetesseScope)
-        fun of(isBoxed: Boolean, isNullable: Boolean = false) =
-            XVoidTypeName(poetesse.config, isBoxed, isNullable)
+        fun of(isNothing: Boolean, isBoxed: Boolean, isNullable: Boolean = false) =
+            XVoidTypeName(poetesse.config, isNothing, isBoxed, isNullable)
     }
 }
 
 @PublishedApi
 context(poetesse: PoetesseScope)
-internal fun KPTypeName.asXVoidTypeNameOrNull(boxed: Boolean): XVoidTypeName? =
-    if (setNullable(false).withoutAnnotations() == KPUnit) XVoidTypeName.of(isNullable || boxed, isNullable)
-    else null
+internal fun KPTypeName.asXVoidTypeNameOrNull(boxed: Boolean): XVoidTypeName? {
+    val cleanType = setNullable(false).withoutAnnotations()
+    val isNothing = cleanType == KPNothing
+    val isUnit = cleanType == KPUnit
+    if (!isUnit && !isNothing) return null
+    if (isUnit && isNullable) return null
+    return XVoidTypeName.of(
+        isNothing = isNothing,
+        isBoxed = isNothing || boxed,
+        isNullable = isNullable,
+    )
+}
 
 @PublishedApi
 context(poetesse: PoetesseScope)
-internal fun JPTypeName.asXVoidTypeNameOrNull(nullable: Boolean): XVoidTypeName? =
-    if (setBoxed(false).withoutAnnotations() == JPVoid) XVoidTypeName.of(nullable || isBoxedVoid, nullable)
-    else null
+internal fun JPTypeName.asXVoidTypeNameOrNull(nullable: Boolean): XVoidTypeName? {
+    val isBoxed = nullable || isBoxedVoid
+    val cleanType = setBoxed(false).withoutAnnotations()
+    if (cleanType != JPVoid) return null
+    return XVoidTypeName.of(
+        isNothing = isBoxed,
+        isBoxed = isBoxed,
+        isNullable = nullable,
+    )
+}
