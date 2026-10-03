@@ -28,8 +28,8 @@ class Poetesse private constructor(
 
     interface JavaNullabilityResolver {
 
-        fun isNullable(typeName: JPTypeName): Boolean
-        fun setNullable(typeName: JPTypeName, nullable: Boolean): JPTypeName
+        fun isNullable(typeName: JPTypeName): Boolean = false
+        fun setNullable(typeName: JPTypeName, nullable: Boolean): JPTypeName = typeName
 
         companion object {
             val Default: JavaNullabilityResolver = object : JavaNullabilityResolver {
