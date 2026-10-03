@@ -4,7 +4,6 @@ import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.extensions.qualifiedName
 import io.github.diskria.poetesse.java.JPParameterizedTypeName
 import io.github.diskria.poetesse.kotlin.KPFunctionalTypeName
-import io.github.diskria.poetesse.utils.StringAffix
 
 class XFunctionalTypeName private constructor(
     config: Poetesse.Config,
@@ -14,6 +13,15 @@ class XFunctionalTypeName private constructor(
     val returnType: XTypeName,
     override val isNullable: Boolean,
 ) : XTypedTypeName<KPFunctionalTypeName, JPParameterizedTypeName>(config) {
+
+    val arity: Int = contextParameters.size + (if (receiver != null) 1 else 0) + parameters.size
+    val hasBigArity: Boolean = arity !in FIXED_FUNCTION_ARITY_RANGE
+    val jvmRawClassName: XClassName
+        get() = if (hasBigArity) {
+            xClass(JVM_FUNCTION_N, nullable = isNullable)
+        } else {
+            xClass("$JVM_FUNCTION_FQCN_PREFIX$arity", nullable = isNullable)
+        }
 
     override fun interopToKotlinInternal(): KPFunctionalTypeName =
         KPFunctionalTypeName.get(
@@ -30,14 +38,14 @@ class XFunctionalTypeName private constructor(
             addAll(parameters.map { it.type })
             add(returnType)
         }
-        val arity = countArity(typeArguments)
-        val jvmFunctionClassName = xClass(jvmFunctionAffix.wrap(arity.toString()))
-        return XParameterizedTypeName.of(jvmFunctionClassName, typeArguments).interopToJava()
+        return XParameterizedTypeName.of(jvmRawClassName, typeArguments).interopToJava()
     }
 
-    internal companion object {
+    companion object {
+        const val JVM_FUNCTION_N = "$JVM_FUNCTION_FQCN_PREFIX$JVM_FUNCTION_N_SUFFIX"
+
         context(poetesse: PoetesseScope)
-        fun of(
+        internal fun of(
             contextParameters: List<XTypeName>,
             receiver: XTypeName?,
             parameters: List<XParameter>,
@@ -61,9 +69,14 @@ internal fun KPFunctionalTypeName.asXFunctionalTypeName() = XFunctionalTypeName.
 context(poetesse: PoetesseScope)
 internal fun JPParameterizedTypeName.asXFunctionalTypeNameOrNull(nullable: Boolean): XFunctionalTypeName? {
     val typeArguments = typeArguments()
-    val arity = countArityOrNull(typeArguments) ?: return null
-    val jvmFunctionArity = jvmFunctionAffix.unwrapOrNull(rawType().qualifiedName)?.toIntOrNull()
-    if (arity != jvmFunctionArity) return null
+    val arity = (typeArguments.size - 1).takeIf { it >= 0 } ?: return null
+    val qualifiedName = rawType().qualifiedName
+    if (!qualifiedName.startsWith(JVM_FUNCTION_FQCN_PREFIX)) return null
+    val suffix = qualifiedName.removePrefix(JVM_FUNCTION_FQCN_PREFIX)
+    if (suffix != JVM_FUNCTION_N_SUFFIX) {
+        val expectedArity = suffix.toIntOrNull()?.takeIf { it in FIXED_FUNCTION_ARITY_RANGE } ?: return null
+        if (arity != expectedArity) return null
+    }
     return XFunctionalTypeName.of(
         contextParameters = emptyList(),
         receiver = null,
@@ -72,13 +85,6 @@ internal fun JPParameterizedTypeName.asXFunctionalTypeNameOrNull(nullable: Boole
         isNullable = nullable,
     )
 }
-
-private val jvmFunctionAffix = StringAffix(prefix = "kotlin.jvm.functions.Function")
-
-private fun countArityOrNull(typeArguments: List<*>): Int? = (typeArguments.size - 1).takeIf { it in 0..22 }
-
-private fun countArity(typeArguments: List<*>): Int =
-    requireNotNull(countArityOrNull(typeArguments)) { "JVM function arity ${typeArguments.size} is not valid" }
 
 fun XTypeName.lambda(
     parameters: Iterable<XParameter> = emptyList(),
@@ -107,3 +113,7 @@ fun XTypeName.lambda(
 
 fun XTypeName.lambda(vararg parameters: XTypeName, nullable: Boolean = false) =
     lambda(parameters = parameters.asIterable(), nullable = nullable)
+
+private const val JVM_FUNCTION_FQCN_PREFIX = "kotlin.jvm.functions.Function"
+private const val JVM_FUNCTION_N_SUFFIX = "N"
+private val FIXED_FUNCTION_ARITY_RANGE = 0..22
