@@ -39,8 +39,10 @@ fun XTypeVariableFactory.xTypeVariable(
 fun XTypeVariableFactory.xTypeVariable(kp: KPTypeVariableName, nullable: Boolean = kp.isNullable): XTypeVariableName =
     kp.setNullable(nullable).asXTypeVariableName()
 
-fun XTypeVariableFactory.xTypeVariable(jp: JPTypeVariableName, nullable: Boolean = false): XTypeVariableName =
-    jp.asXTypeVariableName(nullable)
+fun XTypeVariableFactory.xTypeVariable(
+    jp: JPTypeVariableName,
+    nullable: Boolean = config.javaNullabilityResolver.isNullable(jp),
+): XTypeVariableName = jp.asXTypeVariableName(nullable)
 
 fun XTypeVariableFactory.xWildcard(inT: XTypeName?, outT: XTypeName?): XWildcardTypeName =
     of(inType = inT, outType = outT)

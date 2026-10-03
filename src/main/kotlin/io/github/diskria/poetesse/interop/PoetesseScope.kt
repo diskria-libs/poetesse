@@ -38,8 +38,10 @@ inline fun <reified T> PoetesseScope.xType(nullable: Boolean = true, boxed: Bool
 inline fun <reified T : Any> PoetesseScope.xType(boxed: Boolean = false): XTypeName =
     xType<T>(nullable = false, boxed = boxed)
 
-fun PoetesseScope.xType(jp: JPTypeName, nullable: Boolean = config.javaNullabilityResolver.isNullable(jp)): XTypeName =
-    jp.toXType(nullable)
+fun PoetesseScope.xType(
+    jp: JPTypeName,
+    nullable: Boolean = config.javaNullabilityResolver.isNullable(jp),
+): XTypeName = jp.toXType(nullable)
 
 fun PoetesseScope.xClass(kp: KPClassName, nullable: Boolean = kp.isNullable): XClassName =
     kp.setNullable(nullable).asX<XClassName>()
