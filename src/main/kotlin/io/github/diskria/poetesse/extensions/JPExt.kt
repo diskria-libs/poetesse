@@ -1,6 +1,7 @@
 package io.github.diskria.poetesse.extensions
 
 import io.github.diskria.poetesse.interop.XCodeBlockMutationType
+import io.github.diskria.poetesse.interop.XFunctionalTypeName
 import io.github.diskria.poetesse.java.*
 
 val JPTypeName.isVoid: Boolean
@@ -20,6 +21,11 @@ val JPClassName.binaryName: String get() = reflectionName()
 val JPClassName.internalName: String get() = binaryName.replace('.', '/')
 
 val JPClassName.qualifiedName: String get() = canonicalName()
+
+fun JPTypeName.isCoroutinesContinuationType(returnType: JPTypeName): Boolean =
+    this is JPParameterizedTypeName
+        && rawType().qualifiedName == XFunctionalTypeName.COROUTINES_CONTINUATION_FQCN
+        && returnType.withoutAnnotations() == JPObject
 
 fun JPTypeName.wrapToArray(): JPArrayTypeName =
     JPArrayTypeName.of(this)

@@ -3,6 +3,7 @@ package io.github.diskria.poetesse.interop
 import io.github.diskria.poetesse.Poetesse
 import io.github.diskria.poetesse.PoetesseX
 import io.github.diskria.poetesse.extensions.setNullable
+import io.github.diskria.poetesse.interop.XWildcardTypeName.Companion.of
 import io.github.diskria.poetesse.java.JPClassName
 import io.github.diskria.poetesse.java.JPTypeName
 import io.github.diskria.poetesse.kotlin.KPClassName
@@ -68,3 +69,8 @@ fun PoetesseScope.xClass(
     jp: JPClassName,
     nullable: Boolean = config.javaNullabilityResolver.isNullable(jp),
 ): XClassName = jp.asX<XClassName>(nullable)
+
+fun PoetesseScope.xWildcard(inT: XTypeName?, outT: XTypeName?): XWildcardTypeName =
+    of(inType = inT, outType = outT)
+
+fun PoetesseScope.xStar(): XWildcardTypeName = xWildcard(null, null)

@@ -49,7 +49,7 @@ class XClassName private constructor(
 
             sequenceOf(
                 Iterator::class, Collection::class, List::class, Set::class, Map::class, ListIterator::class,
-                Iterable::class, Map.Entry::class
+                Iterable::class, Map.Entry::class,
             ).forEach { kClass ->
                 val kpClassName = kClass.asKPClassName()
                 val jpClassName = kClass.asJPClassName()

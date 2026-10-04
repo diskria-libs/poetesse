@@ -17,6 +17,9 @@ class XParameterizedTypeName private constructor(
         require(typeArguments.isNotEmpty()) { "XParameterizedTypeName requires at least one type argument." }
     }
 
+    fun starProjected(): XParameterizedTypeName =
+        XParameterizedTypeName(config, rawType, List(typeArguments.size) { xStar() }, isNullable)
+
     override fun interopToKotlinInternal(): KPParameterizedTypeName =
         rawType.interopToKotlin().parameterizedBy(typeArguments.map { it.interopToKotlin() })
 
