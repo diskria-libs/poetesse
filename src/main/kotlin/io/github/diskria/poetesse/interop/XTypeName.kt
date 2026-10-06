@@ -30,6 +30,14 @@ fun <J : JPTypeName, X : XTypedTypeName<*, J>> X.box(): XTypedTypeName<*, J> =
     if (isBoxed) this
     else boxInternal()
 
+tailrec fun XTypeName.getJvmErasedUpperBound(): XTypeName = when (this) {
+    is XWildcardTypeName -> outType?.getJvmErasedUpperBound() ?: xType<Any>()
+    is XTypeVariableName -> bounds.firstOrNull()?.getJvmErasedUpperBound() ?: xType<Any>()
+    is XFunctionalTypeName -> jvmRawClassName
+    is XParameterizedTypeName -> rawType
+    else -> this
+}
+
 @Suppress("UNCHECKED_CAST")
 fun <J : JPTypeName, X : XTypedTypeName<*, J>> X.interopToJava(resolveNullability: Boolean = true): J {
     val jpTypeName = interopToJavaInternal()
